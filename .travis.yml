@@ -1,0 +1,15 @@
+language: python
+python:
+ - "2.7"
+
+before_install:
+# We need NumPy, which currently isn't directly available in TravisCI.
+# Installing from source works but is slow and a waste of time. As long
+# as we're using the same version of Python as the system, use a trick
+# from @peterlandry https://github.com/travis-ci/travis-cookbooks/issues/48
+ - "if [[ $TRAVIS_PYTHON_VERSION == '2.7' ]]; then sudo apt-get install python-numpy python-numpy-dev 2>&1 | tail -n 2; fi"
+ - "if [[ $TRAVIS_PYTHON_VERSION == '2.7' ]]; then ln -s /usr/lib/python2.7/dist-packages/numpy ~/virtualenv/python2.7/lib/python2.7/site-packages/; fi"
+
+
+script:
+ - "python graphs.py"
