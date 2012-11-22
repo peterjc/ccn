@@ -3,8 +3,10 @@ python:
  - "2.7"
 
 before_install:
-# We use these for drawing PNG figures of graphs and lattices:
- - "sudo apt-get install python-pydot python-pyparsing graphviz 2>&1 | tail -n 2"
+# We need GraphViz to draw figures of graphs and lattices:
+ - "sudo apt-get install graphviz 2>&1 | tail -n 2"
+# We need these to call GraphViz from Python:
+ - "pip install python-pydot python-pyparsing --use-mirrors | tail -n 2"
 # We need NumPy, which currently isn't directly available in TravisCI.
 # Installing from source works but is slow and a waste of time. As long
 # as we're using the same version of Python as the system, use a trick
