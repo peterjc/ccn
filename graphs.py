@@ -9,7 +9,7 @@ Applied Dynamical Systems (SIADS), to appear 2012/2013. You are welcome to
 use and modify this code provided this copyright notice is retained, however
 we request you cite this manuscript in any scientific publications using it.
 
-We intend to release the code and any public updates to it on GitHub, at:
+This code and any public updates to it are available on GitHub, at:
 https://github.com/peterjc/ccn
 
 Requirements
