@@ -67,6 +67,18 @@ The structure of the script is as follows:
     these entries to look at other graphs of interest.
 
 
+Testing
+-------
+
+The graphs.py script includes its own basic self tests, run automatically when
+you execute `python graphs.py` on your computer.
+
+[![Build Status](https://secure.travis-ci.org/peterjc/ccn.png?branch=master)](https://travis-ci.org/peterjc/ccn)
+
+These tests are also run automatically whenever changes are uploaded to this
+repository using TravisCI, a continuous testing service.
+
+
 Introduction
 ------------
 
