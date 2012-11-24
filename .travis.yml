@@ -14,7 +14,7 @@ before_install:
 # under Python 3.2 due to an installation problem, thus this trick.
 # See https://github.com/travis-ci/travis-cookbooks/issues/48
  - "if [[ $TRAVIS_PYTHON_VERSION == '3.2' ]]; then sudo apt-get install python3-numpy 2>&1 | tail -n 2; fi"
- - "if [[ $TRAVIS_PYTHON_VERSION == '3.2' ]]; then ln -s /usr/lib/python3/dist-packages/numpy ~/virtualenv/python3.2/lib/python3.2/sit
+ - "if [[ $TRAVIS_PYTHON_VERSION == '3.2' ]]; then ln -s /usr/lib/python3/dist-packages/numpy ~/virtualenv/python3.2/lib/python3.2/site-packages/; fi"
 
 install:
 # Don't need to do any install step for Python 2, but for Python 3
