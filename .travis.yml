@@ -1,5 +1,7 @@
 language: python
 python:
+ - "2.5"
+ - "2.6"
  - "2.7"
  - "3.2"
 
@@ -8,15 +10,6 @@ before_install:
  - "sudo apt-get install graphviz 2>&1 | tail -n 2"
 # We need these to call GraphViz from Python:
  - "pip install pydot pyparsing --use-mirrors | tail -n 2"
-# We need NumPy, which currently isn't directly available in TravisCI.
-# Installing from source works but is slow and a waste of time. As long
-# as we're using the same version of Python as the system, use a trick
-# from @peterlandry https://github.com/travis-ci/travis-cookbooks/issues/48
- - "if [[ $TRAVIS_PYTHON_VERSION == '2.7' ]]; then sudo apt-get install python-numpy 2>&1 | tail -n 2; fi"
- - "if [[ $TRAVIS_PYTHON_VERSION == '2.7' ]]; then ln -s /usr/lib/python2.7/dist-packages/numpy ~/virtualenv/python2.7/lib/python2.7/site-packages/; fi"
-#Same trick for NumPy with Python 3.2,
- - "if [[ $TRAVIS_PYTHON_VERSION == '3.2' ]]; then sudo apt-get install python3-numpy 2>&1 | tail -n 2; fi"
- - "if [[ $TRAVIS_PYTHON_VERSION == '3.2' ]]; then ln -s /usr/lib/python3/dist-packages/numpy ~/virtualenv/python3.2/lib/python3.2/site-packages/; fi"
 
 install:
 # Don't need to do any install step for Python 2, but for Python 3
