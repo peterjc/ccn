@@ -5,7 +5,8 @@ Copyright 2010-2012 by Hiroko Kamei & Peter Cock.  All rights reserved.
 This script is provided as a supplementary file for the manuscript by
 Hiroko Kamei and Peter Cock, "Computation of Balanced Equivalence Relations
 and their Lattice for a Coupled Cell Network", submitted to the journal SIAM
-Applied Dynamical Systems (SIADS), to appear 2012/2013. You are welcome to
+Applied Dynamical Systems (SIADS), to appear 2012/2013. An arXiv preprint
+is available at http://arxiv.org/abs/1211.6334 as well. You are welcome to
 use and modify this code provided this copyright notice is retained, however
 we request you cite this manuscript in any scientific publications using it.
 
