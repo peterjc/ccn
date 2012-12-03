@@ -1717,7 +1717,11 @@ class CoupledCellNetwork(object):
         nodes, (124)(3)(5) and (1)(2)(35)(4), and they cover the final node
         (1)(2)(3)(4)(5), which covers no nodes.
         """
-        return CoupledCellLattice(*self.partitions(resume_file))
+        partitions = list(self.partitions(resume_file))
+        # Sort by rank (increasing), then by partition lexically.
+        # rank(p) = max(p) + 1, thus equivalent to sort on max(p)
+        partitions.sort(key=lambda p: (max(p), p))
+        return CoupledCellLattice(*partitions)
 
     def plot(self, filename):
         """Use this function to produce an image file of the graph.
