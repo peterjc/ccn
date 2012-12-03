@@ -1822,6 +1822,191 @@ class CoupledCellNetwork(AdjMatrixGraph):
 
 
 #########################################################################
+# The next set of functions are to create test networks of given classes
+#########################################################################
+
+
+def make_fully(size):
+    """Make a fully connected network (including self coupling)."""
+    e1 = np.ones((size, size), np.int64)
+    return CoupledCellNetwork(e1)
+
+
+def make_fully_no_self1n(size):
+    """Make a fully connected network, excluding self coupling of first & last node."""
+    e1 = np.ones((size, size), np.int64)
+    e1[0, 0] = 0
+    e1[size - 1, size - 1] = 0
+    return CoupledCellNetwork(e1)
+
+
+def make_pyramid(size):
+    """Make a pyramid graph with given number of nodes.
+
+    This makes most sense when the size is a triangle number (1, 3, 6, 10, ...),
+    where each triangle row is fully connected to the rows above/below only.
+
+    >>> g = make_pyramid(5)
+    >>> print(g)
+    0 1 1 0 0 node 1
+    1 0 0 1 1 node 2
+    1 0 0 1 1 node 3
+    0 1 1 0 0 node 4
+    0 1 1 0 0 node 5
+    >>> g.top_lattice_node()
+    ([0, 1, 1, 0, 0], CoupledCellNetwork([[0, 2], [3, 0]]))
+    >>> len(list(g.partitions()))
+    10
+
+    >>> make_pyramid(2).lattice().n
+    2
+    >>> make_pyramid(3).lattice().n
+    2
+    >>> make_pyramid(4).lattice().n
+    7
+    >>> make_pyramid(5).lattice().n
+    10
+    >>> make_pyramid(6).lattice().n
+    30
+    >>> make_pyramid(7).lattice().n
+    10
+    >>> make_pyramid(8).lattice().n
+    20
+    >>> make_pyramid(9).lattice().n
+    50
+    >>> make_pyramid(10).lattice().n
+    150
+
+    """
+    e1 = np.zeros((size, size), np.int64)
+    rows = []
+    row_num = 1
+    row_so_far = 0
+    while len(rows) < size:
+        rows.append(row_num)
+        row_so_far += 1
+        if row_so_far == row_num:
+            row_num += 1
+            row_so_far = 0
+    if size == 1:
+        assert rows == [1], rows
+    elif size == 2:
+        assert rows == [1, 2], rows
+    elif size == 3:
+        assert rows == [1, 2, 2], rows
+    elif size == 4:
+        assert rows == [1, 2, 2, 3], rows
+    elif size == 6:
+        assert rows == [1, 2, 2, 3, 3, 3], rows
+    for i, row_i in enumerate(rows):
+        # Bidirectional connections to lower rows only
+        for j, row_j in enumerate(rows):
+            if row_i + 1 == row_j:
+                e1[i, j] = 1
+                e1[j, i] = 1
+    assert np.all(np.array(e1) == np.array(e1).T), "Not symmetric"
+    return CoupledCellNetwork(e1)
+
+
+def make_chain(size):
+    """Make a CCN of a chain with self coupling at ends (regular network)."""
+    e1 = np.zeros((size, size), np.int64)
+    e1[0, 0] = 1
+    for i in range(size - 1):
+        e1[i, i + 1] = 1
+        e1[i + 1, i] = 1
+    e1[size - 1, size - 1] = 1
+    assert np.all(np.array(e1) == np.array(e1).T), "Not symmetric"
+    return CoupledCellNetwork(e1)
+
+
+def make_chain_b(size):
+    """Make a CCN of a chain without self coupling at ends (not regular)."""
+    e1 = np.zeros((size, size), np.int64)
+    # e1[0,0] = 1
+    for i in range(size - 1):
+        e1[i, i + 1] = 1
+        e1[i + 1, i] = 1
+    # e1[size-1, size-1] = 1
+    assert np.all(np.array(e1) == np.array(e1).T), "Not symmetric"
+    return CoupledCellNetwork(e1)
+
+
+def make_ring(size):
+    """Make a CCN for a directed ring of nodes."""
+    e1 = np.zeros((size, size), np.int64)
+    for i in range(size):
+        e1[i, (i + 1) % size] = 1
+    return CoupledCellNetwork(e1)
+
+
+def make_bi_dir_ring(size):
+    """Make a CCN for a bi-directional ring of nodes."""
+    e1 = np.zeros((size, size), np.int64)
+    for i in range(size):
+        e1[i, (i + 1) % size] = 1
+        e1[(i + 1) % size, i] = 1
+    assert np.all(np.array(e1) == np.array(e1).T), "Not symmetric"
+    return CoupledCellNetwork(e1)
+
+
+def make_bi_dir_nn_ring(size):
+    """Make a CCN for a bi-directional neighbour and next-nearest neighbour ring."""
+    e1 = np.zeros((size, size), np.int64)
+    for i in range(size):
+        e1[i, (i + 2) % size] = 1
+        e1[i, (i + 1) % size] = 1
+        e1[(i + 1) % size, i] = 1
+        e1[(i + 2) % size, i] = 1
+    assert np.all(np.array(e1) == np.array(e1).T), "Not symmetric"
+    return CoupledCellNetwork(e1)
+
+
+def make_bi_dir_ring_cross(size):
+    """Make a CCN for a bi-directional, with cross edges.
+
+    Only supports a even number of nodes. See for example Checco et al. Fig 4.
+    """
+    if (size % 2) != 0:
+        raise ValueError("Even only")
+    half = size // 2
+    e1 = np.zeros((size, size), np.int64)
+    for i in range(size):
+        e1[i, (i + 1) % size] = 1
+        e1[(i + 1) % size, i] = 1
+        e1[i, (i + half) % size] = 1
+        e1[(i + half) % size, i] = 1
+    assert np.all(np.array(e1) == np.array(e1).T), "Not symmetric"
+    return CoupledCellNetwork(e1)
+
+
+def make_in_star(size):
+    """Make a CCN from a star with all nodes connected to first node."""
+    e1 = np.zeros((size, size), np.int64)
+    for i in range(1, size):
+        e1[0, i] = 1
+    return CoupledCellNetwork(e1)
+
+
+def make_out_star(size):
+    """Make a CCN from a star with first node connected to others."""
+    e1 = np.zeros((size, size), np.int64)
+    for i in range(1, size):
+        e1[i, 0] = 1
+    return CoupledCellNetwork(e1)
+
+
+def make_bi_dir_star(size):
+    """Make a CCN from a bidirectional star with first node as center."""
+    e1 = np.zeros((size, size), np.int64)
+    for i in range(1, size):
+        e1[0, i] = 1
+        e1[i, 0] = 1
+    assert np.all(np.array(e1) == np.array(e1).T), "Not symmetric"
+    return CoupledCellNetwork(e1)
+
+
+#########################################################################
 
 print("Runing self-tests...")
 
