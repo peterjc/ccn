@@ -594,7 +594,7 @@ def possible_partition_refinements(top):
     size = max(top)
     k = size + 1
     assert top[0] == 0
-    assert set(range(k)) == set(top)
+    assert set(range(k)) == set(top), "k = %i, yet %r" % (k, set(top))
 
     # for i in range(k):
     #    print(
