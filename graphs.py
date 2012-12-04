@@ -772,6 +772,41 @@ assert not partition_refinement([0, 1, 1, 0], [0, 1, 1, 2])
 assert not partition_refinement([0, 1, 1, 1], [0, 1, 1, 2])
 
 
+def make_partition(classifiers):
+    """Make a partition from list/tuple/sequence of hashable elements.
+
+    Constructs a partition using our representation as a list of integers,
+    for example:
+
+    >>> make_partition("apple")
+    [0, 1, 1, 2, 3]
+    >>> make_partition(["A", "B", "B", "A"])
+    [0, 1, 1, 0]
+
+    This can also be used to 'normalise' a integer classification:
+
+    >>> make_partition([3, 2, 2, 1])
+    [0, 1, 1, 2]
+
+    Note a list of lists is not suitable, convert this into a list of tuples
+    or another hashable datatype first.
+    """
+    partition = []
+    mapping = {}
+    for x in classifiers:
+        if x in mapping:
+            partition.append(mapping[x])
+        elif mapping:
+            partition.append(max(partition) + 1)
+            mapping[x] = partition[-1]
+        else:
+            # First element
+            assert not partition
+            partition = [0]
+            mapping[x] = 0
+    return partition
+
+
 def go(a, name="", format="png", top_only=False):
     """Take a graph, draw it, then print and draw the lattice.
 
