@@ -376,6 +376,54 @@ def make_quotient(adj_matrix, partition):
     return q_matrix_step_2
 
 
+def make_reduced_lattice_eigenvalue_matrix(adj_matrix, partition):
+    """Used as part of reducing a lattice, returns a new matrix or an exception.
+
+    The operations are much like that for computing a quotient matrix
+    or testing if an equivalence relation is balanced - see the function
+    make_quotient defined above.
+
+    First we combine columns, but not simply using addition - more of
+    a binary operation where 0+0 -> 0; a+0 -> a; 0+a -> a; a+b-> error
+    (where a and b are non-zero and distinct). Then we compare rows.
+    """
+    n = len(adj_matrix)  # gives number of rows, but should be square matrix
+
+    assert (n, n) == adj_matrix.shape, "Matrix not square"
+    assert len(partition) == n, "Bad partition"
+
+    k = max(partition) + 1
+    # Check partition entries are 0,1,2,...,k-1:
+    assert set(partition) == set(range(k)), "Bad partition %r" % partition
+
+    if k == n:
+        # Trivial case of no merging
+        return adj_matrix
+
+    # Take column 'sums' to go from n by n matrix to n by k matrix,
+    q_matrix_step_1 = np.zeros([n, k], np.uint8)
+    for (old_col, new_col) in enumerate(partition):
+        for row in range(n):
+            if adj_matrix[row, old_col] == 0:
+                pass
+            elif q_matrix_step_1[row, new_col] == 0:
+                q_matrix_step_1[row, new_col] = adj_matrix[row, old_col]
+            elif q_matrix_step_1[row, new_col] != adj_matrix[row, old_col]:
+                raise ValueError("Nope, can't merge row %r" % row)
+    # Take representative rows to go from n by k matrix to k by k matrix,
+    # note that we needlessly over-write n-k of the rows (simpler to just
+    # do it rather than checking as it doesn't matter).
+    q_matrix_step_2 = np.zeros([k, k], np.uint8)
+    for (old_row, new_row) in enumerate(partition):
+        q_matrix_step_2[new_row, :] = q_matrix_step_1[old_row, :]
+    # Check that all the merged rows agreed (by comparing them to the
+    # representative row picked above):
+    for (old_row, new_row) in enumerate(partition):
+        if not (q_matrix_step_2[new_row, :] == q_matrix_step_1[old_row, :]).all():
+            raise ValueError("Not a valid lattice reduction")
+    return q_matrix_step_2
+
+
 def possible_partitions(n):
     """Return all possible partitions of n nodes as a Python list.
 
@@ -1758,6 +1806,114 @@ class CoupledCellNetwork(object):
         partitions.sort(key=lambda p: (max(p), p))
         return CoupledCellLattice(*partitions)
 
+    def reduced_lattice(self, caption_sep="+", resume_file=None):
+        q_and_p = list(self.quotients_with_partitions(resume_file))
+        q_and_p.sort(key=lambda q_p: (max(q_p[1]), q_p[1]))
+        n = len(q_and_p)
+
+        PLACES = 6  # Used for fuzzy matching of eigenvalues
+
+        if len(self.matrices) > 1:
+            raise NotImplementedError("Only one edge type implemented so far!")
+        all_eigen = sorted(
+            round(e, PLACES) for e in np.linalg.eigvals(self.matrices[0])
+        )
+        unique_eigen = sorted(set(all_eigen))
+
+        partitions = [q_p[1] for q_p in q_and_p]
+        quotients = [q_p[0] for q_p in q_and_p]
+        for q in quotients:
+            assert len(q.matrices) == 1, "Quotient has more edge types than parent!"
+        assert partitions[-1] == list(range(self.n)), (
+            "Bottom lattice node is %r" % partitions[-1]
+        )
+
+        eigenvalues = []
+        for q in quotients:
+            evals = sorted(round(e, PLACES) for e in np.linalg.eigvals(q.matrices[0]))
+            for e in evals:
+                assert e in all_eigen
+                assert evals.count(e) <= all_eigen.count(e)
+            eigenvalues.append(tuple(evals))  # Tuple is hashable, see make_partition
+        for p, q, e in zip(partitions, quotients, eigenvalues):
+            print(p, e)
+            print(q.matrices[0])
+            print("")
+
+        fat_lattice = CoupledCellLattice(*partitions)
+        sym_fat_self = (
+            fat_lattice.matrix + fat_lattice.matrix.T + np.identity(n, np.int8)
+        )
+        print(sym_fat_self)
+        print("")
+        eigen_matrices = [
+            sym_fat_self * np.array([evals.count(e) for evals in eigenvalues])
+            for e in unique_eigen
+        ]
+        # Now do column combination (using a sort of 'or' operation)
+        # and row comparison much like that used to identify if a
+        # partition is balanced.
+        # Only need to consider partitions which merge within the ranks
+        # i.e. sub-partitions of the rank induced partition,
+        # In fact, can go further in reducing the scope, and only
+        # need try merging nodes with same set of eigenvalues.
+        print("Possible reductions:")
+        for p in possible_partition_refinements(make_partition(eigenvalues)):
+            ok = True
+            for m in eigen_matrices:
+                # for e, m in zip(sorted(set(all_eigen)), eigen_matrices):
+                # print(p, e)
+                try:
+                    q = make_reduced_lattice_eigenvalue_matrix(m, p)
+                except ValueError as err:
+                    # print(p, ("<-- No: %s" % err))
+                    ok = False
+                    break
+            if not ok:
+                continue
+            # Prepare reduced lattice captions
+            new_n = max(p) + 1
+            assert q.shape == (new_n, new_n)
+            reduced_nodes = [[] for i in range(new_n)]
+            reduced_eigens = [None] * new_n
+            reduced_ranks = [None] * new_n
+            for i, node_class in enumerate(p):
+                reduced_nodes[node_class].append(partitions[i])
+                reduced_eigens[node_class] = eigenvalues[i]
+                reduced_ranks[node_class] = max(partitions[i])
+            # Assign eta
+            parents = np.identity(new_n, np.uint8)
+            eta = [0] * new_n
+            omega = np.zeros((new_n, len(unique_eigen)), np.int)
+            for r in range(new_n):
+                parents += np.dot(q, parents)
+                for i in range(new_n):
+                    if reduced_ranks[i] == r:
+                        for j in range(len(unique_eigen)):
+                            omega[i, j] = eigenvalues[i].count(unique_eigen[j])
+                        e = r + 1  # start with eta = node's rank
+                        for j in range(new_n):
+                            if reduced_ranks[j] < r and parents[i, j]:
+                                e -= eta[j]
+                                omega[i] -= omega[j]
+                        eta[i] = e
+            if min(eta) < 0 or min(omega[-1]) < 0:
+                continue
+            print("")
+            for i in range(new_n):
+                print("+".join(cyclic_partition(p) for p in reduced_nodes[i]))
+                print("evals=", reduced_eigens[i], "eta=", eta[i], "omega=", omega[i])
+            print(eta)
+            if min(eta) < 0:
+                print(p, "<-- Nice except eta negative")
+                continue
+            assert sum(eta) == 4, eta
+            if omega.min() < 0:
+                print(p, "<-- Nice except omega negative")
+                continue
+            print(p, "<-- Good, %i nodes post reduction" % (max(p) + 1))
+        print("Done")
+
     def plot(self, filename):
         """Use this function to produce an image file of the graph.
 
@@ -2033,6 +2189,20 @@ tests = doctest.testmod()
 if tests.failed:
     raise RuntimeError("%i/%i tests failed" % tests)
 print("Tests done")
+
+
+network = make_bi_dir_ring(6)
+# network = CoupledCellNetwork([[2, 0, 0, 0],
+#                              [2, 0, 0, 0],
+#                              [2, 0, 0, 0],
+#                              [2, 0, 0, 0]])
+print(network)
+lattice = network.lattice()
+print(lattice)
+reduced = network.reduced_lattice()
+print(reduced)
+
+sys.exit(0)
 
 ##########################################################
 # User editable section below
