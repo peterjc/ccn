@@ -1923,7 +1923,7 @@ class CoupledCellNetwork(object):
             if min(eta) < 0:
                 print(p, "<-- Nice except eta negative")
                 continue
-            assert sum(eta) == 4, eta
+            assert sum(eta) == self.n, eta
             if omega.min() < 0:
                 print(p, "<-- Nice except omega negative")
                 continue
