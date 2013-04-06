@@ -1844,7 +1844,7 @@ class CoupledCellNetwork(object):
             "#%i\n%s\n%r\n%r" % (i, caption, partitions[i], eigenvalues[i])
             for (i, caption) in enumerate(tmp_lattice.captions)
         ]
-        tmp_lattice.plot("debug.png")
+        tmp_lattice.plot("reduction_debug.png")
 
         for p, q, e in zip(partitions, quotients, eigenvalues):
             print(p, e)
@@ -1928,7 +1928,7 @@ class CoupledCellNetwork(object):
                 continue
             print("")
             for i in range(new_n):
-                print("+".join(cyclic_partition(p) for p in reduced_nodes[i]))
+                print("+".join(cyclic_partition(tmp) for tmp in reduced_nodes[i]))
                 print("evals=", reduced_eigens[i], "eta=", eta[i], "omega=", omega[i])
             print(eta)
             if min(eta) < 0:
@@ -1939,6 +1939,23 @@ class CoupledCellNetwork(object):
                 print(p, "<-- Nice except omega negative")
                 continue
             print(p, "<-- Good, %i nodes post reduction" % (max(p) + 1))
+
+            # Pick first of each merged node set as representative...
+            tmp_lattice2 = CoupledCellLattice(
+                *[reduced_nodes[i][0] for i in range(new_n)]
+            )
+            assert tmp_lattice2.n == new_n, tmp_lattice2
+            tmp_lattice2.captions = [
+                "%s\n%s\neta=%s\nomega=%s"
+                % (
+                    "+".join("#%i" % partitions.index(tmp) for tmp in reduced_nodes[i]),
+                    "+".join(cyclic_partition(tmp) for tmp in reduced_nodes[i]),
+                    eta[i],
+                    omega[i],
+                )
+                for i in range(new_n)
+            ]
+            tmp_lattice2.plot("reduction_debug2.png")
         print("Done")
 
     def plot(self, filename):
