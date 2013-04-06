@@ -1850,6 +1850,11 @@ class CoupledCellNetwork(object):
             sym_fat_self * np.array([evals.count(e) for evals in eigenvalues])
             for e in unique_eigen
         ]
+        print("")
+        for e, tmp in zip(unique_eigen, eigen_matrices):
+            print("E for eigenvalue", e)
+            print(tmp)
+            print("")
         # Now do column combination (using a sort of 'or' operation)
         # and row comparison much like that used to identify if a
         # partition is balanced.
@@ -2190,12 +2195,24 @@ if tests.failed:
     raise RuntimeError("%i/%i tests failed" % tests)
 print("Tests done")
 
-
-network = make_bi_dir_ring(6)
+# network = CoupledCellNetwork([[0, 0, 1, 1],
+#                              [0, 0, 1, 1],
+#                              [0, 1, 0, 1],
+#                              [0, 1, 0, 1]]) # Number 319, HRL5
+network = CoupledCellNetwork(
+    [
+        [0, 1, 0, 1, 0],
+        [1, 0, 0, 1, 0],
+        [1, 0, 0, 0, 1],
+        [1, 1, 0, 0, 0],
+        [1, 0, 1, 0, 0],
+    ]
+)  # network = make_bi_dir_ring(6)
 # network = CoupledCellNetwork([[2, 0, 0, 0],
 #                              [2, 0, 0, 0],
 #                              [2, 0, 0, 0],
 #                              [2, 0, 0, 0]])
+go(network, "reduction_test_n%i" % network.n)
 print(network)
 lattice = network.lattice()
 print(lattice)
