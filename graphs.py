@@ -1887,6 +1887,10 @@ class CoupledCellNetwork(object):
                     break
             if not ok:
                 continue
+            try:
+                q = make_quotient(tmp_lattice.matrix, p)
+            except ValueError:
+                continue
             # Prepare reduced lattice captions
             new_n = max(p) + 1
             assert q.shape == (new_n, new_n)
@@ -1898,7 +1902,6 @@ class CoupledCellNetwork(object):
                 reduced_eigens[node_class] = eigenvalues[i]
                 reduced_ranks[node_class] = max(partitions[i])
             # Assign eta
-            q = make_quotient(tmp_lattice.matrix, p)
             parents = np.identity(new_n, np.uint8)
             eta = [0] * new_n
             omega = np.zeros((new_n, len(unique_eigen)), np.int)
@@ -2214,21 +2217,25 @@ if tests.failed:
     raise RuntimeError("%i/%i tests failed" % tests)
 print("Tests done")
 
-# network = CoupledCellNetwork([[0, 0, 1, 1],
-#                              [0, 0, 1, 1],
-#                              [0, 1, 0, 1],
-#                              [0, 1, 0, 1]]) # Number 319, HRL5
+
+network = CoupledCellNetwork(
+    [[0, 0, 1, 1], [0, 0, 1, 1], [0, 1, 0, 1], [0, 1, 0, 1]]
+)  # Number 319, HRL5
+
 # network = CoupledCellNetwork([[0, 1, 0, 1, 0],
 #                              [1, 0, 0, 1, 0],
 #                              [1, 0, 0, 0, 1],
 #                              [1, 1, 0, 0, 0],
 #                              [1, 0, 1, 0, 0]])
+
 network = make_bi_dir_ring(6)
+
 # network = CoupledCellNetwork([[2, 0, 0, 0],
 #                              [2, 0, 0, 0],
 #                              [2, 0, 0, 0],
 #                              [2, 0, 0, 0]])
-go(network, "reduction_test_n%i" % network.n)
+
+go(network, "reduction_test")
 print(network)
 lattice = network.lattice()
 print(lattice)
