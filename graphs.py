@@ -1908,7 +1908,8 @@ class CoupledCellNetwork(object):
                         for j in range(len(unique_eigen)):
                             omega[i, j] = eigenvalues[i].count(unique_eigen[j])
                         e = r + 1  # start with eta = node's rank
-                        for j in range(new_n):
+                        for j in range(i):
+                            assert reduced_ranks[j] <= r
                             if reduced_ranks[j] < r and parents[i, j]:
                                 e -= eta[j]
                                 omega[i] -= omega[j]
