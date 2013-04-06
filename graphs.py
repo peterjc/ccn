@@ -1808,6 +1808,8 @@ class CoupledCellNetwork(object):
 
     def reduced_lattice(self, caption_sep="+", resume_file=None):
         q_and_p = list(self.quotients_with_partitions(resume_file))
+        # Sort by rank (increasing), then by partition lexically.
+        # rank(p) = max(p) + 1, thus equivalent to sort on max(p)
         q_and_p.sort(key=lambda q_p: (max(q_p[1]), q_p[1]))
         n = len(q_and_p)
 
@@ -1821,6 +1823,7 @@ class CoupledCellNetwork(object):
         unique_eigen = sorted(set(all_eigen))
 
         partitions = [q_p[1] for q_p in q_and_p]
+        assert partitions == sorted(partitions, key=lambda p: (max(p), p))
         quotients = [q_p[0] for q_p in q_and_p]
         for q in quotients:
             assert len(q.matrices) == 1, "Quotient has more edge types than parent!"
@@ -1835,6 +1838,14 @@ class CoupledCellNetwork(object):
                 assert e in all_eigen
                 assert evals.count(e) <= all_eigen.count(e)
             eigenvalues.append(tuple(evals))  # Tuple is hashable, see make_partition
+
+        tmp_lattice = CoupledCellLattice(*partitions)
+        tmp_lattice.captions = [
+            "#%i\n%s\n%r\n%r" % (i, caption, partitions[i], eigenvalues[i])
+            for (i, caption) in enumerate(tmp_lattice.captions)
+        ]
+        tmp_lattice.plot("debug.png")
+
         for p, q, e in zip(partitions, quotients, eigenvalues):
             print(p, e)
             print(q.matrices[0])
@@ -2199,15 +2210,12 @@ print("Tests done")
 #                              [0, 0, 1, 1],
 #                              [0, 1, 0, 1],
 #                              [0, 1, 0, 1]]) # Number 319, HRL5
-network = CoupledCellNetwork(
-    [
-        [0, 1, 0, 1, 0],
-        [1, 0, 0, 1, 0],
-        [1, 0, 0, 0, 1],
-        [1, 1, 0, 0, 0],
-        [1, 0, 1, 0, 0],
-    ]
-)  # network = make_bi_dir_ring(6)
+# network = CoupledCellNetwork([[0, 1, 0, 1, 0],
+#                              [1, 0, 0, 1, 0],
+#                              [1, 0, 0, 0, 1],
+#                              [1, 1, 0, 0, 0],
+#                              [1, 0, 1, 0, 0]])
+network = make_bi_dir_ring(6)
 # network = CoupledCellNetwork([[2, 0, 0, 0],
 #                              [2, 0, 0, 0],
 #                              [2, 0, 0, 0],
