@@ -1898,6 +1898,7 @@ class CoupledCellNetwork(object):
                 reduced_eigens[node_class] = eigenvalues[i]
                 reduced_ranks[node_class] = max(partitions[i])
             # Assign eta
+            q = make_quotient(tmp_lattice.matrix, p)
             parents = np.identity(new_n, np.uint8)
             eta = [0] * new_n
             omega = np.zeros((new_n, len(unique_eigen)), np.int)
@@ -1906,13 +1907,19 @@ class CoupledCellNetwork(object):
                 for i in range(new_n):
                     if reduced_ranks[i] == r:
                         for j in range(len(unique_eigen)):
-                            omega[i, j] = eigenvalues[i].count(unique_eigen[j])
+                            omega[i, j] = reduced_eigens[i].count(unique_eigen[j])
                         e = r + 1  # start with eta = node's rank
+                        # print("Reduced lattice node %s, start eta %r, omega %r"
+                        #      % (i, e, omega[i]))
                         for j in range(i):
                             assert reduced_ranks[j] <= r
                             if reduced_ranks[j] < r and parents[i, j]:
+                                # print("Considering parent %s, with eta %r, omega %r"
+                                #       % (j, eta[j], omega[j]))
                                 e -= eta[j]
                                 omega[i] -= omega[j]
+                                # print("Reduced lattice node %s, revised eta %r, omega %r"
+                                #       % (i, e, omega[i]))
                         eta[i] = e
             if min(eta) < 0 or min(omega[-1]) < 0:
                 continue
