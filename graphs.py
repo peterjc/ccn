@@ -2240,17 +2240,13 @@ network = CoupledCellNetwork(
     [[0, 0, 1, 1], [0, 0, 1, 1], [0, 1, 0, 1], [0, 1, 0, 1]]
 )  # Number 319, HRL5
 
-network = CoupledCellNetwork(
-    [
-        [0, 1, 0, 1, 0],
-        [1, 0, 0, 1, 0],
-        [1, 0, 0, 0, 1],
-        [1, 1, 0, 0, 0],
-        [1, 0, 1, 0, 0],
-    ]
-)
+# network = CoupledCellNetwork([[0, 1, 0, 1, 0],
+#                              [1, 0, 0, 1, 0],
+#                              [1, 0, 0, 0, 1],
+#                              [1, 1, 0, 0, 0],
+#                              [1, 0, 1, 0, 0]])
 
-# network = make_bi_dir_ring(6)
+network = make_bi_dir_ring(3)
 
 # network = CoupledCellNetwork([[2, 0, 0, 0],
 #                              [2, 0, 0, 0],
