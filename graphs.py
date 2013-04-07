@@ -1887,12 +1887,9 @@ class CoupledCellNetwork(object):
                     break
             if not ok:
                 continue
-            try:
-                q = make_quotient(tmp_lattice.matrix, p)
-            except ValueError:
-                continue
             # Prepare reduced lattice captions
             new_n = max(p) + 1
+            q = np.zeros((new_n, new_n), np.uint8)
             assert q.shape == (new_n, new_n)
             reduced_nodes = [[] for i in range(new_n)]
             reduced_eigens = [None] * new_n
@@ -1901,6 +1898,10 @@ class CoupledCellNetwork(object):
                 reduced_nodes[node_class].append(partitions[i])
                 reduced_eigens[node_class] = eigenvalues[i]
                 reduced_ranks[node_class] = max(partitions[i])
+                # Simple merge of lattice connectivity...
+                for j, tmp in enumerate(p):
+                    if tmp_lattice.matrix[i, j]:
+                        q[node_class, tmp] = 1
             # Assign eta
             parents = np.identity(new_n, np.uint8)
             eta = [0] * new_n
@@ -2239,13 +2240,17 @@ network = CoupledCellNetwork(
     [[0, 0, 1, 1], [0, 0, 1, 1], [0, 1, 0, 1], [0, 1, 0, 1]]
 )  # Number 319, HRL5
 
-# network = CoupledCellNetwork([[0, 1, 0, 1, 0],
-#                              [1, 0, 0, 1, 0],
-#                              [1, 0, 0, 0, 1],
-#                              [1, 1, 0, 0, 0],
-#                              [1, 0, 1, 0, 0]])
+network = CoupledCellNetwork(
+    [
+        [0, 1, 0, 1, 0],
+        [1, 0, 0, 1, 0],
+        [1, 0, 0, 0, 1],
+        [1, 1, 0, 0, 0],
+        [1, 0, 1, 0, 0],
+    ]
+)
 
-network = make_bi_dir_ring(6)
+# network = make_bi_dir_ring(6)
 
 # network = CoupledCellNetwork([[2, 0, 0, 0],
 #                              [2, 0, 0, 0],
