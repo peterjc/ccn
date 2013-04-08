@@ -1839,19 +1839,18 @@ class CoupledCellNetwork(object):
                 assert evals.count(e) <= all_eigen.count(e)
             eigenvalues.append(tuple(evals))  # Tuple is hashable, see make_partition
 
-        tmp_lattice = CoupledCellLattice(*partitions)
-        tmp_lattice.captions = [
-            "#%i\n%s\n%r\n%r" % (i, caption, partitions[i], eigenvalues[i])
-            for (i, caption) in enumerate(tmp_lattice.captions)
-        ]
-        tmp_lattice.plot("reduction_debug.png")
-
         for p, q, e in zip(partitions, quotients, eigenvalues):
             print(p, e)
             print(q.matrices[0])
             print("")
 
         fat_lattice = CoupledCellLattice(*partitions)
+        # Expand the captions with more details for exploration/debug use:
+        fat_lattice.captions = [
+            "#%i\n%s\n%r\n%r" % (i, caption, partitions[i], eigenvalues[i])
+            for (i, caption) in enumerate(fat_lattice.captions)
+        ]
+        fat_lattice.plot("reduction_debug.png")
         sym_fat = fat_lattice.matrix + fat_lattice.matrix.T
         print(sym_fat)
         print("")
@@ -1898,7 +1897,7 @@ class CoupledCellNetwork(object):
                 reduced_ranks[node_class] = max(partitions[i])
                 # Simple merge of lattice connectivity...
                 for j, tmp in enumerate(p):
-                    if tmp_lattice.matrix[i, j]:
+                    if fat_lattice.matrix[i, j]:
                         q[node_class, tmp] = 1
             # Assign eta
             parents = np.identity(new_n, np.uint8)
