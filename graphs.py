@@ -1852,13 +1852,11 @@ class CoupledCellNetwork(object):
             print("")
 
         fat_lattice = CoupledCellLattice(*partitions)
-        sym_fat_self = (
-            fat_lattice.matrix + fat_lattice.matrix.T + np.identity(n, np.int8)
-        )
-        print(sym_fat_self)
+        sym_fat = fat_lattice.matrix + fat_lattice.matrix.T
+        print(sym_fat)
         print("")
         eigen_matrices = [
-            sym_fat_self * np.array([evals.count(e) for evals in eigenvalues])
+            sym_fat * np.array([evals.count(e) for evals in eigenvalues])
             for e in unique_eigen
         ]
         print("")
