@@ -97,7 +97,7 @@ be typed as a nested list of integers:
     ...                                [0,1,0,0,0],
     ...                                [0,0,1,0,0],
     ...                                [1,0,0,0,0]])
-    >>> print network7
+    >>> print(network7)
     0 0 0 1 0 node 1
     1 0 0 0 0 node 2
     0 1 0 0 0 node 3
@@ -121,7 +121,7 @@ The network object has a method to calculate those cell partitions which are
 balanced equivalence relations (balanced colourings):
 
     >>> for p in network7.partitions():
-    ...     print "%r or %s" % (p, cyclic_partition(p))
+    ...     print("%r or %s" % (p, cyclic_partition(p)))
     [0, 0, 0, 0, 0] or (12345)
     [0, 0, 0, 0, 1] or (1234)(5)
     [0, 1, 0, 1, 1] or (13)(245)
@@ -134,7 +134,7 @@ well. There is also a method which uses the balanced equivalence relations to
 build a lattice:
 
     >>> lattice7 = network7.lattice()
-    >>> print lattice7
+    >>> print(lattice7)
     0 0 0 0 0 0 (12345)
     1 0 0 0 0 0 (1234)(5)
     1 0 0 0 0 0 (13)(245)
@@ -198,7 +198,7 @@ edge types):
     ...                                [0,1,0,0,0],
     ...                                [0,0,0,0,0],
     ...                                [0,0,0,0,0]])
-    >>> print network3
+    >>> print(network3)
     (0,0) (0,0) (0,0) (0,1) (0,0) node 1
     (1,0) (0,0) (0,0) (0,0) (0,0) node 2
     (0,0) (0,1) (0,0) (0,0) (0,0) node 3
@@ -213,7 +213,7 @@ same as before, for example notice how there are only 4 balanced equivalence
 relations (compared to the regular network #7 used above with 6):
 
     >>> for p in network3.partitions():
-    ...     print "%r or %s" % (p, cyclic_partition(p))
+    ...     print("%r or %s" % (p, cyclic_partition(p)))
     [0, 1, 0, 1, 1] or (13)(245)
     [0, 1, 0, 1, 2] or (13)(24)(5)
     [0, 1, 2, 3, 1] or (1)(25)(3)(4)
@@ -221,7 +221,7 @@ relations (compared to the regular network #7 used above with 6):
 
 Taking the second of these partitions gives a three cell quotient network:
 
-    >>> print network3.quotient([0, 1, 0, 1, 2])
+    >>> print(network3.quotient([0, 1, 0, 1, 2]))
     (0,0) (0,1) (0,0) node 1+3
     (1,0) (0,0) (0,0) node 2+4
     (1,0) (0,0) (0,0) node 5
@@ -229,7 +229,7 @@ Taking the second of these partitions gives a three cell quotient network:
 And using the balanced equivalence relations to build the lattice:
 
     >>> lattice = network3.lattice()
-    >>> print lattice
+    >>> print(lattice)
     0 0 0 0 (13)(245)
     1 0 0 0 (13)(24)(5)
     1 0 0 0 (1)(25)(3)(4)
@@ -260,6 +260,9 @@ triangular matrix. Graphically:
 The idea is you can edit the examples in last section of this file to run this
 program on particular networks of interest.
 """
+
+#For Python 2/3 transition, use print function:
+from __future__ import print_function
 
 import os
 import sys
@@ -313,14 +316,14 @@ def make_quotient(adj_matrix, partition):
 
     >>> import numpy as np
     >>> a = np.array([[1,0,1],[2,0,1],[0,0,2]])
-    >>> print a
+    >>> print(a)
     [[1 0 1]
      [2 0 1]
      [0 0 2]]
 
     Take the trivial partition (no node merging):
 
-    >>> print make_quotient(a, [0, 1, 2])
+    >>> print(make_quotient(a, [0, 1, 2]))
     [[1 0 1]
      [2 0 1]
      [0 0 2]]
@@ -329,14 +332,14 @@ def make_quotient(adj_matrix, partition):
     first and last nodes (nodes 0 and 2 in python zero based counting, 1 and 3
     in normal one based counting) giving a 2x2 quotient matrix:
 
-    >>> print make_quotient(a, [0, 1, 0])
+    >>> print(make_quotient(a, [0, 1, 0]))
     [[2 0]
      [3 0]]
 
     Finally, here is a partition which is not a balanced equivalence relation,
     and therefore hasn't got a quotient matrix:
 
-    >>> print make_quotient(a, [0, 1, 1])
+    >>> print(make_quotient(a, [0, 1, 1]))
     Traceback (most recent call last):
     ...
     ValueError: Not a balanced equivalence relation
@@ -382,14 +385,14 @@ def possible_partitions(n):
     For example:
 
     >>> for partition in possible_partitions(1):
-    ...     print partition
+    ...     print(partition)
     [0]
     >>> for partition in possible_partitions(2):
-    ...     print partition
+    ...     print(partition)
     [0, 0]
     [0, 1]
     >>> for partition in possible_partitions(3):
-    ...     print partition
+    ...     print(partition)
     [0, 0, 0]
     [0, 0, 1]
     [0, 1, 0]
@@ -405,7 +408,7 @@ def possible_partitions(n):
     was made since Python considers [0, 1, 1] < [1, 0, 0]. 
 
     >>> for partition in possible_partitions(4):
-    ...     print partition
+    ...     print(partition)
     [0, 0, 0, 0]
     [0, 0, 0, 1]
     [0, 0, 1, 0]
@@ -451,23 +454,23 @@ def possible_partitions_of_required_size(n, min_size):
     """Specialised version of function possible_partitions
 
     >>> for partition in possible_partitions_of_required_size(2, 1):
-    ...     print partition
+    ...     print(partition)
     [0, 0]
     [0, 1]
 
     >>> for partition in possible_partitions_of_required_size(2, 2):
-    ...     print partition
+    ...     print(partition)
     [0, 1]
 
     >>> for partition in possible_partitions_of_required_size(3, 2):
-    ...     print partition
+    ...     print(partition)
     [0, 0, 1]
     [0, 1, 0]
     [0, 1, 1]
     [0, 1, 2]
 
     >>> for partition in possible_partitions_of_required_size(4, 3):
-    ...     print partition
+    ...     print(partition)
     [0, 0, 1, 2]
     [0, 1, 0, 2]
     [0, 1, 1, 2]
@@ -477,7 +480,7 @@ def possible_partitions_of_required_size(n, min_size):
     [0, 1, 2, 3]
 
     >>> for partition in possible_partitions_of_required_size(4, 4):
-    ...     print partition
+    ...     print(partition)
     [0, 1, 2, 3]
 
     >>> len(list(possible_partitions_of_required_size(3, 2)))
@@ -520,7 +523,7 @@ def possible_partition_refinements(top):
     For example, consider 4 nodes and their partitions:
 
     >>> for partition in possible_partitions(4):
-    ...     print partition, cyclic_partition(partition)
+    ...     print(partition, cyclic_partition(partition))
     [0, 0, 0, 0] (1234)
     [0, 0, 0, 1] (123)(4)
     [0, 0, 1, 0] (124)(3)
@@ -543,10 +546,10 @@ def possible_partition_refinements(top):
     that would include some false positives which are not relevant.
 
     >>> top = [0, 0, 1, 1]
-    >>> print cyclic_partition(top)
+    >>> print(cyclic_partition(top))
     (12)(34)
     >>> for partition in possible_partition_refinements(top):
-    ...     print partition, cyclic_partition(partition)
+    ...     print(partition, cyclic_partition(partition))
     [0, 0, 1, 1] (12)(34)
     [0, 0, 1, 2] (12)(3)(4)
     [0, 1, 2, 2] (1)(2)(34)
@@ -556,10 +559,10 @@ def possible_partition_refinements(top):
     with five nodes:
 
     >>> top = [0, 0, 1, 1, 2]
-    >>> print cyclic_partition(top)
+    >>> print(cyclic_partition(top))
     (12)(34)(5)
     >>> for partition in possible_partition_refinements(top):
-    ...     print partition, cyclic_partition(partition)
+    ...     print(partition, cyclic_partition(partition))
     [0, 0, 1, 1, 2] (12)(34)(5)
     [0, 0, 1, 2, 3] (12)(3)(4)(5)
     [0, 1, 2, 2, 3] (1)(2)(34)(5)
@@ -569,7 +572,7 @@ def possible_partition_refinements(top):
 
     >>> for partition in possible_partitions(len(top)):
     ...     if partition_refinement(partition, top) or partition==top:
-    ...         print partition, cyclic_partition(partition) 
+    ...         print(partition, cyclic_partition(partition)) 
     [0, 0, 1, 1, 2] (12)(34)(5)
     [0, 0, 1, 2, 3] (12)(3)(4)(5)
     [0, 1, 2, 2, 3] (1)(2)(34)(5)
@@ -630,21 +633,21 @@ def cyclic_partition(partition, sep="", captions=[]):
     notation (by default counting the nodes from one rather than zero
     as is normal in Python):
 
-    >>> print cyclic_partition([0,0,1,0,2])
+    >>> print(cyclic_partition([0,0,1,0,2]))
     (124)(3)(5)
 
     You can insert a separator between nodes (useful if not all single
     digits):
 
-    >>> print cyclic_partition([0,0,1,0,2], "+")
+    >>> print(cyclic_partition([0,0,1,0,2], "+"))
     (1+2+4)(3)(5)
 
     You can also supply node names:
 
-    >>> print cyclic_partition([0,0,1,0,2], "+", "abcde")
+    >>> print(cyclic_partition([0,0,1,0,2], "+", "abcde"))
     (a+b+d)(c)(e)
-    >>> print cyclic_partition([0,0,1,0,2], "+",
-    ...                        ["red", "green", "blue", "black", "white"])
+    >>> print(cyclic_partition([0,0,1,0,2], "+",
+    ...                        ["red", "green", "blue", "black", "white"]))
     (red+green+black)(blue)(white)
     """
     #Get number of merged nodes (equivalence classes):
@@ -703,7 +706,7 @@ def partition_refinement(partition_a, partition_b):
     ...    for b in partitions:
     ...        cyc_b = cyclic_partition(b)
     ...        if partition_refinement(a,b):
-    ...           print "%s refines %s" % (cyc_a, cyc_b)
+    ...           print("%s refines %s" % (cyc_a, cyc_b))
     (1234)(5) refines (12345)
     (13)(245) refines (12345)
     (13)(24)(5) refines (12345)
@@ -783,10 +786,10 @@ def go(a, name='', format="png", top_only=False):
     """
     if not isinstance(a, CoupledCellNetwork):
         raise TypeError("Expected a CoupledCellNetwork object.")
-    print '='*50
-    print
-    print "%s network adjacency matrix:" % name
-    print a
+    print('='*50)
+    print()
+    print("%s network adjacency matrix:" % name)
+    print(a)
     if a.n > 9:
         sep = "+"
     else:
@@ -800,13 +803,13 @@ def go(a, name='', format="png", top_only=False):
     if name and not os.path.isfile("%s_top_node.%s" % (name, format)):
         q.plot("%s_top_node.%s" % (name, format))
     if top_only:
-        print
-        print "Lattice top node (balanced equlivalence relationship with least clusters) %0.1fs:" % taken
-        print
-        print "Partition: %s" % cyclic_partition(p, sep)
-        print
-        print "Quotient matrix:"
-        print q
+        print()
+        print("Lattice top node (balanced equlivalence relationship with least clusters) %0.1fs:" % taken)
+        print()
+        print("Partition: %s" % cyclic_partition(p, sep))
+        print()
+        print("Quotient matrix:")
+        print(q)
     else:
         #Calculate the quotients with partitions and the resulting lattice
         #(all in one go to avoid duplicated computation, you could also use
@@ -816,28 +819,28 @@ def go(a, name='', format="png", top_only=False):
         l = a.lattice()
         taken = time.time() - start
         for p in l.partitions:
-            print
-            print "Partition %s, quotient matrix:" % cyclic_partition(p, sep)
+            print()
+            print("Partition %s, quotient matrix:" % cyclic_partition(p, sep))
             q = a.quotient(p)
             if max(p)+1 < a.n:
                 #Non-trivial
-                print q
+                print(q)
             else:
-                print "(trivial)"
+                print("(trivial)")
         #l = a.lattice()
-        print
-        print "%s Lattice matrix:" % name
-        print l
-        print
+        print()
+        print("%s Lattice matrix:" % name)
+        print(l)
+        print()
         if taken < 60:
-            print "Lattice took %0.1fs" % taken
+            print("Lattice took %0.1fs" % taken)
         elif taken < 360:
-            print "Lattice took %0.1fmins" % (taken/60)
+            print("Lattice took %0.1fmins" % (taken/60))
         else:
-            print "Lattice took %0.1fhours" % (taken/360)
+            print("Lattice took %0.1fhours" % (taken/360))
         if name and not os.path.isfile("%s_lattice.%s" % (name, format)):
             l.plot("%s_lattice.%s" % (name, format))
-        print '(%i lattice nodes)' % l.n
+        print('(%i lattice nodes)' % l.n)
 
 
 class AdjMatrixGraph(object):
@@ -857,7 +860,7 @@ class AdjMatrixGraph(object):
         >>> my_matrix = AdjMatrixGraph([[1,0,1],[1,1,0],[0,0,1]])
         >>> my_matrix
         AdjMatrixGraph([[1, 0, 1], [1, 1, 0], [0, 0, 1]])
-        >>> print my_matrix
+        >>> print(my_matrix)
         1 0 1
         1 1 0
         0 0 1
@@ -911,7 +914,7 @@ class CoupledCellLattice(AdjMatrixGraph):
         ...                              [0,1,0,1,2],
         ...                              [0,1,2,3,1],
         ...                              [0,1,2,3,4])
-        >>> print lattice
+        >>> print(lattice)
         0 0 0 0 (13)(245)
         1 0 0 0 (13)(24)(5)
         1 0 0 0 (1)(25)(3)(4)
@@ -969,9 +972,9 @@ class CoupledCellLattice(AdjMatrixGraph):
             #refinement = np.array([[partition_refinement(a,b) for b in partitions]\
             #                        for a in partitions], np.bool)
         except MemoryError, e:
-            print "Out of memory problem? Lattice of %i partitions" % n
+            print("Out of memory problem? Lattice of %i partitions" % n)
             for p,r in zip(partitions, ranks):
-                print p,r
+                print(p,r)
             raise MemoryError("Out of memory problem? Lattice of %i partitions" % n)
 
         #Making a lower triangular matrix
@@ -1003,7 +1006,7 @@ class CoupledCellLattice(AdjMatrixGraph):
             edge_matrix = refinement.copy()
             #TODO - Can we do this in-situ (so needing less RAM)?
         except MemoryError, e:
-            print "Out of memory problem removing redundant edges in lattice of %i partitions" % n
+            print("Out of memory problem removing redundant edges in lattice of %i partitions" % n)
             raise MemoryError("Out of memory problem? Lattice of %i partitions" % n)
         for row in range(n):
             for col in range(n):
@@ -1110,14 +1113,14 @@ class CoupledCellNetwork(AdjMatrixGraph):
         e.g.
 
         >>> ccn1 = CoupledCellNetwork([[1,0,1],[1,1,0],[0,0,1]])
-        >>> print ccn1
+        >>> print(ccn1)
         1 0 1 node 1
         1 1 0 node 2
         0 0 1 node 3
 
         >>> ccn2 = CoupledCellNetwork([[1,0,1],[1,1,0],[0,0,1]],
         ...                           [[0,2,1],[0,0,0],[2,0,0]])
-        >>> print ccn2
+        >>> print(ccn2)
         (1,0) (0,2) (1,1) node 1
         (1,0) (1,0) (0,0) node 2
         (0,2) (0,0) (1,0) node 3
@@ -1187,7 +1190,7 @@ class CoupledCellNetwork(AdjMatrixGraph):
         [0, 1, 0, 1, 1]
         >>> network3.input_driven_refinement([0, 1, 0, 1, 1])
         [0, 1, 0, 1, 1]
-        >>> print cyclic_partition([0, 1, 0, 1, 1])
+        >>> print(cyclic_partition([0, 1, 0, 1, 1]))
         (13)(245)
 
         See also the method top_lattice_node which calls this method repeatedly
@@ -1221,7 +1224,7 @@ class CoupledCellNetwork(AdjMatrixGraph):
         #>>> p = [0]*16
         #>>> for i in range(16): print single_edge_color_counts(i, big.matrices[0], len(p), max(p)+1, p)
         
-        >>> print big.input_driven_refinement([0]*16)
+        >>> print(big.input_driven_refinement([0]*16))
         [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
 
         """
@@ -1310,7 +1313,7 @@ class CoupledCellNetwork(AdjMatrixGraph):
         ...                                [0,0,0,0,0],
         ...                                [0,0,0,0,0]])
         >>> p, q = network3.top_lattice_node()
-        >>> print p
+        >>> print(p)
         [0, 1, 0, 1, 1]
 
         This more complicated example should match Figure 5 in Belykh and Hasler (2011),
@@ -1354,10 +1357,10 @@ class CoupledCellNetwork(AdjMatrixGraph):
         ...                           [0, 0, 0, 0,  1, 0, 0, 0,  0, 0, 0, 0,  1, 0, 0, 0],
         ...                           [0, 0, 0, 0,  0, 0, 0, 0,  0, 0, 0, 0,  0, 2, 0, 0],
         ...                           [0, 0, 0, 0,  0, 0, 0, 0,  0, 0, 0, 0,  0, 0, 2, 0]])
-        >>> print  big.input_driven_refinement([0]*16)
+        >>> print(big.input_driven_refinement([0]*16))
         [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
         >>> p, q = big.top_lattice_node()
-        >>> print cyclic_partition(p, "+")
+        >>> print(cyclic_partition(p, "+"))
         (1+2+3+4+5+6+7+8+9+10+11+12+13+14+15+16)
 
         """
@@ -1397,7 +1400,7 @@ class CoupledCellNetwork(AdjMatrixGraph):
         ...       [1,0,0,0,0],
         ...       [1,0,0,0,0]]
         >>> a = CoupledCellNetwork(e1,e2)
-        >>> print a
+        >>> print(a)
         (0,0) (1,1) (0,0) (1,0) (0,0) node 1
         (1,0) (0,0) (0,0) (1,1) (0,0) node 2
         (0,1) (0,0) (1,0) (0,0) (1,0) node 3
@@ -1408,12 +1411,12 @@ class CoupledCellNetwork(AdjMatrixGraph):
         (balanced colourings), including the trivial partition which merges
         all the nodes:
 
-        >>> print a.quotient([0,0,0,0,0])
+        >>> print(a.quotient([0,0,0,0,0]))
         (2,1) node 1+2+3+4+5
 
         This more interesting partition gives a 3 by 3 quotient network:
 
-        >>> print a.quotient([0,0,1,0,2])
+        >>> print(a.quotient([0,0,1,0,2]))
         (2,1) (0,0) (0,0) node 1+2+4
         (0,1) (1,0) (1,0) node 3
         (0,1) (1,0) (1,0) node 5
@@ -1437,8 +1440,8 @@ class CoupledCellNetwork(AdjMatrixGraph):
         ...                         [1,1,0,0],
         ...                         [0,0,1,0]])
         >>> for q, p in a.quotients_with_partitions():
-        ...     print "Quotient with %i nodes: %s" % (q.n, cyclic_partition(p))
-        ...     print q
+        ...     print("Quotient with %i nodes: %s" % (q.n, cyclic_partition(p)))
+        ...     print(q)
         Quotient with 3 nodes: (1)(24)(3)
         0 2 0 node 1
         0 0 1 node 2+4
@@ -1526,8 +1529,8 @@ class CoupledCellNetwork(AdjMatrixGraph):
         ...                         [1,1,0,0],
         ...                         [0,0,1,0]])
         >>> for q in a.quotients():
-        ...     print "Quotient with %i nodes:" % q.n
-        ...     print q
+        ...     print("Quotient with %i nodes:" % q.n)
+        ...     print(q)
         Quotient with 3 nodes:
         0 2 0 node 1
         0 0 1 node 2+4
@@ -1552,7 +1555,7 @@ class CoupledCellNetwork(AdjMatrixGraph):
         ...                         [1,1,0,0],
         ...                         [0,0,1,0]])
         >>> for p in a.partitions():
-        ...     print p, cyclic_partition(p)
+        ...     print(p, cyclic_partition(p))
         [0, 1, 2, 1] (1)(24)(3)
         [0, 1, 2, 3] (1)(2)(3)(4)
 
@@ -1640,14 +1643,14 @@ class CoupledCellNetwork(AdjMatrixGraph):
         ...       [1,0,0,0,0],
         ...       [1,0,0,0,0]]
         >>> a = CoupledCellNetwork(e1,e2)
-        >>> print a
+        >>> print(a)
         (0,0) (1,1) (0,0) (1,0) (0,0) node 1
         (1,0) (0,0) (0,0) (1,1) (0,0) node 2
         (0,1) (0,0) (1,0) (0,0) (1,0) node 3
         (1,1) (1,0) (0,0) (0,0) (0,0) node 4
         (0,1) (0,0) (1,0) (0,0) (1,0) node 5
         >>> q = a.lattice()
-        >>> print q
+        >>> print(q)
         0 0 0 0 0 (12345)
         1 0 0 0 0 (124)(35)
         0 1 0 0 0 (124)(3)(5)
@@ -1751,13 +1754,13 @@ class CoupledCellNetwork(AdjMatrixGraph):
 
 #########################################################################
 
-print "Runing self-tests..."
+print("Runing self-tests...")
 import doctest
 tests = doctest.testmod()
 if tests[0]:
     #Note on Python 2.5+ can use tests.failed rather than tests[0]
     raise RuntimeError("%i/%i tests failed" % tests)
-print "Tests done"
+print("Tests done")
 
 ##########################################################
 # User editable section below
@@ -1954,9 +1957,9 @@ e1 = [[0,1,1,0,0,0,0,0,0,0],
       [0,0,0,1,1,1,0,0,0,0]]
 assert np.all(np.array(e1) == np.array(e1).T), "Not symmetric"
 
-print
-print "="*50
-print "Warning this next one prints out a lot... (big lattice!)"
+print()
+print("="*50)
+print("Warning this next one prints out a lot... (big lattice!)")
 go(CoupledCellNetwork(e1), "n10")
 
 ######################################################
@@ -2229,4 +2232,5 @@ e1= [[0,1,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,0,1],
      [1,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,1,0,0,0,1,0]]
 go(CoupledCellNetwork(e1), "tangled22")
 
-print "Done"
+print("Done")
+
