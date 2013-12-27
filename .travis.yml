@@ -17,9 +17,8 @@ before_install:
 
 install:
 # Don't need to do any install step for Python 2, but for Python 3
-# must run 2to3 (twice, once for doctests, once for main code):
- - "if [[ $TRAVIS_PYTHON_VERSION == '3.2' ]]; then 2to3 -w -n --no-diffs -d graphs.py 2>&1 | tail -n 2; fi"
- - "if [[ $TRAVIS_PYTHON_VERSION == '3.2' ]]; then 2to3 -w -n --no-diffs graphs.py 2>&1 | tail -n 2; fi"
+# must run 2to3 (once for main code, doctests don't need changing):
+ - "if [[ $TRAVIS_PYTHON_VERSION == '3.2' ]]; then 2to3 -w -n --no-diffs -x print graphs.py 2>&1; fi"
  - "echo Ready to test..."
 
 script:
