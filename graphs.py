@@ -261,8 +261,9 @@ The idea is you can edit the examples in last section of this file to run this
 program on particular networks of interest.
 """
 
-#For Python 2/3 transition, use print function:
-from __future__ import print_function
+#For Python 2.6 and 2.7 could use the print function
+#via 'from __future__ import print_function' but that
+#won't work under Python 2.4 or 2.5
 
 import os
 import sys
@@ -523,7 +524,7 @@ def possible_partition_refinements(top):
     For example, consider 4 nodes and their partitions:
 
     >>> for partition in possible_partitions(4):
-    ...     print(partition, cyclic_partition(partition))
+    ...     print("%s %s" % (partition, cyclic_partition(partition)))
     [0, 0, 0, 0] (1234)
     [0, 0, 0, 1] (123)(4)
     [0, 0, 1, 0] (124)(3)
@@ -549,7 +550,7 @@ def possible_partition_refinements(top):
     >>> print(cyclic_partition(top))
     (12)(34)
     >>> for partition in possible_partition_refinements(top):
-    ...     print(partition, cyclic_partition(partition))
+    ...     print("%s %s" % (partition, cyclic_partition(partition)))
     [0, 0, 1, 1] (12)(34)
     [0, 0, 1, 2] (12)(3)(4)
     [0, 1, 2, 2] (1)(2)(34)
@@ -562,7 +563,7 @@ def possible_partition_refinements(top):
     >>> print(cyclic_partition(top))
     (12)(34)(5)
     >>> for partition in possible_partition_refinements(top):
-    ...     print(partition, cyclic_partition(partition))
+    ...     print("%s %s" % (partition, cyclic_partition(partition)))
     [0, 0, 1, 1, 2] (12)(34)(5)
     [0, 0, 1, 2, 3] (12)(3)(4)(5)
     [0, 1, 2, 2, 3] (1)(2)(34)(5)
@@ -572,7 +573,7 @@ def possible_partition_refinements(top):
 
     >>> for partition in possible_partitions(len(top)):
     ...     if partition_refinement(partition, top) or partition==top:
-    ...         print(partition, cyclic_partition(partition)) 
+    ...         print("%s %s" % (partition, cyclic_partition(partition))) 
     [0, 0, 1, 1, 2] (12)(34)(5)
     [0, 0, 1, 2, 3] (12)(3)(4)(5)
     [0, 1, 2, 2, 3] (1)(2)(34)(5)
@@ -786,8 +787,8 @@ def go(a, name='', format="png", top_only=False):
     """
     if not isinstance(a, CoupledCellNetwork):
         raise TypeError("Expected a CoupledCellNetwork object.")
-    print('='*50)
-    print()
+    print("=" * 50)
+    print("")
     print("%s network adjacency matrix:" % name)
     print(a)
     if a.n > 9:
@@ -803,11 +804,11 @@ def go(a, name='', format="png", top_only=False):
     if name and not os.path.isfile("%s_top_node.%s" % (name, format)):
         q.plot("%s_top_node.%s" % (name, format))
     if top_only:
-        print()
+        print("")
         print("Lattice top node (balanced equlivalence relationship with least clusters) %0.1fs:" % taken)
-        print()
+        print("")
         print("Partition: %s" % cyclic_partition(p, sep))
-        print()
+        print("")
         print("Quotient matrix:")
         print(q)
     else:
@@ -819,7 +820,7 @@ def go(a, name='', format="png", top_only=False):
         l = a.lattice()
         taken = time.time() - start
         for p in l.partitions:
-            print()
+            print("")
             print("Partition %s, quotient matrix:" % cyclic_partition(p, sep))
             q = a.quotient(p)
             if max(p)+1 < a.n:
@@ -828,10 +829,10 @@ def go(a, name='', format="png", top_only=False):
             else:
                 print("(trivial)")
         #l = a.lattice()
-        print()
+        print("")
         print("%s Lattice matrix:" % name)
         print(l)
-        print()
+        print("")
         if taken < 60:
             print("Lattice took %0.1fs" % taken)
         elif taken < 360:
@@ -1554,8 +1555,8 @@ class CoupledCellNetwork(AdjMatrixGraph):
         ...                         [0,0,1,0],
         ...                         [1,1,0,0],
         ...                         [0,0,1,0]])
-        >>> for p in a.partitions():
-        ...     print(p, cyclic_partition(p))
+        >>> for partition in a.partitions():
+        ...     print("%s %s" % (partition, cyclic_partition(partition)))
         [0, 1, 2, 1] (1)(24)(3)
         [0, 1, 2, 3] (1)(2)(3)(4)
 
@@ -1957,7 +1958,7 @@ e1 = [[0,1,1,0,0,0,0,0,0,0],
       [0,0,0,1,1,1,0,0,0,0]]
 assert np.all(np.array(e1) == np.array(e1).T), "Not symmetric"
 
-print()
+print("")
 print("="*50)
 print("Warning this next one prints out a lot... (big lattice!)")
 go(CoupledCellNetwork(e1), "n10")
