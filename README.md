@@ -30,8 +30,8 @@ and 2.7, and has been tested under Python 3.2, which requires conversion using
 the 2to3 script which comes with recent versions Python:
 
     cp graphs.py graphs_py3.py 
-    2to3 -w -n --no-diffs -d graphs_py3.py 
-    2to3 -w -n --no-diffs graphs_py3.py 
+    2to3 -w -n --no-diffs -x print graphs_py3.py 
+    python3 graphs_py3.py 
 
 It requires NumPy (Numerical Python), available from http://numpy.scipy.org
 This is used for array support, in particular matrix multiplication. This

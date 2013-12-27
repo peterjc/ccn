@@ -24,9 +24,9 @@ This was written using Python 2.6, and has been tested on Python 2.4, 2.5, 2.6
 and 2.7, and has been tested under Python 3.2, which requires conversion using
 the 2to3 script which comes with recent versions Python:
 
-cp graphs.py graphs_py3.py 
-2to3 -w -n --no-diffs -d graphs_py3.py 
-2to3 -w -n --no-diffs graphs_py3.py 
+    cp graphs.py graphs_py3.py
+    2to3 -w -n --no-diffs -x print graphs_py3.py
+    python3 graphs_py3.py
 
 It requires NumPy (Numerical Python), available from http://numpy.scipy.org
 This is used for array support, in particular matrix multiplication. This
@@ -46,13 +46,13 @@ At the command prompt (terminal window), assuming this file has been saved
 as graphs.py in the current directory, on Mac or Linux you would run this
 code by typing:
 
-python graphs.py
+    python graphs.py
 
 On Windows, assuming you have installed Python 2.7 in the default location,
 you would use the following in the command prompt (also called a "DOS box"
 or terminal window):
 
-C:\Python27\python graphs.py
+    C:\Python27\python graphs.py
 
 The script should then run, printing output to the screen, and (assuming the
 GraphViz requirements are installed) also generate a number of image files.
