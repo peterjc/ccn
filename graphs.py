@@ -261,34 +261,31 @@ The idea is you can edit the examples in last section of this file to run this
 program on particular networks of interest.
 """
 
-#For Python 2.6 and 2.7 could use the print function
-#via 'from __future__ import print_function' but that
-#won't work under Python 2.4 or 2.5
+# For Python 2.6 and 2.7, allows us to use non-trivial print
+# statements beyond print(my_string) which works on Python 2 & 3.
+from __future__ import print_function
 
 import os
 import sys
 import time
 import shutil
-import numpy as np
+from itertools import product
+
+if "-v" in sys.argv or "--version" in sys.argv:
+    print("Couple Cell Network graphs.py v1.0.1")
+    sys.exit(0)
+
+try:
+    import numpy as np
+except ImportError:
+    sys.stderr.write("Please install NumPy\n")
+    sys.exit(1)
+
 try:
     import pydot
 except ImportError:
     sys.stderr.write("Please install pyparsing, pydot & graphviz if you want "
                      "to draw graphs or lattice diagrams\n")
-
-try:
-    from itertools import product
-except:
-    #Fallback for pre-Python 2.6
-    def product(*args, **kwds):
-        # product('ABCD', 'xy') --> Ax Ay Bx By Cx Cy Dx Dy
-        # product(range(2), repeat=3) --> 000 001 010 011 100 101 110 111
-        pools = map(tuple, args) * kwds.get('repeat', 1)
-        result = [[]]
-        for pool in pools:
-            result = [x+[y] for x in result for y in pool]
-        for prod in result:
-            yield tuple(prod)
 
 MAXLAT = 42294 #Increase this if you have a big powerful computer and are patient ;)
 
