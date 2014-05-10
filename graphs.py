@@ -972,7 +972,7 @@ class CoupledCellLattice(AdjMatrixGraph):
             #Note this includes zeros (False)  on the diagonal:
             #refinement = np.array([[partition_refinement(a,b) for b in partitions]\
             #                        for a in partitions], np.bool)
-        except MemoryError, e:
+        except MemoryError as e:
             print("Out of memory problem? Lattice of %i partitions" % n)
             for p,r in zip(partitions, ranks):
                 print(p,r)
@@ -1006,7 +1006,7 @@ class CoupledCellLattice(AdjMatrixGraph):
         try:
             edge_matrix = refinement.copy()
             #TODO - Can we do this in-situ (so needing less RAM)?
-        except MemoryError, e:
+        except MemoryError as e:
             print("Out of memory problem removing redundant edges in lattice of %i partitions" % n)
             raise MemoryError("Out of memory problem? Lattice of %i partitions" % n)
         for row in range(n):
