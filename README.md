@@ -18,6 +18,17 @@ This code and any public updates to it are available on GitHub, at:
 https://github.com/peterjc/ccn
 
 
+History
+-------
+
+| Version | Description                                                      |
+|---------|------------------------------------------------------------------|
+| v1.0.0  | - Supported Python 2.4, 2.5, 2.6, 2.7 directly, and worked under |
+|         |   Python 3 via the 2to3 conversion script.                       |
+| v1.0.1  | - Dropped support for Python 2.4 and 2.5, but now runs unmodifed |
+|         |   on Python 2.6, 2.7 and Python 3.2, 3.3 and 3.4.                |
+
+
 Requirements
 ------------
 
@@ -25,18 +36,13 @@ This script requires Python. Python is pre-installed on Apple Mac OS X, and on
 Linux distributions is easily installable via the package manager. For Windows
 use one of the installers available from http://www.python.org
 
-This was written using Python 2.6, and has been tested on Python 2.4, 2.5, 2.6
-and 2.7, and has been tested under Python 3.2, which requires conversion using
-the 2to3 script which comes with recent versions Python:
-
-    cp graphs.py graphs_py3.py 
-    2to3 -w -n --no-diffs -x print graphs_py3.py 
-    python3 graphs_py3.py 
+While it originally supported older versions of Python, this script has been
+updated to work unmodified on Python 2.6, 2.7, and Python 3.2, 3.3, 3.4 (and
+is expected to work on future Python 3 releases).
 
 It requires NumPy (Numerical Python), available from http://numpy.scipy.org
 This is used for array support, in particular matrix multiplication. This
-was originally written using NumPy 1.3.0, but a more recent version should
-also work.
+should work with NumPy 1.6 or later.
 
 In order to draw the graphs or lattices, it requires the free tool GraphViz
 available from http://www.graphviz.org and a small python library to call
