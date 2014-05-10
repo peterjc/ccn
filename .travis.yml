@@ -3,23 +3,15 @@ python:
  - "2.6"
  - "2.7"
  - "3.2"
+ - "3.3"
+ - "3.4"
 
 before_install:
 # We need GraphViz to draw figures of graphs and lattices:
  - "sudo apt-get install graphviz 2>&1 | tail -n 2"
 # We need these to call GraphViz from Python:
  - "pip install pydot pyparsing --use-mirrors | tail -n 2"
-# We need NumPy, which currently isn't directly available in TravisCI
-# under Python 3.2 due to an installation problem, thus this trick.
-# See https://github.com/travis-ci/travis-cookbooks/issues/48
- - "if [[ $TRAVIS_PYTHON_VERSION == '3.2' ]]; then sudo apt-get install python3-numpy 2>&1 | tail -n 2; fi"
- - "if [[ $TRAVIS_PYTHON_VERSION == '3.2' ]]; then ln -s /usr/lib/python3/dist-packages/numpy ~/virtualenv/python3.2/lib/python3.2/site-packages/; fi"
-
-install:
-# Don't need to do any install step for Python 2, but for Python 3
-# must run 2to3 (once for main code, doctests don't need changing):
- - "if [[ $TRAVIS_PYTHON_VERSION == '3.2' ]]; then 2to3 -w -n --no-diffs -x print graphs.py 2>&1; fi"
- - "echo Ready to test..."
+# We also need NumPy, which TravisCI should have by default now :)
 
 script:
  - "python graphs.py"
