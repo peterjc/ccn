@@ -981,22 +981,25 @@ class CoupledCellLattice(AdjMatrixGraph):
                     if linked:
                         refinement[row,col] = linked
 
-        #Now remove redundant edges
+        # Now remove redundant edges
         try:
             edge_matrix = refinement.copy()
-            #TODO - Can we do this in-situ (so needing less RAM)?
+            # TODO - Can we do this in-situ (so needing less RAM)?
         except MemoryError as e:
             print("Out of memory problem removing redundant edges in lattice of %i partitions" % n)
             raise MemoryError("Out of memory problem? Lattice of %i partitions" % n)
         for row in range(n):
             for col in range(n):
                 if col < row and refinement[row,col] and ranks[col]+1 < ranks[row]:
-                    #This edge jumps at least one rank, so could be redundant
-                    #print "Checking %s <-> %s" % (cyclic_partition(partitions[row]), cyclic_partition(partitions[col]))
+                    # This edge jumps at least one rank, so could be redundant
+                    # print("Checking %s <-> %s" % (cyclic_partition(partitions[row]),
+                    #                               cyclic_partition(partitions[col]))
                     for mid in range(col, row):
                         if refinement[row,mid] and refinement[mid,col]:
-                            #This other point provides a route => edge was redundant
-                            #print "Found %s <-> %s <-> %s" % (cyclic_partition(partitions[row]), cyclic_partition(partitions[mid]), cyclic_partition(partitions[col]))
+                            # This other point provides a route => edge was redundant
+                            # print("Found %s <-> %s <-> %s" % (cyclic_partition(partitions[row]),
+                            #                                   cyclic_partition(partitions[mid]),
+                            #                                   cyclic_partition(partitions[col])))
                             edge_matrix[row, col] = False
                             break
 
@@ -1492,7 +1495,7 @@ class CoupledCellNetwork(AdjMatrixGraph):
                             h.write("%r\n" % partition)
                             h.flush()
                         except ValueError:
-                           pass
+                            pass
                     elif partition == last_good_partition:
                         last_good_partition = None
                 h.write("DONE\t%i\n" % count)
