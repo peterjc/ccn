@@ -468,24 +468,24 @@ def possible_partitions_of_required_size(n, min_size):
     14
 
     """
-    #This is a recursive function
+    # This is a recursive function
     if n < 1:
         raise ValueError("Require n at least one, not %r" % n)
     elif min_size < 1:
         raise ValueError("Require positive size, not %r" % min_size)
     elif min_size > n:
         raise StopIteration
-        raise ValueError("Size (%r) must be at most n (%r)" % (min_size, n))
+        # raise ValueError("Size (%r) must be at most n (%r)" % (min_size, n))
     elif n == 1:
         if min_size == 1:
             yield [0]
     else:
-        #Get the possible first n-1 digits of the possible
-        #partitions by recursion:
+        # Get the possible first n-1 digits of the possible
+        # partitions by recursion:
         for p in possible_partitions_of_required_size(n-1, max(1,min_size-1)):
-            #The possible final digit for these partitions is
-            #given by x = 0, 1, ..., max(p), max(p)+1
-            #(which by construction means it will be at most n).
+            # The possible final digit for these partitions is
+            # given by x = 0, 1, ..., max(p), max(p)+1
+            # (which by construction means it will be at most n).
             for x in range(max(p) + 2):
                 if max(max(p),x) + 1 >= min_size:
                     yield p+[x]
@@ -950,7 +950,7 @@ class CoupledCellLattice(AdjMatrixGraph):
             #Note this includes zeros (False)  on the diagonal:
             #refinement = np.array([[partition_refinement(a,b) for b in partitions]\
             #                        for a in partitions], np.bool)
-        except MemoryError as e:
+        except MemoryError:
             print("Out of memory problem? Lattice of %i partitions" % n)
             for p,r in zip(partitions, ranks):
                 print(p,r)
@@ -984,7 +984,7 @@ class CoupledCellLattice(AdjMatrixGraph):
         try:
             edge_matrix = refinement.copy()
             # TODO - Can we do this in-situ (so needing less RAM)?
-        except MemoryError as e:
+        except MemoryError:
             print("Out of memory problem removing redundant edges in lattice of %i partitions" % n)
             raise MemoryError("Out of memory problem? Lattice of %i partitions" % n)
         for row in range(n):
