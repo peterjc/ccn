@@ -254,7 +254,7 @@ import shutil
 from itertools import product
 
 if "-v" in sys.argv or "--version" in sys.argv:
-    print("Couple Cell Network graphs.py v1.0.1")
+    print("Coupled Cell Network graphs.py v1.0.2")
     sys.exit(0)
 
 try:
@@ -603,7 +603,7 @@ def possible_partition_refinements(top):
         #print "-"*40, ">", new_partition
         yield new_partition
 
-def cyclic_partition(partition, sep="", captions=[]):
+def cyclic_partition(partition, sep="", captions=None):
     """Display a partition in cyclic form.
 
     If the matrix has n nodes, then the partition should be given as
