@@ -1360,7 +1360,7 @@ class CoupledCellNetwork(AdjMatrixGraph):
             q=self.quotient(p)
             return p, q
         except ValueError:
-            raise RunTimeError("Top lattice node %r was not balanced" % p)
+            raise RuntimeError("Top lattice node %r was not balanced" % p)
 
     def quotient(self, partition):
         """Returns another adj matrix, or raises an exception.
