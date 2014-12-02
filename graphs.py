@@ -250,7 +250,6 @@ from __future__ import print_function
 import os
 import sys
 import time
-import shutil
 from itertools import product
 
 if "-v" in sys.argv or "--version" in sys.argv:
