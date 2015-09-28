@@ -12,7 +12,7 @@ before_install:
  - "sudo apt-get install graphviz"
 # We need these to call GraphViz from Python:
  - "pip install --upgrade pip"
- - "pip install pydot pyparsing"
+ - "pip install pydot-ng pyparsing"
 # We also need NumPy, which TravisCI should have by default now :)
 
 script:
