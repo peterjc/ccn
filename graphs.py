@@ -265,8 +265,14 @@ except ImportError:
 try:
     import pydot
 except ImportError:
-    sys.stderr.write("Please install pyparsing, pydot & graphviz if you want "
-                     "to draw graphs or lattice diagrams\n")
+    try:
+        # Try this API compatible version which works on Python 3
+        import pydot_ng as pydot
+    except ImportError:
+        pydot = None
+        sys.stderr.write("Please install pyparsing, pydot & graphviz if you want "
+                         "to draw graphs or lattice diagrams\n")
+
 
 MAXLAT = 42294 #Increase this if you have a big powerful computer and are patient ;)
 
@@ -1026,9 +1032,7 @@ class CoupledCellLattice(AdjMatrixGraph):
         It uses pydot library to talk to GraphViz to do this.
         """
         n = self.n
-        try:
-            import pydot
-        except ImportError:
+        if pydot is None:
             sys.stderr.write("Please install graphviz, pydot and pyparsing "
                              "to draw lattice diagrams\n")
             return
@@ -1676,9 +1680,7 @@ class CoupledCellNetwork(AdjMatrixGraph):
         type is determined from the filename extension (e.g. PNG, PDF).
         """
         n = self.n
-        try:
-            import pydot
-        except ImportError:
+        if pydot is None:
             sys.stderr.write("Please install graphviz, pydot and pyparsing "
                              "to draw graphs\n")
             return
