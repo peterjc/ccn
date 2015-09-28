@@ -253,7 +253,7 @@ import time
 from itertools import product
 
 if "-v" in sys.argv or "--version" in sys.argv:
-    print("Coupled Cell Network graphs.py v1.0.2")
+    print("Coupled Cell Network graphs.py v1.0.3")
     sys.exit(0)
 
 try:
@@ -1713,7 +1713,7 @@ class CoupledCellNetwork(AdjMatrixGraph):
                   'magenta', 'pink', 'yellow', 'navy',
                   'sienna', 'brown', 'crimson', 'cyan']
         STYLES = ['solid', 'dashed', 'dotted', 'bold']
-        LINE_COLOR_STYLES = zip(COLORS, STYLES*3)
+        LINE_COLOR_STYLES = list(zip(COLORS, STYLES*3))
 
         if len(self.matrices) > len(LINE_COLOR_STYLES):
             raise ValueError("Too many edge types, define some more valid "
