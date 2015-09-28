@@ -5,12 +5,13 @@ python:
  - "3.2"
  - "3.3"
  - "3.4"
+ - "3.5"
 
 before_install:
 # We need GraphViz to draw figures of graphs and lattices:
- - "sudo apt-get install graphviz 2>&1 | tail -n 2"
+ - "sudo apt-get install graphviz"
 # We need these to call GraphViz from Python:
- - "pip install pydot pyparsing --use-mirrors | tail -n 2"
+ - "pip install pydot pyparsing"
 # We also need NumPy, which TravisCI should have by default now :)
 
 script:
