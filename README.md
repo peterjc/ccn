@@ -27,6 +27,10 @@ History
 |         |   Python 3 via the 2to3 conversion script.                       |
 | v1.0.1  | - Dropped support for Python 2.4 and 2.5, but now runs unmodifed |
 |         |   on Python 2.6, 2.7 and Python 3.2, 3.3 and 3.4.                |
+| v1.0.2  | - Made the Python script executable; fixed typo.                 |
+| v1.0.3  | - Minor coding style updates.                                    |
+|         | - Can use pydot_ng as Python 3 alternative to pydot.             |
+|         | - Fix for graphical output under Python 3.                       |
 
 
 Requirements
@@ -46,8 +50,11 @@ should work with NumPy 1.6 or later.
 
 In order to draw the graphs or lattices, it requires the free tool GraphViz
 available from http://www.graphviz.org and a small python library to call
-GraphViz called pydot from http://code.google.com/p/pydot/ which in turn
+GraphViz called pydot from https://github.com/erocarrera/pydot which in turn
 requires pyparsing from http://sourceforge.net/projects/pyparsing/
+
+Currently pydot has not been updated to work on Python 3, instead you can
+install pydot_ng https://github.com/pydot/pydot-ng
 
 
 Usage
