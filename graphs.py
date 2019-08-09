@@ -337,7 +337,10 @@ def make_quotient(adj_matrix, partition):
     NotBalancedError: Not a balanced equivalence relation
     """
     n = len(adj_matrix)  # gives number of rows, but should be square matrix
-    assert (n, n) == adj_matrix.shape, "Matrix not square"
+    if (n, n) != adj_matrix.shape:
+        raise ValueError(
+            "Adjacency matrix should be square, not %s" % repr(adj_matrix.shape)
+        )
     assert len(partition) == n, "Bad partition"
 
     # Get number of merged nodes (equivalence classes):
@@ -871,9 +874,13 @@ class AdjMatrixGraph(object):
         # Turn the edges into a NumPy array (if they are not already),
         # could be a list of lists of ints for example:
         # Assuming a number of (repeat) edges is limited to 255 (saves RAM)
-        self.matrix = np.array(edge_matrix, np.uint8)
-        assert (n, n) == self.matrix.shape, "Adjacency matrix should be square"
-        assert self.matrix.min() >= 0, "Entries should be non-negative"
+        self.matrix = matrix = np.array(edge_matrix, np.uint8)
+        if (n, n) != matrix.shape:
+            raise ValueError(
+                "Adjacency matrix should be square, not %s" % repr(matrix.shape)
+            )
+        if matrix.min() < 0:
+            raise ValueError("Entries should be non-negative, %r" % matrix)
 
     def __str__(self):
         """Return string representation of the matrix, used by the print command."""
@@ -1151,7 +1158,10 @@ class CoupledCellNetwork(AdjMatrixGraph):
                 self.n = n
             # Turn it into a numpy array (in case it wasn't already)
             matrix = np.array(matrix, np.uint8)
-            assert (n, n) == matrix.shape, "All edge matrices must be same size"
+            if (n, n) != matrix.shape:
+                raise ValueError(
+                    "All edge matrixes must be (%i, %i), not %r" % (n, n, matrix.shape)
+                )
             self.matrices.append(matrix)
 
     def __str__(self):
