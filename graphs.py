@@ -595,7 +595,7 @@ def possible_partition_refinements(top):
         # print sub_parts, "-->"
         new_partition = []
         old_index = [0] * k
-        mapping = dict()
+        mapping = {}
         for old in top:
             sub = sub_parts[old][old_index[old]]
             # print sub_parts, "-->", old, sub_parts[old], old_index[old], sub
@@ -727,7 +727,7 @@ def partition_refinement(partition_a, partition_b):
         # See where number "i" occurs in partition a,
         positions = [p for p, v in enumerate(partition_a) if v == i]
         # Make sure these all belong to the same partition in b
-        if len(set([partition_b[p] for p in positions])) > 1:
+        if len({partition_b[p] for p in positions}) > 1:
             # Failed - b is not a refinement (sub partition) of a
             return False
     return True
@@ -992,7 +992,7 @@ class CoupledCellLattice(AdjMatrixGraph):
                     # refinement[row,col] = partition_refinement(a,b)
                     linked = True
                     for positions in all_positions:
-                        if len(set([b[p] for p in positions])) > 1:
+                        if len({b[p] for p in positions}) > 1:
                             # Failed - b is not a refinement (sub partition) of a
                             linked = False
                             break
