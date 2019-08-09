@@ -2179,7 +2179,7 @@ assert [sum(row) for row in e1] == [1, 2, 1, 1, 2, 1, 1, 1, 1, 1, 2, 2, 1, 2, 1,
 ]
 # fmt: off
 assert [sum(e1[i][j] for i in range(16)) for j in range(16)] == [
-    1, 2, 2, 3, 3, 2, 3, 2, 2, 1, 1, 2, 2, 3, 2, 1,
+    1, 1, 1, 2, 2, 1, 2, 1, 1, 1, 1, 1, 2, 2, 1, 1
 ], [sum(e1[i][j] for j in range(16)) for i in range(16)]
 # fmt: on
 go(CoupledCellNetwork(e1), "Lehnert_2010_Syncline_Poster")
