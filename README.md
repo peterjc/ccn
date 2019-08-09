@@ -23,6 +23,7 @@ History
 
 | Version | Description                                                      |
 |---------|------------------------------------------------------------------|
+| v1.0.4  | - Testing Python 3.5 to 3.8 only; dropped Python 2 support.      |
 | v1.0.3  | - Minor coding style updates.                                    |
 |         | - Can use pydot_ng as Python 3 alternative to pydot.             |
 |         | - Fix for graphical output under Python 3.                       |

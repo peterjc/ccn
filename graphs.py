@@ -2,6 +2,8 @@
 """Algorithm to find balanced equivalence relations and lattices.
 
 Copyright 2010-2012 by Hiroko Kamei & Peter Cock.  All rights reserved.
+Revisions copyright 2012-2019 Peter Cock. All rights reserved.
+
 This script is provided as a supplementary file for the manuscript by
 Hiroko Kamei and Peter Cock, "Computation of Balanced Equivalence Relations
 and their Lattice for a Coupled Cell Network", submitted to the journal SIAM
@@ -30,11 +32,11 @@ code by typing:
 
     python graphs.py
 
-On Windows, assuming you have installed Python 2.7 in the default location,
+On Windows, assuming you have installed Python 3.7 in the default location,
 you would use the following in the command prompt (also called a "DOS box"
 or terminal window):
 
-    C:\Python27\python graphs.py
+    C:\Python37\python graphs.py
 
 The script should then run, printing output to the screen, and (assuming the
 GraphViz requirements are installed) also generate a number of image files.
@@ -243,9 +245,6 @@ The idea is you can edit the examples in last section of this file to run this
 program on particular networks of interest.
 """
 
-# For Python 2.6 and 2.7, allows us to use non-trivial print
-# statements beyond print(my_string) which works on Python 2 & 3.
-from __future__ import print_function
 
 import os
 import sys
@@ -253,14 +252,13 @@ import time
 from itertools import product
 
 if "-v" in sys.argv or "--version" in sys.argv:
-    print("Coupled Cell Network graphs.py v1.0.3")
+    print("Coupled Cell Network graphs.py v1.0.4")
     sys.exit(0)
 
 try:
     import numpy as np
 except ImportError:
-    sys.stderr.write("Please install NumPy\n")
-    sys.exit(1)
+    sys.exit("Please install NumPy")
 
 try:
     import pydot
@@ -1741,8 +1739,7 @@ class CoupledCellNetwork(AdjMatrixGraph):
 print("Runing self-tests...")
 import doctest
 tests = doctest.testmod()
-if tests[0]:
-    #Note on Python 2.5+ can use tests.failed rather than tests[0]
+if tests.failed:
     raise RuntimeError("%i/%i tests failed" % tests)
 print("Tests done")
 
