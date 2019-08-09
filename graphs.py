@@ -278,7 +278,7 @@ MAXLAT = 42294  # Increase this if you have a big powerful computer and are pati
 
 
 def make_quotient(adj_matrix, partition):
-    """Returns quotient adjacency matrix, or raises an exception.
+    """Return quotient adjacency matrix, or raises an exception.
 
     This is the core algorithm described in the manuscript.
 
@@ -761,7 +761,7 @@ assert not partition_refinement([0, 1, 1, 1], [0, 1, 1, 2])
 
 
 def go(a, name="", format="png", top_only=False):
-    """Function to take a graph, draw it, then print and draw the lattice.
+    """Take a graph, draw it, then print and draw the lattice.
 
     Given a CoupledCellNetwork object (and an optional name for it), it shows
     the adjacency matrix (and draws it to a file), those partitions which are
@@ -842,9 +842,7 @@ class AdjMatrixGraph(object):
     """Object to represent a graph using an adjacency matrix."""
 
     def __init__(self, edge_matrix):
-        """This function is called when an AdjMatrixGraph object is created.
-
-        Note that init is short for initialise.
+        """Initialise an AdjMatrixGraph object.
 
         edge_matrix - adjacency matrix to define the connections.
                       Either a square numpy array object, square
@@ -872,7 +870,7 @@ class AdjMatrixGraph(object):
         assert self.matrix.min() >= 0, "Entries should be non-negative"
 
     def __str__(self):
-        """String representation of the matrix, used by the print command."""
+        """Return string representation of the matrix, used by the print command."""
         answer = []
         n = self.n
         x = max(len(str(self.matrix[i, j])) for i in range(n) for j in range(n))
@@ -881,15 +879,15 @@ class AdjMatrixGraph(object):
         return "\n".join(answer)
 
     def __repr__(self):
-        """String representation of the matrix."""
+        """Return string representation of the matrix."""
         return "%s(%r)" % (self.__class__.__name__, self.matrix.tolist())
 
 
 class CoupledCellLattice(AdjMatrixGraph):
-    """Object for a balanced equivalence relation lattice."""
+    """Balanced equivalence relation lattice."""
 
     def __init__(self, *partitions):
-        r"""This function is called when an CoupledCellLattice object is created.
+        r"""Initialise a CoupledCellLattice object.
 
         You can create a lattice object "by hand" if required. However, you are
         normally expected to create a CoupledCellNetwork object and use its
@@ -1033,7 +1031,7 @@ class CoupledCellLattice(AdjMatrixGraph):
         self.captions = [cyclic_partition(p, sep) for p in partitions]
 
     def __str__(self):
-        """String representation of the matrix, used by the print command."""
+        """Return string representation of the matrix, used by the print command."""
         answer = []
         n = self.n
         x = max(len(str(self.matrix[i, j])) for i in range(n) for j in range(n))
@@ -1113,9 +1111,7 @@ class CoupledCellNetwork(AdjMatrixGraph):
     """
 
     def __init__(self, *edge_matrices):
-        """This function is called when an CoupledCellNetwork object is created.
-
-        Note that init is short for initialise.
+        """Initialise a CoupledCellNetwork object.
 
         edge_matrices - One or more adjacency matrices to define the
                         connections. Use one matrix for each edge type.
@@ -1153,7 +1149,7 @@ class CoupledCellNetwork(AdjMatrixGraph):
             self.matrices.append(matrix)
 
     def __str__(self):
-        """String representation of the matrix, used by the print command."""
+        """Return string representation of the matrix, used by the print command."""
         answer = []
         n = self.n
         try:
@@ -1191,7 +1187,7 @@ class CoupledCellNetwork(AdjMatrixGraph):
         return "\n".join(answer)
 
     def __repr__(self):
-        """String representation for debugging."""
+        """Return string representation of the matrix."""
         answer = ", ".join(repr(m.tolist()) for m in self.matrices)
         return "%s(%s)" % (self.__class__.__name__, answer)
 
@@ -1310,7 +1306,7 @@ class CoupledCellNetwork(AdjMatrixGraph):
         return answer
 
     def top_lattice_node(self):
-        """Returns the top/minimal partition and its quotient matrix.
+        """Return the top/minimal partition and its quotient matrix.
 
         Uses an algorithm combining Aldis (2008) and Belykh and Hasler (2011)
         to find the lattice top node, which is the balanced equivalence relation
@@ -1411,7 +1407,7 @@ class CoupledCellNetwork(AdjMatrixGraph):
             raise RuntimeError("Top lattice node %r was not balanced" % p)
 
     def quotient(self, partition):
-        """Returns another adj matrix, or raises an exception.
+        """Return another quotient network adjacency matrix, or raise exception.
 
         If the matrix has n nodes, then the partition should be given as
         a list of n integers between 0 and k-1, where k is the number of
@@ -1462,7 +1458,7 @@ class CoupledCellNetwork(AdjMatrixGraph):
         return q
 
     def quotients_with_partitions(self, resume_file=None):
-        """Generator function, returning smaller matrices and partitions.
+        """Return quotients (smaller matrices) and partitions (generator function).
 
         This allows you to iterate over all valid quotient networks:
 
@@ -1555,7 +1551,7 @@ class CoupledCellNetwork(AdjMatrixGraph):
             # All done
 
     def quotients(self, resume_file=None):
-        """Generator function, returning smaller matrices.
+        """Return quotients as smaller matrices (generator function).
 
         This allows you to iterate over all valid quotient networks:
 
@@ -1581,7 +1577,7 @@ class CoupledCellNetwork(AdjMatrixGraph):
         return (q for q, p in self.quotients_with_partitions(resume_file))
 
     def partitions(self, resume_file=None):
-        """Generator function, returns those partitions which are balanced.
+        """Return those partitions which are balanced (generator function).
 
         This allows you to iterate over all valid balanced equivalence relations:
 
@@ -1665,7 +1661,7 @@ class CoupledCellNetwork(AdjMatrixGraph):
                 yield p
 
     def lattice(self, caption_sep="+", resume_file=None):
-        r"""Finds balanced equivalence relations and builds lattice.
+        r"""Find balanced equivalence relations and build lattice.
 
         Consider graph #5 from the manuscript, which has two edge types:
 
