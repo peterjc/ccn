@@ -797,8 +797,8 @@ def go(a, name="", format="png", top_only=False):
     if top_only:
         print("")
         print(
-            "Lattice top node (balanced equlivalence relationship with least clusters) %0.1fs:"
-            % taken
+            "Lattice top node "
+            "(balanced equlivalence relationship with least clusters) %0.1fs:" % taken
         )
         print("")
         print("Partition: %s" % cyclic_partition(p, sep))
@@ -1003,8 +1003,8 @@ class CoupledCellLattice(AdjMatrixGraph):
             # TODO - Can we do this in-situ (so needing less RAM)?
         except MemoryError:
             print(
-                "Out of memory problem removing redundant edges in lattice of %i partitions"
-                % n
+                "Out of memory problem removing redundant edges "
+                "in lattice of %i partitions" % n
             )
             raise MemoryError("Out of memory problem? Lattice of %i partitions" % n)
         for row in range(n):
@@ -1016,9 +1016,12 @@ class CoupledCellLattice(AdjMatrixGraph):
                     for mid in range(col, row):
                         if refinement[row, mid] and refinement[mid, col]:
                             # This other point provides a route => edge was redundant
-                            # print("Found %s <-> %s <-> %s" % (cyclic_partition(partitions[row]),
-                            #                                   cyclic_partition(partitions[mid]),
-                            #                                   cyclic_partition(partitions[col])))
+                            # print(
+                            #     "Found %s <-> %s <-> %s"
+                            #     % (cyclic_partition(partitions[row]),
+                            #        cyclic_partition(partitions[mid]),
+                            #        cyclic_partition(partitions[col]))
+                            # )
                             edge_matrix[row, col] = False
                             break
 
@@ -1054,7 +1057,7 @@ class CoupledCellLattice(AdjMatrixGraph):
             )
             return
 
-        # Use the OS path module's "Split Extension" function, work out the file extension
+        # Use the OS path module's "Split Extension" function
         extension = os.path.splitext(filename)[-1]
         # Check that there was a leading "."
         assert extension[0] == os.path.extsep
@@ -1227,22 +1230,23 @@ class CoupledCellNetwork(AdjMatrixGraph):
 
         Here is a larger example using repeated edges (but only one edge type):
 
-        >>> big = CoupledCellNetwork([[0, 0, 0, 2,  0, 0, 0, 0,  0, 0, 0, 0,  0, 0, 0, 0],
-        ...                           [1, 0, 0, 0,  0, 0, 0, 0,  0, 0, 0, 0,  1, 0, 0, 0],
-        ...                           [0, 2, 0, 0,  0, 0, 0, 0,  0, 0, 0, 0,  0, 0, 0, 0],
-        ...                           [0, 0, 2, 0,  0, 0, 0, 0,  0, 0, 0, 0,  0, 0, 0, 0],
-        ...                           [0, 0, 0, 1,  0, 0, 0, 0,  0, 0, 0, 0,  0, 0, 0, 1],
-        ...                           [0, 0, 0, 0,  2, 0, 0, 0,  0, 0, 0, 0,  0, 0, 0, 0],
-        ...                           [0, 0, 0, 0,  0, 2, 0, 0,  0, 0, 0, 0,  0, 0, 0, 0],
-        ...                           [0, 0, 0, 0,  0, 0, 2, 0,  0, 0, 0, 0,  0, 0, 0, 0],
-        ...                           [0, 0, 0, 0,  0, 0, 0, 2,  0, 0, 0, 0,  0, 0, 0, 0],
-        ...                           [0, 0, 0, 0,  0, 0, 0, 0,  2, 0, 0, 0,  0, 0, 0, 0],
-        ...                           [0, 0, 0, 0,  0, 0, 0, 0,  0, 1, 0, 0,  0, 1, 0, 0],
-        ...                           [0, 0, 0, 0,  0, 0, 1, 0,  0, 0, 1, 0,  0, 0, 0, 0],
-        ...                           [0, 0, 0, 0,  0, 0, 0, 0,  0, 0, 0, 2,  0, 0, 0, 0],
-        ...                           [0, 0, 0, 0,  1, 0, 0, 0,  0, 0, 0, 0,  1, 0, 0, 0],
-        ...                           [0, 0, 0, 0,  0, 0, 0, 0,  0, 0, 0, 0,  0, 2, 0, 0],
-        ...                           [0, 0, 0, 0,  0, 0, 0, 0,  0, 0, 0, 0,  0, 0, 2, 0]])
+        >>> big = CoupledCellNetwork([
+        ...     [0, 0, 0, 2,  0, 0, 0, 0,  0, 0, 0, 0,  0, 0, 0, 0],
+        ...     [1, 0, 0, 0,  0, 0, 0, 0,  0, 0, 0, 0,  1, 0, 0, 0],
+        ...     [0, 2, 0, 0,  0, 0, 0, 0,  0, 0, 0, 0,  0, 0, 0, 0],
+        ...     [0, 0, 2, 0,  0, 0, 0, 0,  0, 0, 0, 0,  0, 0, 0, 0],
+        ...     [0, 0, 0, 1,  0, 0, 0, 0,  0, 0, 0, 0,  0, 0, 0, 1],
+        ...     [0, 0, 0, 0,  2, 0, 0, 0,  0, 0, 0, 0,  0, 0, 0, 0],
+        ...     [0, 0, 0, 0,  0, 2, 0, 0,  0, 0, 0, 0,  0, 0, 0, 0],
+        ...     [0, 0, 0, 0,  0, 0, 2, 0,  0, 0, 0, 0,  0, 0, 0, 0],
+        ...     [0, 0, 0, 0,  0, 0, 0, 2,  0, 0, 0, 0,  0, 0, 0, 0],
+        ...     [0, 0, 0, 0,  0, 0, 0, 0,  2, 0, 0, 0,  0, 0, 0, 0],
+        ...     [0, 0, 0, 0,  0, 0, 0, 0,  0, 1, 0, 0,  0, 1, 0, 0],
+        ...     [0, 0, 0, 0,  0, 0, 1, 0,  0, 0, 1, 0,  0, 0, 0, 0],
+        ...     [0, 0, 0, 0,  0, 0, 0, 0,  0, 0, 0, 2,  0, 0, 0, 0],
+        ...     [0, 0, 0, 0,  1, 0, 0, 0,  0, 0, 0, 0,  1, 0, 0, 0],
+        ...     [0, 0, 0, 0,  0, 0, 0, 0,  0, 0, 0, 0,  0, 2, 0, 0],
+        ...     [0, 0, 0, 0,  0, 0, 0, 0,  0, 0, 0, 0,  0, 0, 2, 0]])
         >>> print(big.input_driven_refinement([0]*16))
         [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
 
@@ -1355,8 +1359,8 @@ class CoupledCellNetwork(AdjMatrixGraph):
         >>> figure5.input_driven_refinement([0]*10)
         [0, 1, 1, 2, 2, 2, 3, 3, 3, 3]
 
-        In this case we only needed one call to reach a balanced equivalence relationship,
-        thus:
+        In this case we only needed one call to reach a balanced equivalence
+        relationship, thus:
 
         >>> p, q = figure5.top_lattice_node()
         >>> p
@@ -1365,22 +1369,24 @@ class CoupledCellNetwork(AdjMatrixGraph):
         Now a 16 cell example, which is interesting for using repeated edges (although
         there is only one edge type here):
 
-        >>> big = CoupledCellNetwork([[0, 0, 0, 2,  0, 0, 0, 0,  0, 0, 0, 0,  0, 0, 0, 0],
-        ...                           [1, 0, 0, 0,  0, 0, 0, 0,  0, 0, 0, 0,  1, 0, 0, 0],
-        ...                           [0, 2, 0, 0,  0, 0, 0, 0,  0, 0, 0, 0,  0, 0, 0, 0],
-        ...                           [0, 0, 2, 0,  0, 0, 0, 0,  0, 0, 0, 0,  0, 0, 0, 0],
-        ...                           [0, 0, 0, 1,  0, 0, 0, 0,  0, 0, 0, 0,  0, 0, 0, 1],
-        ...                           [0, 0, 0, 0,  2, 0, 0, 0,  0, 0, 0, 0,  0, 0, 0, 0],
-        ...                           [0, 0, 0, 0,  0, 2, 0, 0,  0, 0, 0, 0,  0, 0, 0, 0],
-        ...                           [0, 0, 0, 0,  0, 0, 2, 0,  0, 0, 0, 0,  0, 0, 0, 0],
-        ...                           [0, 0, 0, 0,  0, 0, 0, 2,  0, 0, 0, 0,  0, 0, 0, 0],
-        ...                           [0, 0, 0, 0,  0, 0, 0, 0,  2, 0, 0, 0,  0, 0, 0, 0],
-        ...                           [0, 0, 0, 0,  0, 0, 0, 0,  0, 1, 0, 0,  0, 1, 0, 0],
-        ...                           [0, 0, 0, 0,  0, 0, 1, 0,  0, 0, 1, 0,  0, 0, 0, 0],
-        ...                           [0, 0, 0, 0,  0, 0, 0, 0,  0, 0, 0, 2,  0, 0, 0, 0],
-        ...                           [0, 0, 0, 0,  1, 0, 0, 0,  0, 0, 0, 0,  1, 0, 0, 0],
-        ...                           [0, 0, 0, 0,  0, 0, 0, 0,  0, 0, 0, 0,  0, 2, 0, 0],
-        ...                           [0, 0, 0, 0,  0, 0, 0, 0,  0, 0, 0, 0,  0, 0, 2, 0]])
+        >>> big = CoupledCellNetwork([
+        ...     [0, 0, 0, 2,  0, 0, 0, 0,  0, 0, 0, 0,  0, 0, 0, 0],
+        ...     [1, 0, 0, 0,  0, 0, 0, 0,  0, 0, 0, 0,  1, 0, 0, 0],
+        ...     [0, 2, 0, 0,  0, 0, 0, 0,  0, 0, 0, 0,  0, 0, 0, 0],
+        ...     [0, 0, 2, 0,  0, 0, 0, 0,  0, 0, 0, 0,  0, 0, 0, 0],
+        ...     [0, 0, 0, 1,  0, 0, 0, 0,  0, 0, 0, 0,  0, 0, 0, 1],
+        ...     [0, 0, 0, 0,  2, 0, 0, 0,  0, 0, 0, 0,  0, 0, 0, 0],
+        ...     [0, 0, 0, 0,  0, 2, 0, 0,  0, 0, 0, 0,  0, 0, 0, 0],
+        ...     [0, 0, 0, 0,  0, 0, 2, 0,  0, 0, 0, 0,  0, 0, 0, 0],
+        ...     [0, 0, 0, 0,  0, 0, 0, 2,  0, 0, 0, 0,  0, 0, 0, 0],
+        ...     [0, 0, 0, 0,  0, 0, 0, 0,  2, 0, 0, 0,  0, 0, 0, 0],
+        ...     [0, 0, 0, 0,  0, 0, 0, 0,  0, 1, 0, 0,  0, 1, 0, 0],
+        ...     [0, 0, 0, 0,  0, 0, 1, 0,  0, 0, 1, 0,  0, 0, 0, 0],
+        ...     [0, 0, 0, 0,  0, 0, 0, 0,  0, 0, 0, 2,  0, 0, 0, 0],
+        ...     [0, 0, 0, 0,  1, 0, 0, 0,  0, 0, 0, 0,  1, 0, 0, 0],
+        ...     [0, 0, 0, 0,  0, 0, 0, 0,  0, 0, 0, 0,  0, 2, 0, 0],
+        ...     [0, 0, 0, 0,  0, 0, 0, 0,  0, 0, 0, 0,  0, 0, 2, 0],
+        ... ])
         >>> print(big.input_driven_refinement([0]*16))
         [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
         >>> p, q = big.top_lattice_node()
@@ -1493,7 +1499,8 @@ class CoupledCellNetwork(AdjMatrixGraph):
                 except ValueError:
                     pass
         else:
-            # Note - we now exploit the Aldis (2008) / Belylh & Hasler (2011) based shortcut
+            # Note - we now exploit the Aldis (2008) / Belylh & Hasler (2011)
+            # based shortcut
             done = False
             count = 0
             last_good_partition = None
@@ -1730,7 +1737,7 @@ class CoupledCellNetwork(AdjMatrixGraph):
             )
             return
 
-        # Use the OS path module's "Split Extension" function, work out the file extension
+        # Use the OS path module's "Split Extension" function,
         extension = os.path.splitext(filename)[-1]
         # Check that there was a leading "."
         assert extension[0] == os.path.extsep
@@ -3002,7 +3009,8 @@ e1 = [
 ]
 go(CoupledCellNetwork(e1), "Casado_F2_original")
 
-# This is Fig. 2 from Rabinovich et al (2001), FitzHugh-Nagumo models in neuronal dynamics.
+# This is Fig. 2 from Rabinovich et al (2001),
+# FitzHugh-Nagumo models in neuronal dynamics.
 # Same as Ibaraz example, but with an edge from node 1 to 5.
 e1 = [
     [0, 1, 0, 0, 0, 0, 0, 0, 0],
