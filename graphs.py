@@ -268,11 +268,14 @@ except ImportError:
         import pydot_ng as pydot
     except ImportError:
         pydot = None
-        sys.stderr.write("Please install pyparsing, pydot & graphviz if you want "
-                         "to draw graphs or lattice diagrams\n")
+        sys.stderr.write(
+            "Please install pyparsing, pydot & graphviz if you want "
+            "to draw graphs or lattice diagrams\n"
+        )
 
 
-MAXLAT = 42294 #Increase this if you have a big powerful computer and are patient ;)
+MAXLAT = 42294  # Increase this if you have a big powerful computer and are patient ;)
+
 
 def make_quotient(adj_matrix, partition):
     """Returns quotient adjacency matrix, or raises an exception.
@@ -327,36 +330,36 @@ def make_quotient(adj_matrix, partition):
     ...
     ValueError: Not a balanced equivalence relation
     """
-    n = len(adj_matrix) #gives number of rows, but should be square matrix
-    assert (n,n) == adj_matrix.shape, "Matrix not square"
+    n = len(adj_matrix)  # gives number of rows, but should be square matrix
+    assert (n, n) == adj_matrix.shape, "Matrix not square"
     assert len(partition) == n, "Bad partition"
 
-    #Get number of merged nodes (equivalence classes):
-    k = max(partition)+1
-    #Check partition entries are 0,1,2,...,k-1:
+    # Get number of merged nodes (equivalence classes):
+    k = max(partition) + 1
+    # Check partition entries are 0,1,2,...,k-1:
     assert set(partition) == set(range(k)), "Bad partition %r" % partition
 
     if k == n:
-        #Trivial case of no merging
+        # Trivial case of no merging
         return adj_matrix
-    
-    #Take column sums to go from n by n matrix to n by k matrix,
-    q_matrix_step_1 = np.zeros([n,k], np.uint8)
+
+    # Take column sums to go from n by n matrix to n by k matrix,
+    q_matrix_step_1 = np.zeros([n, k], np.uint8)
     for (old_col, new_col) in enumerate(partition):
-        q_matrix_step_1[:,new_col] += adj_matrix[:,old_col].astype(np.uint8)
-    #Take representative rows to go from n by k matrix to k by k matrix,
-    #note that we needlessly over-write n-k of the rows (simpler to just
-    #do it rather than checking as it doesn't matter).
-    q_matrix_step_2 = np.zeros([k,k], np.uint8)
+        q_matrix_step_1[:, new_col] += adj_matrix[:, old_col].astype(np.uint8)
+    # Take representative rows to go from n by k matrix to k by k matrix,
+    # note that we needlessly over-write n-k of the rows (simpler to just
+    # do it rather than checking as it doesn't matter).
+    q_matrix_step_2 = np.zeros([k, k], np.uint8)
     for (old_row, new_row) in enumerate(partition):
-        q_matrix_step_2[new_row,:] = q_matrix_step_1[old_row,:]
-    #Check that all the merged rows agreed (by comparing them to the
-    #representative row picked above):
+        q_matrix_step_2[new_row, :] = q_matrix_step_1[old_row, :]
+    # Check that all the merged rows agreed (by comparing them to the
+    # representative row picked above):
     for (old_row, new_row) in enumerate(partition):
-        #NumPy's == gives element wise equality, giving k True/False values
-        #We use the .all() to check if they are all True, thus all equal.
-        if not (q_matrix_step_2[new_row,:] == q_matrix_step_1[old_row,:]).all():
-            #Not a balanced colouring...
+        # NumPy's == gives element wise equality, giving k True/False values
+        # We use the .all() to check if they are all True, thus all equal.
+        if not (q_matrix_step_2[new_row, :] == q_matrix_step_1[old_row, :]).all():
+            # Not a balanced colouring...
             raise ValueError("Not a balanced equivalence relation")
     return q_matrix_step_2
 
@@ -417,20 +420,20 @@ def possible_partitions(n):
     was made since Python considers [0, 1, 1] < [1, 0, 0].
     """
 
-    #This is a recursive function
+    # This is a recursive function
     if n < 1:
         raise ValueError("Require n at least one, not %r" % n)
     elif n == 1:
         yield [0]
     else:
-        #Get the possible first n-1 digits of the possible
-        #partitions by recursion:
-        for p in possible_partitions(n-1):
-            #The possible final digit for these partitions is
-            #given x = 0, 1, ..., max(p), max(p)+1
-            #(which by construction means it will be at most n).
-            for x in range(max(p)+2):
-                yield p+[x]
+        # Get the possible first n-1 digits of the possible
+        # partitions by recursion:
+        for p in possible_partitions(n - 1):
+            # The possible final digit for these partitions is
+            # given x = 0, 1, ..., max(p), max(p)+1
+            # (which by construction means it will be at most n).
+            for x in range(max(p) + 2):
+                yield p + [x]
 
 
 def possible_partitions_of_required_size(n, min_size):
@@ -486,13 +489,14 @@ def possible_partitions_of_required_size(n, min_size):
     else:
         # Get the possible first n-1 digits of the possible
         # partitions by recursion:
-        for p in possible_partitions_of_required_size(n-1, max(1,min_size-1)):
+        for p in possible_partitions_of_required_size(n - 1, max(1, min_size - 1)):
             # The possible final digit for these partitions is
             # given by x = 0, 1, ..., max(p), max(p)+1
             # (which by construction means it will be at most n).
             for x in range(max(p) + 2):
-                if max(max(p),x) + 1 >= min_size:
-                    yield p+[x]
+                if max(max(p), x) + 1 >= min_size:
+                    yield p + [x]
+
 
 def possible_partition_refinements(top):
     """Given a partition of n nodes, how can it be sub-partitioned?
@@ -582,17 +586,17 @@ def possible_partition_refinements(top):
     assert top[0] == 0
     assert set(range(k)) == set(top)
 
-    #for i in range(k):
+    # for i in range(k):
     #    print "Class %i, count %i, sub-partitions %r" % (i, top.count(i), list(possible_partitions(top.count(i))))
     pN = [possible_partitions(top.count(i)) for i in range(k)]
     for sub_parts in product(*pN):
-        #print sub_parts, "-->"
+        # print sub_parts, "-->"
         new_partition = []
-        old_index = [0]*k
+        old_index = [0] * k
         mapping = dict()
         for old in top:
             sub = sub_parts[old][old_index[old]]
-            #print sub_parts, "-->", old, sub_parts[old], old_index[old], sub
+            # print sub_parts, "-->", old, sub_parts[old], old_index[old], sub
             if (old, sub) in mapping:
                 new_partition.append(mapping[old, sub])
             else:
@@ -603,8 +607,9 @@ def possible_partition_refinements(top):
                 new_partition.append(v)
                 mapping[old, sub] = v
             old_index[old] += 1
-        #print "-"*40, ">", new_partition
+        # print "-"*40, ">", new_partition
         yield new_partition
+
 
 def cyclic_partition(partition, sep="", captions=None):
     """Display a partition in cyclic form.
@@ -633,22 +638,24 @@ def cyclic_partition(partition, sep="", captions=None):
     ...                        ["red", "green", "blue", "black", "white"]))
     (red+green+black)(blue)(white)
     """
-    #Get number of merged nodes (equivalence classes):
+    # Get number of merged nodes (equivalence classes):
     if not captions:
-        captions = [str(i+1) for i in range(len(partition))]
+        captions = [str(i + 1) for i in range(len(partition))]
     else:
-        assert len(captions) == len(partition), \
-               "%i captions for %i nodes" % (captions, partition)
-    k = max(partition)+1
-    #assert set(partition) == set(range(k)), "Bad partition"
-    #if not sep and k > 9: sep="+"
+        assert len(captions) == len(partition), "%i captions for %i nodes" % (
+            captions,
+            partition,
+        )
+    k = max(partition) + 1
+    # assert set(partition) == set(range(k)), "Bad partition"
+    # if not sep and k > 9: sep="+"
     mapping = {}
     for old, new in enumerate(partition):
         if new in mapping:
             mapping[new] += sep + captions[old]
         else:
             mapping[new] = captions[old]
-    #Join up the captions for the k nodes (0, 1, ..., k-1)
+    # Join up the captions for the k nodes (0, 1, ..., k-1)
     return "".join("(%s)" % mapping[new] for new in range(k))
 
 
@@ -703,55 +710,56 @@ def partition_refinement(partition_a, partition_b):
     (1)(2)(3)(4)(5) refines (13)(24)(5)
     (1)(2)(3)(4)(5) refines (1)(25)(3)(4)
     """
-    #if partition_a == partition_b:
+    # if partition_a == partition_b:
     #    return False
-    #assert len(partition_a) == len(partition_b)
-    #rank_a = max(partition_a) #works but assumes partition format
-    #rank_b = max(partition_b)
+    # assert len(partition_a) == len(partition_b)
+    # rank_a = max(partition_a) #works but assumes partition format
+    # rank_b = max(partition_b)
     rank_a = len(set(partition_a))
     rank_b = len(set(partition_b))
     if rank_a <= rank_b:
         return False
 
     for i in range(rank_a):
-        #assert i in partition_a, "Bad partition? %r" % partition_a
-        #See where number "i" occurs in partition a,
-        positions = [p for p,v in enumerate(partition_a) if v==i]
-        #Make sure these all belong to the same partition in b
+        # assert i in partition_a, "Bad partition? %r" % partition_a
+        # See where number "i" occurs in partition a,
+        positions = [p for p, v in enumerate(partition_a) if v == i]
+        # Make sure these all belong to the same partition in b
         if len(set([partition_b[p] for p in positions])) > 1:
-            #Failed - b is not a refinement (sub partition) of a
+            # Failed - b is not a refinement (sub partition) of a
             return False
     return True
 
-#A few extra tests,
-assert not partition_refinement([0,0,1,1,0],[0,1,2,3,2])
-assert not partition_refinement([0,1,2,3,2],[0,0,1,1,0])
-assert not partition_refinement([0,0,1,1,0],[0,1,2,2,1])
-assert partition_refinement([0,1,2,2,1],[0,0,1,1,0])
 
-assert not partition_refinement([0,1,0,1,2],[0,1,0,1,2])
-assert partition_refinement([0,1,0,1,2],[0,1,0,1,1])
-assert partition_refinement([0,1,0,1,2],[0,0,0,0,0])
-assert partition_refinement([0,1,0,1,1],[0,0,0,0,0])
-assert partition_refinement([0,1,2,3,4],[0,0,0,0,0])
+# A few extra tests,
+assert not partition_refinement([0, 0, 1, 1, 0], [0, 1, 2, 3, 2])
+assert not partition_refinement([0, 1, 2, 3, 2], [0, 0, 1, 1, 0])
+assert not partition_refinement([0, 0, 1, 1, 0], [0, 1, 2, 2, 1])
+assert partition_refinement([0, 1, 2, 2, 1], [0, 0, 1, 1, 0])
 
-assert partition_refinement([0,1,2,3,4],[0,1,2,3,2])
-assert partition_refinement([0,1,2,3,4],[0,1,0,0,2])
-assert partition_refinement([0,1,2,3,2],[0,0,1,0,1])
-assert partition_refinement([0,0,1,0,2],[0,0,1,0,1])
-assert partition_refinement([0,0,1,0,1],[0,0,0,0,0])
+assert not partition_refinement([0, 1, 0, 1, 2], [0, 1, 0, 1, 2])
+assert partition_refinement([0, 1, 0, 1, 2], [0, 1, 0, 1, 1])
+assert partition_refinement([0, 1, 0, 1, 2], [0, 0, 0, 0, 0])
+assert partition_refinement([0, 1, 0, 1, 1], [0, 0, 0, 0, 0])
+assert partition_refinement([0, 1, 2, 3, 4], [0, 0, 0, 0, 0])
 
-assert partition_refinement([0,1,2,3,4],[0,0,0,0,0])
-assert not partition_refinement([0,0,0,0,0],[0,1,2,3,4])
-assert not partition_refinement([0,1,0,0,1],[0,0,0,1,1])
+assert partition_refinement([0, 1, 2, 3, 4], [0, 1, 2, 3, 2])
+assert partition_refinement([0, 1, 2, 3, 4], [0, 1, 0, 0, 2])
+assert partition_refinement([0, 1, 2, 3, 2], [0, 0, 1, 0, 1])
+assert partition_refinement([0, 0, 1, 0, 2], [0, 0, 1, 0, 1])
+assert partition_refinement([0, 0, 1, 0, 1], [0, 0, 0, 0, 0])
 
-assert partition_refinement([0,1,1,2],[0,1,1,0])
-assert partition_refinement([0,1,1,2],[0,1,1,1])
-assert not partition_refinement([0,1,1,0],[0,1,1,2])
-assert not partition_refinement([0,1,1,1],[0,1,1,2])
+assert partition_refinement([0, 1, 2, 3, 4], [0, 0, 0, 0, 0])
+assert not partition_refinement([0, 0, 0, 0, 0], [0, 1, 2, 3, 4])
+assert not partition_refinement([0, 1, 0, 0, 1], [0, 0, 0, 1, 1])
+
+assert partition_refinement([0, 1, 1, 2], [0, 1, 1, 0])
+assert partition_refinement([0, 1, 1, 2], [0, 1, 1, 1])
+assert not partition_refinement([0, 1, 1, 0], [0, 1, 1, 2])
+assert not partition_refinement([0, 1, 1, 1], [0, 1, 1, 2])
 
 
-def go(a, name='', format="png", top_only=False):
+def go(a, name="", format="png", top_only=False):
     """Function to take a graph, draw it, then print and draw the lattice.
 
     Given a CoupledCellNetwork object (and an optional name for it), it shows
@@ -779,7 +787,7 @@ def go(a, name='', format="png", top_only=False):
         sep = ""
     if name and not os.path.isfile("%s.%s" % (name, format)):
         a.plot("%s.%s" % (name, format))
-    #Find top node (quick)
+    # Find top node (quick)
     start = time.time()
     p, q = a.top_lattice_node()
     taken = time.time() - start
@@ -787,17 +795,20 @@ def go(a, name='', format="png", top_only=False):
         q.plot("%s_top_node.%s" % (name, format))
     if top_only:
         print("")
-        print("Lattice top node (balanced equlivalence relationship with least clusters) %0.1fs:" % taken)
+        print(
+            "Lattice top node (balanced equlivalence relationship with least clusters) %0.1fs:"
+            % taken
+        )
         print("")
         print("Partition: %s" % cyclic_partition(p, sep))
         print("")
         print("Quotient matrix:")
         print(q)
     else:
-        #Calculate the quotients with partitions and the resulting lattice
-        #(all in one go to avoid duplicated computation, you could also use
-        #the a.quotients_with_partitions() method or similar if you didn't
-        #want the lattice).
+        # Calculate the quotients with partitions and the resulting lattice
+        # (all in one go to avoid duplicated computation, you could also use
+        # the a.quotients_with_partitions() method or similar if you didn't
+        # want the lattice).
         start = time.time()
         l = a.lattice()
         taken = time.time() - start
@@ -805,12 +816,12 @@ def go(a, name='', format="png", top_only=False):
             print("")
             print("Partition %s, quotient matrix:" % cyclic_partition(p, sep))
             q = a.quotient(p)
-            if max(p)+1 < a.n:
-                #Non-trivial
+            if max(p) + 1 < a.n:
+                # Non-trivial
                 print(q)
             else:
                 print("(trivial)")
-        #l = a.lattice()
+        # l = a.lattice()
         print("")
         print("%s Lattice matrix:" % name)
         print(l)
@@ -818,17 +829,17 @@ def go(a, name='', format="png", top_only=False):
         if taken < 60:
             print("Lattice took %0.1fs" % taken)
         elif taken < 360:
-            print("Lattice took %0.1fmins" % (taken/60))
+            print("Lattice took %0.1fmins" % (taken / 60))
         else:
-            print("Lattice took %0.1fhours" % (taken/360))
+            print("Lattice took %0.1fhours" % (taken / 360))
         if name and not os.path.isfile("%s_lattice.%s" % (name, format)):
             l.plot("%s_lattice.%s" % (name, format))
-        print('(%i lattice nodes)' % l.n)
+        print("(%i lattice nodes)" % l.n)
 
 
 class AdjMatrixGraph(object):
     """Object to represent a graph using an adjacency matrix."""
-    
+
     def __init__(self, edge_matrix):
         """This function is called when an AdjMatrixGraph object is created
 
@@ -851,30 +862,30 @@ class AdjMatrixGraph(object):
         """
         n = len(edge_matrix)
         self.n = n
-        #Turn the edges into a NumPy array (if they are not already),
-        #could be a list of lists of ints for example:
-        #Assuming a number of (repeat) edges is limited to 255 (saves RAM)
+        # Turn the edges into a NumPy array (if they are not already),
+        # could be a list of lists of ints for example:
+        # Assuming a number of (repeat) edges is limited to 255 (saves RAM)
         self.matrix = np.array(edge_matrix, np.uint8)
-        assert (n,n) == self.matrix.shape, "Adjacency matrix should be square"
+        assert (n, n) == self.matrix.shape, "Adjacency matrix should be square"
         assert self.matrix.min() >= 0, "Entries should be non-negative"
 
     def __str__(self):
         """String representation of the matrix, used by the print command"""
         answer = []
         n = self.n
-        x = max(len(str(self.matrix[i,j])) for i in range(n) for j in range(n))
+        x = max(len(str(self.matrix[i, j])) for i in range(n) for j in range(n))
         for i in range(self.n):
-            answer.append(" ".join([str(self.matrix[i,j]).ljust(x) \
-                                    for j in range(n)]))
+            answer.append(" ".join([str(self.matrix[i, j]).ljust(x) for j in range(n)]))
         return "\n".join(answer)
 
     def __repr__(self):
         return "%s(%r)" % (self.__class__.__name__, self.matrix.tolist())
 
+
 class CoupledCellLattice(AdjMatrixGraph):
     """Object for a balanced equivalence relation lattice.
     """
-    
+
     def __init__(self, *partitions):
         """This function is called when an CoupledCellLattice object is created.
 
@@ -930,17 +941,18 @@ class CoupledCellLattice(AdjMatrixGraph):
         equivalence relations, also known as balanced colourings) automatically.
         """
         start = time.time()
-        self.n = n = len(partitions) #number of lattice nodes
+        self.n = n = len(partitions)  # number of lattice nodes
         self.partitions = partitions
 
         if n > MAXLAT:
-            raise ValueError("Excessive lattice size %i nodes, MAXLAT = %i" \
-                             % (n, MAXLAT))
+            raise ValueError(
+                "Excessive lattice size %i nodes, MAXLAT = %i" % (n, MAXLAT)
+            )
 
-        trivial_partitions = [[0]*len(partitions[0]), range(len(partitions[0]))]
+        trivial_partitions = [[0] * len(partitions[0]), range(len(partitions[0]))]
         colors = ["white"] * n
-        #This assumes the partitions are sorted:
-        if partitions[0] == [0]*len(partitions[0]):
+        # This assumes the partitions are sorted:
+        if partitions[0] == [0] * len(partitions[0]):
             colors[0] = "grey"
         if partitions[-1] == range(len(partitions[0])):
             colors[-1] = "grey"
@@ -951,54 +963,57 @@ class CoupledCellLattice(AdjMatrixGraph):
 
         try:
             refinement = np.zeros((n, n), np.uint8)
-            #Note this includes zeros (False)  on the diagonal:
-            #refinement = np.array([[partition_refinement(a,b) for b in partitions]\
+            # Note this includes zeros (False)  on the diagonal:
+            # refinement = np.array([[partition_refinement(a,b) for b in partitions]\
             #                        for a in partitions], np.bool)
         except MemoryError:
             print("Out of memory problem? Lattice of %i partitions" % n)
-            for p,r in zip(partitions, ranks):
-                print(p,r)
+            for p, r in zip(partitions, ranks):
+                print(p, r)
             raise MemoryError("Out of memory problem? Lattice of %i partitions" % n)
 
-        #Making a lower triangular matrix
+        # Making a lower triangular matrix
         ep = list(enumerate(partitions))
         for row, a in ep:
-            #This is equivalent to but faster than:
-            #for col, b in ep:
+            # This is equivalent to but faster than:
+            # for col, b in ep:
             #    if col < row:
             #        refinement[row,col] = partition_refinement(a,b)
             rank_a = ranks[row]
             enu_a = list(enumerate(a))
-            all_positions = [[p for p,v in enu_a if v==i] for i in range(rank_a)]
+            all_positions = [[p for p, v in enu_a if v == i] for i in range(rank_a)]
             for col, b in ep:
-                #Want col < row as building a lower triangular matrix
-                #The ranks must change too, a quick comparison                                                                                                                            
+                # Want col < row as building a lower triangular matrix
+                # The ranks must change too, a quick comparison
                 if col < row and rank_a > ranks[col]:
-                    #refinement[row,col] = partition_refinement(a,b)
+                    # refinement[row,col] = partition_refinement(a,b)
                     linked = True
                     for positions in all_positions:
                         if len(set([b[p] for p in positions])) > 1:
-                            #Failed - b is not a refinement (sub partition) of a
+                            # Failed - b is not a refinement (sub partition) of a
                             linked = False
                             break
                     if linked:
-                        refinement[row,col] = linked
+                        refinement[row, col] = linked
 
         # Now remove redundant edges
         try:
             edge_matrix = refinement.copy()
             # TODO - Can we do this in-situ (so needing less RAM)?
         except MemoryError:
-            print("Out of memory problem removing redundant edges in lattice of %i partitions" % n)
+            print(
+                "Out of memory problem removing redundant edges in lattice of %i partitions"
+                % n
+            )
             raise MemoryError("Out of memory problem? Lattice of %i partitions" % n)
         for row in range(n):
             for col in range(n):
-                if col < row and refinement[row,col] and ranks[col]+1 < ranks[row]:
+                if col < row and refinement[row, col] and ranks[col] + 1 < ranks[row]:
                     # This edge jumps at least one rank, so could be redundant
                     # print("Checking %s <-> %s" % (cyclic_partition(partitions[row]),
                     #                               cyclic_partition(partitions[col]))
                     for mid in range(col, row):
-                        if refinement[row,mid] and refinement[mid,col]:
+                        if refinement[row, mid] and refinement[mid, col]:
                             # This other point provides a route => edge was redundant
                             # print("Found %s <-> %s <-> %s" % (cyclic_partition(partitions[row]),
                             #                                   cyclic_partition(partitions[mid]),
@@ -1010,18 +1025,19 @@ class CoupledCellLattice(AdjMatrixGraph):
         if max(max(p) for p in partitions) > 9:
             sep = "+"
         else:
-            sep =""
+            sep = ""
         self.captions = [cyclic_partition(p, sep) for p in partitions]
-
 
     def __str__(self):
         """String representation of the matrix, used by the print command"""
         answer = []
         n = self.n
-        x = max(len(str(self.matrix[i,j])) for i in range(n) for j in range(n))
+        x = max(len(str(self.matrix[i, j])) for i in range(n) for j in range(n))
         for i in range(self.n):
-            answer.append(" ".join([str(self.matrix[i,j]).ljust(x) \
-                                    for j in range(n)]) + " %s" % self.captions[i])
+            answer.append(
+                " ".join([str(self.matrix[i, j]).ljust(x) for j in range(n)])
+                + " %s" % self.captions[i]
+            )
         return "\n".join(answer)
 
     def plot(self, filename):
@@ -1031,48 +1047,56 @@ class CoupledCellLattice(AdjMatrixGraph):
         """
         n = self.n
         if pydot is None:
-            sys.stderr.write("Please install graphviz, pydot and pyparsing "
-                             "to draw lattice diagrams\n")
+            sys.stderr.write(
+                "Please install graphviz, pydot and pyparsing "
+                "to draw lattice diagrams\n"
+            )
             return
 
-        #Use the OS path module's "Split Extension" function, work out the file extension
+        # Use the OS path module's "Split Extension" function, work out the file extension
         extension = os.path.splitext(filename)[-1]
-        #Check that there was a leading "."
+        # Check that there was a leading "."
         assert extension[0] == os.path.extsep
-        #Remove the leading "." and make lower case (to give to graphviz as format):
+        # Remove the leading "." and make lower case (to give to graphviz as format):
         extension = extension[1:].lower()
 
-        g = pydot.Dot(graph_type='graph')
+        g = pydot.Dot(graph_type="graph")
 
-        #Divide into subgraphs, one for each lattice rank.
-        #This is a GraphViz layout trick so that each rank is
-        #shown on its own horizontal level in the image.
-        for rank in range(1, max(self.ranks)+1):
-            sub_g = pydot.Subgraph(graph_type='graph',
-                                   graph_name = "Rank%i"%rank,
-                                   rank="same") #GraphViz rank is about layout
-            sub_g.add_node(pydot.Node("Rank %i"%rank, shape="none"))
+        # Divide into subgraphs, one for each lattice rank.
+        # This is a GraphViz layout trick so that each rank is
+        # shown on its own horizontal level in the image.
+        for rank in range(1, max(self.ranks) + 1):
+            sub_g = pydot.Subgraph(
+                graph_type="graph", graph_name="Rank%i" % rank, rank="same"
+            )  # GraphViz rank is about layout
+            sub_g.add_node(pydot.Node("Rank %i" % rank, shape="none"))
             for i in range(self.n):
-                #Only add this node to the sub graph if it has the right rank.
-                if self.ranks[i]==rank :
-                    sub_g.add_node(pydot.Node(self.captions[i],
-                                              fillcolor=self.colors[i],
-                                              style="filled"))
+                # Only add this node to the sub graph if it has the right rank.
+                if self.ranks[i] == rank:
+                    sub_g.add_node(
+                        pydot.Node(
+                            self.captions[i], fillcolor=self.colors[i], style="filled"
+                        )
+                    )
             g.add_subgraph(sub_g)
             if rank != 1:
-                g.add_edge(pydot.Edge("Rank %i" % (rank-1), "Rank %i" % (rank)))
+                g.add_edge(pydot.Edge("Rank %i" % (rank - 1), "Rank %i" % (rank)))
 
-        #Now that we have added all the nodes, we can do the edges:
+        # Now that we have added all the nodes, we can do the edges:
         for EdgeTo in range(n):
             for EdgeFrom in range(n):
-                if self.matrix[EdgeTo,EdgeFrom]:
-                    g.add_edge(pydot.Edge(self.captions[EdgeFrom],
-                                          self.captions[EdgeTo],
-                                          style='solid'))
-                    
-        #Now get the graph object to write itself to an image file.
+                if self.matrix[EdgeTo, EdgeFrom]:
+                    g.add_edge(
+                        pydot.Edge(
+                            self.captions[EdgeFrom],
+                            self.captions[EdgeTo],
+                            style="solid",
+                        )
+                    )
+
+        # Now get the graph object to write itself to an image file.
         try:
-            g.write(filename, prog='dot', format=extension)
+            g.write(filename, prog="dot", format=extension)
         except pydot.InvocationException:
             sys.stderr.write("Please check graphviz is installed\n")
 
@@ -1083,6 +1107,7 @@ class CoupledCellNetwork(AdjMatrixGraph):
     Multiple edge types are supported, specified and represented internally
     as a separate adjacency matrix for each edge type.
     """
+
     def __init__(self, *edge_matrices):
         """This function is called when an CoupledCellNetwork object is created.
 
@@ -1117,11 +1142,11 @@ class CoupledCellNetwork(AdjMatrixGraph):
             if n is None:
                 n = len(matrix)
                 self.n = n
-            #Turn it into a numpy array (in case it wasn't already)
+            # Turn it into a numpy array (in case it wasn't already)
             matrix = np.array(matrix, np.uint8)
-            assert (n,n) == matrix.shape, "All edge matrices must be same size"
+            assert (n, n) == matrix.shape, "All edge matrices must be same size"
             self.matrices.append(matrix)
-            
+
     def __str__(self):
         """String representation of the matrix, used by the print command"""
         answer = []
@@ -1129,19 +1154,35 @@ class CoupledCellNetwork(AdjMatrixGraph):
         try:
             captions = self.captions
         except AttributeError:
-            captions = [str(i+1) for i in range(n)]
-        if len(self.matrices)==1:
+            captions = [str(i + 1) for i in range(n)]
+        if len(self.matrices) == 1:
             m = self.matrices[0]
-            x = max(len(str(m[i,j])) for i in range(n) for j in range(n))
+            x = max(len(str(m[i, j])) for i in range(n) for j in range(n))
             for i in range(self.n):
-                answer.append(" ".join([str(m[i,j]).ljust(x) for j in range(n)]) \
-                              + " node " + captions[i])
+                answer.append(
+                    " ".join([str(m[i, j]).ljust(x) for j in range(n)])
+                    + " node "
+                    + captions[i]
+                )
         else:
-            x = max(len(str(m[i,j])) for i in range(n) for j in range(n) for m in self.matrices)
+            x = max(
+                len(str(m[i, j]))
+                for i in range(n)
+                for j in range(n)
+                for m in self.matrices
+            )
             for i in range(self.n):
-                answer.append(" ".join(["(%s)" % ",".join([str(m[i,j]).ljust(x) \
-                                                           for m in self.matrices]) \
-                                        for j in range(n)]) + " node " + captions[i])
+                answer.append(
+                    " ".join(
+                        [
+                            "(%s)"
+                            % ",".join([str(m[i, j]).ljust(x) for m in self.matrices])
+                            for j in range(n)
+                        ]
+                    )
+                    + " node "
+                    + captions[i]
+                )
         return "\n".join(answer)
 
     def __repr__(self):
@@ -1212,9 +1253,9 @@ class CoupledCellNetwork(AdjMatrixGraph):
         [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
 
         """
-        colors = max(partition)+1
+        colors = max(partition) + 1
 
-        #Basic testing of partition validity
+        # Basic testing of partition validity
         assert len(partition) == self.n
         assert 0 == min(partition)
         assert max(partition) < self.n
@@ -1222,32 +1263,37 @@ class CoupledCellNetwork(AdjMatrixGraph):
 
         assert isinstance(self.matrices, list), self.matrices
 
-        #This could be written far more elegantly, but it isn't a computational
-        #bottleneck so I have not attempted to polish or speed it up at all.
-        
+        # This could be written far more elegantly, but it isn't a computational
+        # bottleneck so I have not attempted to polish or speed it up at all.
+
         def input_color_count(node, matrix, n, color, partition):
-            #For each other potential input node i,
-            #is it connected and is it the requested colour?
-            #Note the NUMBER of input edged from each node is important
-            return sum(matrix[node,i] for i in range(n) if partition[i]==color)
+            # For each other potential input node i,
+            # is it connected and is it the requested colour?
+            # Note the NUMBER of input edged from each node is important
+            return sum(matrix[node, i] for i in range(n) if partition[i] == color)
 
         def single_edge_color_counts(node, matrix, n, colors, partition):
             assert node < n
             assert matrix.shape == (n, n), "%r vs %r" % (matrix.shape, n)
-            return tuple(input_color_count(node, matrix, n, c, partition) for c in range(colors))
+            return tuple(
+                input_color_count(node, matrix, n, c, partition) for c in range(colors)
+            )
 
         def color_counts(node, matrix_list, n, colors, partition):
             assert node < n
             assert isinstance(matrix_list, list), matrix_list
             assert matrix_list[0].shape == (n, n)
-            return tuple(single_edge_color_counts(node, m, n, colors, partition) for m in matrix_list)
+            return tuple(
+                single_edge_color_counts(node, m, n, colors, partition)
+                for m in matrix_list
+            )
 
-        #Make list of tuples, one entry for each node containing:
-        #-current color (partition class, integer), c
-        #-input color counts for edge type 1
-        #-input color counts for edge type 2
-        #-...
-        #-input color counts for edge type M
+        # Make list of tuples, one entry for each node containing:
+        # -current color (partition class, integer), c
+        # -input color counts for edge type 1
+        # -input color counts for edge type 2
+        # -...
+        # -input color counts for edge type M
         answer = []
         assigned_color = {}
         for i, c in enumerate(partition):
@@ -1258,7 +1304,7 @@ class CoupledCellNetwork(AdjMatrixGraph):
                 answer.append(assigned_color[key])
             else:
                 if answer:
-                    new_c = max(answer)+1
+                    new_c = max(answer) + 1
                 else:
                     new_c = 0
                 answer.append(new_c)
@@ -1348,18 +1394,18 @@ class CoupledCellNetwork(AdjMatrixGraph):
         (1+2+3+4+5+6+7+8+9+10+11+12+13+14+15+16)
 
         """
-        p = [0]*self.n
+        p = [0] * self.n
         while True:
-            #Note that rather than calculating each input driven refinement
-            #in isolation like this, many of the values could be recycled at
-            #each iteration, reducing the computation (at the cost of more
-            #complexity). Currently this is not a performance bottleneck.
+            # Note that rather than calculating each input driven refinement
+            # in isolation like this, many of the values could be recycled at
+            # each iteration, reducing the computation (at the cost of more
+            # complexity). Currently this is not a performance bottleneck.
             new = self.input_driven_refinement(p)
-            if new==p:
+            if new == p:
                 break
-            p=new
+            p = new
         try:
-            q=self.quotient(p)
+            q = self.quotient(p)
             return p, q
         except ValueError:
             raise RuntimeError("Top lattice node %r was not balanced" % p)
@@ -1406,12 +1452,13 @@ class CoupledCellNetwork(AdjMatrixGraph):
         (0,1) (1,0) (1,0) node 5
 
         """
-        #If the partition is not a balanced colouring, then at least one
-        #of the edge type specific matrices will raise a ValueError:
-        q = CoupledCellNetwork(*[make_quotient(m, partition) for m \
-                                    in self.matrices])
-        q.captions = ["+".join(str(j+1) for j,p in enumerate(partition) if p==i) \
-                      for i in range(max(partition)+1)]
+        # If the partition is not a balanced colouring, then at least one
+        # of the edge type specific matrices will raise a ValueError:
+        q = CoupledCellNetwork(*[make_quotient(m, partition) for m in self.matrices])
+        q.captions = [
+            "+".join(str(j + 1) for j, p in enumerate(partition) if p == i)
+            for i in range(max(partition) + 1)
+        ]
         return q
 
     def quotients_with_partitions(self, resume_file=None):
@@ -1439,55 +1486,58 @@ class CoupledCellNetwork(AdjMatrixGraph):
         In this example (with a single edge type) there are just two.
         """
         top = self.top_lattice_node()[0]
-        if top == [0]*self.n:
-            #Trival top node, this is faster:
+        if top == [0] * self.n:
+            # Trival top node, this is faster:
             partitions = possible_partitions(self.n)
         else:
             partitions = possible_partition_refinements(top)
         if not resume_file:
-            #Handle trivial top node as special case?
+            # Handle trivial top node as special case?
             for partition in partitions:
                 try:
                     yield self.quotient(partition), partition
                 except ValueError:
                     pass
         else:
-            #Note - we now exploit the Aldis (2008) / Belylh & Hasler (2011) based shortcut
+            # Note - we now exploit the Aldis (2008) / Belylh & Hasler (2011) based shortcut
             done = False
             count = 0
             last_good_partition = None
             if os.path.isfile(resume_file):
-                #print "Resuming from %s" % resume_file
+                # print "Resuming from %s" % resume_file
                 if resume_file.endswith(".gz"):
                     import gzip
+
                     h = gzip.open(resume_file)
                 else:
                     h = open(resume_file, "rU")
                 a = h.readline()
                 assert a.strip() == repr(self)
                 for line in h:
-                    if line[0]=="[" and line[-2:]=="]\n":
-                        last_good_partition = [int(i.strip()) for i in line[1:-2].split(",")]
+                    if line[0] == "[" and line[-2:] == "]\n":
+                        last_good_partition = [
+                            int(i.strip()) for i in line[1:-2].split(",")
+                        ]
                         assert len(last_good_partition) == self.n
                         yield self.quotient(last_good_partition), last_good_partition
                         count += 1
-                    elif line=="DONE\n":
+                    elif line == "DONE\n":
                         done = True
                         break
                     elif line.startswith("DONE\t"):
-                        assert line=="DONE\t%i\n" % count
+                        assert line == "DONE\t%i\n" % count
                         done = True
                         break
                 h.close()
                 if not done:
                     h = open(resume_file, "a")
             else:
-                #print "Checkpointing in %s" % resume_file
+                # print "Checkpointing in %s" % resume_file
                 h = open(resume_file, "w")
                 h.write("%r\n" % self)
             if not done:
-                #TODO - Jump the known partitions from the file?
-                #i.e. avoid rechecking they are balanced
+                # TODO - Jump the known partitions from the file?
+                # i.e. avoid rechecking they are balanced
                 for partition in partitions:
                     if not last_good_partition:
                         try:
@@ -1501,7 +1551,7 @@ class CoupledCellNetwork(AdjMatrixGraph):
                         last_good_partition = None
                 h.write("DONE\t%i\n" % count)
                 h.close()
-            #All done
+            # All done
 
     def quotients(self, resume_file=None):
         """Generator function, returning smaller matrices.
@@ -1527,7 +1577,7 @@ class CoupledCellNetwork(AdjMatrixGraph):
 
         In this example (with a single edge type) there are just two.
         """
-        return (q for q,p in self.quotients_with_partitions(resume_file))
+        return (q for q, p in self.quotients_with_partitions(resume_file))
 
     def partitions(self, resume_file=None):
         """Generator function, returns those partitions which are balanced.
@@ -1545,53 +1595,56 @@ class CoupledCellNetwork(AdjMatrixGraph):
 
         In this example (with a single edge type) there are just two.
         """
-        #Note considerable code duplication with quotients_with_partitions
-        #BUT this avoids needlessly rechecking previously identified
-        #partitions are balanced.
+        # Note considerable code duplication with quotients_with_partitions
+        # BUT this avoids needlessly rechecking previously identified
+        # partitions are balanced.
         if resume_file:
             done = False
             count = 0
             last_good_partition = None
             if os.path.isfile(resume_file):
-                #print "Resuming from %s" % resume_file
+                # print "Resuming from %s" % resume_file
                 if resume_file.endswith(".gz"):
                     import gzip
+
                     h = gzip.open(resume_file)
                 else:
                     h = open(resume_file, "rU")
                 a = h.readline()
                 assert a.strip() == repr(self)
                 for line in h:
-                    if line[0]=="[" and line[-2:]=="]\n":
-                        last_good_partition = [int(i.strip()) for i in line[1:-2].split(",")]
+                    if line[0] == "[" and line[-2:] == "]\n":
+                        last_good_partition = [
+                            int(i.strip()) for i in line[1:-2].split(",")
+                        ]
                         assert len(last_good_partition) == self.n
                         yield last_good_partition
                         count += 1
-                    elif line=="DONE\n":
+                    elif line == "DONE\n":
                         done = True
                         break
                     elif line.startswith("DONE\t"):
-                        assert line=="DONE\t%i\n" % count
+                        assert line == "DONE\t%i\n" % count
                         done = True
                         break
                 h.close()
                 if not done:
                     h = open(resume_file, "a")
             else:
-                #print "Checkpointing in %s" % resume_file
+                # print "Checkpointing in %s" % resume_file
                 h = open(resume_file, "w")
                 h.write("%r\n" % self)
             if not done:
-                #TODO - Jump the known partitions from the file?
+                # TODO - Jump the known partitions from the file?
                 top = self.top_lattice_node()[0]
-                if top == [0]*self.n:
-                    #Trival top node, this is faster:
+                if top == [0] * self.n:
+                    # Trival top node, this is faster:
                     partitions = possible_partitions(self.n)
                 else:
                     partitions = possible_partition_refinements(top)
                 for partition in partitions:
                     if not last_good_partition:
-                        #Is it balanced?
+                        # Is it balanced?
                         try:
                             q = self.quotient(partition)
                         except ValueError:
@@ -1605,13 +1658,13 @@ class CoupledCellNetwork(AdjMatrixGraph):
                         last_good_partition = None
                 h.write("DONE\t%i\n" % count)
                 h.close()
-            #All done
+            # All done
         else:
-            for q,p in self.quotients_with_partitions():
+            for q, p in self.quotients_with_partitions():
                 yield p
-        #return (p for q,p in self.quotients_with_partitions())
+        # return (p for q,p in self.quotients_with_partitions())
 
-    def lattice(self, caption_sep='+', resume_file=None):
+    def lattice(self, caption_sep="+", resume_file=None):
         """Finds balanced equivalence relations and builds lattice.
 
         Consider graph #5 from the manuscript, which has two edge types:
@@ -1679,57 +1732,76 @@ class CoupledCellNetwork(AdjMatrixGraph):
         """
         n = self.n
         if pydot is None:
-            sys.stderr.write("Please install graphviz, pydot and pyparsing "
-                             "to draw graphs\n")
+            sys.stderr.write(
+                "Please install graphviz, pydot and pyparsing " "to draw graphs\n"
+            )
             return
 
-        #Use the OS path module's "Split Extension" function, work out the file extension
+        # Use the OS path module's "Split Extension" function, work out the file extension
         extension = os.path.splitext(filename)[-1]
-        #Check that there was a leading "."
+        # Check that there was a leading "."
         assert extension[0] == os.path.extsep
-        #Remove the leading "." and make lower case (to give to graphviz as format):
+        # Remove the leading "." and make lower case (to give to graphviz as format):
         extension = extension[1:].lower()
 
-        #Following seems to work, but we lose the number of connections
-        #i.e. get a single line between nodes even when have a 2, or 3 in array
-        #g=pydot.graph_from_adjacency_matrix(self.matrix, directed=directed)
+        # Following seems to work, but we lose the number of connections
+        # i.e. get a single line between nodes even when have a 2, or 3 in array
+        # g=pydot.graph_from_adjacency_matrix(self.matrix, directed=directed)
 
-        g = pydot.Dot(graph_type='digraph')
+        g = pydot.Dot(graph_type="digraph")
 
         try:
             captions = self.captions
             assert len(set(captions)) == self.n, captions
         except AttributeError:
-            captions = [str(i+1) for i in range(n)]
-            
+            captions = [str(i + 1) for i in range(n)]
+
         for i in range(n):
             g.add_node(pydot.Node(captions[i]))
 
         # Test colours and styles are used when drawing graphs with multiple
         # edge types
-        COLORS = ['black', 'red', 'blue', 'green',
-                  'magenta', 'pink', 'yellow', 'navy',
-                  'sienna', 'brown', 'crimson', 'cyan']
-        STYLES = ['solid', 'dashed', 'dotted', 'bold']
-        LINE_COLOR_STYLES = list(zip(COLORS, STYLES*3))
+        COLORS = [
+            "black",
+            "red",
+            "blue",
+            "green",
+            "magenta",
+            "pink",
+            "yellow",
+            "navy",
+            "sienna",
+            "brown",
+            "crimson",
+            "cyan",
+        ]
+        STYLES = ["solid", "dashed", "dotted", "bold"]
+        LINE_COLOR_STYLES = list(zip(COLORS, STYLES * 3))
 
         if len(self.matrices) > len(LINE_COLOR_STYLES):
-            raise ValueError("Too many edge types, define some more valid "
-                             "graphviz styles or colors!")
+            raise ValueError(
+                "Too many edge types, define some more valid "
+                "graphviz styles or colors!"
+            )
 
-        #Now that we have added all the nodes, we can do the edges:
-        for matrix,(color,style) in zip(self.matrices,LINE_COLOR_STYLES):
+        # Now that we have added all the nodes, we can do the edges:
+        for matrix, (color, style) in zip(self.matrices, LINE_COLOR_STYLES):
             for EdgeTo in range(n):
                 for EdgeFrom in range(n):
-                    #We allow multiple edges of the same type
-                    for i in range(matrix[EdgeTo,EdgeFrom]):
-                        g.add_edge(pydot.Edge(captions[EdgeFrom],
-                                              captions[EdgeTo],
-                                              style=style, color=color))
-                    
-        #Now get the graph object to write itself to an image file.
+                    # We allow multiple edges of the same type
+                    for i in range(matrix[EdgeTo, EdgeFrom]):
+                        g.add_edge(
+                            pydot.Edge(
+                                captions[EdgeFrom],
+                                captions[EdgeTo],
+                                style=style,
+                                color=color,
+                            )
+                        )
+
+        # Now get the graph object to write itself to an image file.
         try:
-            g.write(filename, prog='dot', format=extension)
+            g.write(filename, prog="dot", format=extension)
         except pydot.InvocationException:
             sys.stderr.write("Please check graphviz is installed\n")
 
@@ -1738,6 +1810,7 @@ class CoupledCellNetwork(AdjMatrixGraph):
 
 print("Runing self-tests...")
 import doctest
+
 tests = doctest.testmod()
 if tests.failed:
     raise RuntimeError("%i/%i tests failed" % tests)
@@ -1751,170 +1824,1118 @@ print("Tests done")
 #
 ##########################################################
 
-#Network one has three edge types,
-e1 = [[0,0,0,0],
-      [1,0,0,1],
-      [0,0,0,0],
-      [0,0,0,0]]
-e2 = [[0,0,0,0],
-      [0,0,0,0],
-      [1,0,0,1],
-      [0,0,0,0]]
-e3 = [[0,0,0,0],
-      [0,0,0,0],
-      [0,1,0,0],
-      [0,0,0,0]]
-go(CoupledCellNetwork(e1,e2,e3), "n1")
+# Network one has three edge types,
+e1 = [[0, 0, 0, 0], [1, 0, 0, 1], [0, 0, 0, 0], [0, 0, 0, 0]]
+e2 = [[0, 0, 0, 0], [0, 0, 0, 0], [1, 0, 0, 1], [0, 0, 0, 0]]
+e3 = [[0, 0, 0, 0], [0, 0, 0, 0], [0, 1, 0, 0], [0, 0, 0, 0]]
+go(CoupledCellNetwork(e1, e2, e3), "n1")
 
 ##########################################################
 
-e1 = [[0,0,0,0],
-      [1,0,0,0],
-      [1,0,0,0],
-      [0,0,0,0]]
-e2 = [[0,0,1,0],
-      [0,0,0,0],
-      [0,0,0,0],
-      [0,0,0,0]]
-e3 = [[0,0,0,1],
-      [0,0,0,0],
-      [0,0,0,0],
-      [0,0,0,0]]
-e4 = [[0,0,0,0],
-      [0,0,0,0],
-      [0,0,0,0],
-      [0,1,1,0]]
-go(CoupledCellNetwork(e1,e2,e3,e4), "n2")
+e1 = [[0, 0, 0, 0], [1, 0, 0, 0], [1, 0, 0, 0], [0, 0, 0, 0]]
+e2 = [[0, 0, 1, 0], [0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0]]
+e3 = [[0, 0, 0, 1], [0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0]]
+e4 = [[0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0], [0, 1, 1, 0]]
+go(CoupledCellNetwork(e1, e2, e3, e4), "n2")
 
 ##########################################################
 
-e1 = [[0,0,0,0,0],
-      [1,0,0,0,0],
-      [0,0,0,0,0],
-      [0,0,1,0,0],
-      [1,0,0,0,0]]
-e2 = [[0,0,0,1,0],
-      [0,0,0,0,0],
-      [0,1,0,0,0],
-      [0,0,0,0,0],
-      [0,0,0,0,0]]
-go(CoupledCellNetwork(e1,e2), "n3")
+e1 = [
+    [0, 0, 0, 0, 0],
+    [1, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0],
+    [0, 0, 1, 0, 0],
+    [1, 0, 0, 0, 0],
+]
+e2 = [
+    [0, 0, 0, 1, 0],
+    [0, 0, 0, 0, 0],
+    [0, 1, 0, 0, 0],
+    [0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0],
+]
+go(CoupledCellNetwork(e1, e2), "n3")
 
 ##########################################################
 
-e1 = [[0,1,0,0],
-      [0,0,1,0],
-      [0,0,0,1],
-      [1,0,0,0]]
-e2 = [[0,0,0,1],
-      [1,0,0,0],
-      [0,1,0,0],
-      [0,0,1,0]]
-e3 = [[0,0,1,0],
-      [0,0,0,1],
-      [1,0,0,0],
-      [0,1,0,0]]
-go(CoupledCellNetwork(e1,e2,e3), "n4")
+e1 = [[0, 1, 0, 0], [0, 0, 1, 0], [0, 0, 0, 1], [1, 0, 0, 0]]
+e2 = [[0, 0, 0, 1], [1, 0, 0, 0], [0, 1, 0, 0], [0, 0, 1, 0]]
+e3 = [[0, 0, 1, 0], [0, 0, 0, 1], [1, 0, 0, 0], [0, 1, 0, 0]]
+go(CoupledCellNetwork(e1, e2, e3), "n4")
 
 ##########################################################
 
-e1 = [[0,1,0,1,0],
-      [1,0,0,1,0],
-      [0,0,1,0,1],
-      [1,1,0,0,0],
-      [0,0,1,0,1]]
-e2 = [[0,1,0,0,0],
-      [0,0,0,1,0],
-      [1,0,0,0,0],
-      [1,0,0,0,0],
-      [1,0,0,0,0]]
-go(CoupledCellNetwork(e1,e2), "n5")
+e1 = [
+    [0, 1, 0, 1, 0],
+    [1, 0, 0, 1, 0],
+    [0, 0, 1, 0, 1],
+    [1, 1, 0, 0, 0],
+    [0, 0, 1, 0, 1],
+]
+e2 = [
+    [0, 1, 0, 0, 0],
+    [0, 0, 0, 1, 0],
+    [1, 0, 0, 0, 0],
+    [1, 0, 0, 0, 0],
+    [1, 0, 0, 0, 0],
+]
+go(CoupledCellNetwork(e1, e2), "n5")
 
 ##########################################################
 
-e1 = [[0,0,0,1,1],
-      [1,0,0,1,0],
-      [1,0,0,0,1],
-      [1,1,0,0,0],
-      [1,0,1,0,0]]
+e1 = [
+    [0, 0, 0, 1, 1],
+    [1, 0, 0, 1, 0],
+    [1, 0, 0, 0, 1],
+    [1, 1, 0, 0, 0],
+    [1, 0, 1, 0, 0],
+]
 go(CoupledCellNetwork(e1), "n6")
 
 ##########################################################
 
-e1 = [[0,0,0,1,0],
-      [1,0,0,0,0],
-      [0,1,0,0,0],
-      [0,0,1,0,0],
-      [1,0,0,0,0]]
+e1 = [
+    [0, 0, 0, 1, 0],
+    [1, 0, 0, 0, 0],
+    [0, 1, 0, 0, 0],
+    [0, 0, 1, 0, 0],
+    [1, 0, 0, 0, 0],
+]
 go(CoupledCellNetwork(e1), "n7")
 
 ##########################################################
 
-e1 = [[0,0,0,0,0,1,0,0],
-      [0,0,0,0,0,0,0,0],
-      [0,0,0,0,0,0,1,0],
-      [0,0,0,0,0,0,0,0],
-      [0,0,0,0,0,0,0,1],
-      [0,0,0,0,1,0,0,0],
-      [1,0,0,0,0,0,0,0],
-      [0,0,1,0,0,0,0,0]]
-e2 = [[0,0,0,0,0,0,0,0],
-      [0,0,1,0,0,0,1,0],
-      [0,1,0,0,0,0,0,0],
-      [0,0,0,0,1,0,0,1],
-      [0,0,0,1,0,0,0,0],
-      [0,0,0,0,0,0,0,0],
-      [0,0,0,0,0,0,0,0],
-      [0,0,0,0,0,0,0,0]]
-#go(CoupledCellNetwork(e1,e2), "n8")
+e1 = [
+    [0, 0, 0, 0, 0, 1, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 1, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 1],
+    [0, 0, 0, 0, 1, 0, 0, 0],
+    [1, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 1, 0, 0, 0, 0, 0],
+]
+e2 = [
+    [0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 1, 0, 0, 0, 1, 0],
+    [0, 1, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 1, 0, 0, 1],
+    [0, 0, 0, 1, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0],
+]
+# go(CoupledCellNetwork(e1,e2), "n8")
 
 ##########################################################
 
-#This should match Figure 3(b) in Belykh and Hasler (2011) Chaos,
-#Mesoscale and clusters of synchrony in networks of bursting neurons.
+# This should match Figure 3(b) in Belykh and Hasler (2011) Chaos,
+# Mesoscale and clusters of synchrony in networks of bursting neurons.
 #                        1 1 1 1 1 1 1 1 1 1 2 2 2 2 2 2 2 2 2 2 3
 #      1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0
-e1 = [[0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0], # 1
-      [0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0], # 2
-      [0,1,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0], # 3
-      [0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,1,0,0,0,0,0,1,0,0,0,0,0,0,0], # 4
-      [0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0], # 5
-      [0,0,0,0,0,0,1,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0], # 6
-      [0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0], # 7
-      [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,1], # 8
-      [0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0], # 9
-      [0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0], # 10
-      [0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0], # 11
-      [0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,1], # 12
-      [0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0], # 13
-      [1,0,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0], # 14
-      [0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,1,0,0,0,0,0,0], # 15
-      [0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,1,0,0], # 16
-      [0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,1,0,0,0,0,0,0,0,0,0,0], # 17
-      [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0], # 18
-      [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,1,0,0], # 19
-      [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,1,0,0,0,0,0,0,0], # 20
-      [0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0], # 21
-      [0,1,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0], # 22
-      [0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0], # 23
-      [0,0,0,0,0,0,0,0,0,0,1,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0], # 24
-      [0,0,0,0,0,1,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0], # 25
-      [0,0,0,0,1,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0], # 26
-      [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0], # 27
-      [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,1,0,0,0,0,0,0,0,0,0,0,0], # 28
-      [0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0], # 29
-      [0,0,0,0,0,0,0,1,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]] # 30
-#Double check the row sums match the number of edges expected,
-#Node                     1 1 1 1 1 1 1 1 1 1 2 2 2 2 2 2 2 2 2 2 3
+e1 = [
+    [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        1,
+        0,
+        0,
+        0,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+    ],  # 1
+    [
+        0,
+        0,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+    ],  # 2
+    [
+        0,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+    ],  # 3
+    [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        1,
+        0,
+        0,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+    ],  # 4
+    [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        1,
+        0,
+        0,
+        0,
+        0,
+    ],  # 5
+    [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0,
+    ],  # 6
+    [
+        0,
+        0,
+        0,
+        0,
+        0,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+    ],  # 7
+    [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        1,
+    ],  # 8
+    [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0,
+    ],  # 9
+    [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        1,
+        0,
+    ],  # 10
+    [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+    ],  # 11
+    [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        1,
+        0,
+        0,
+        0,
+        1,
+    ],  # 12
+    [
+        0,
+        0,
+        0,
+        0,
+        0,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+    ],  # 13
+    [
+        1,
+        0,
+        0,
+        1,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+    ],  # 14
+    [
+        0,
+        0,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        1,
+        0,
+        0,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+    ],  # 15
+    [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        1,
+        0,
+        0,
+    ],  # 16
+    [
+        0,
+        0,
+        0,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        1,
+        0,
+        0,
+        0,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+    ],  # 17
+    [
+        1,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+    ],  # 18
+    [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        1,
+        0,
+        0,
+    ],  # 19
+    [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+    ],  # 20
+    [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+    ],  # 21
+    [
+        0,
+        1,
+        0,
+        0,
+        0,
+        0,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+    ],  # 22
+    [
+        0,
+        0,
+        0,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+    ],  # 23
+    [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        1,
+        0,
+        0,
+        0,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+    ],  # 24
+    [
+        0,
+        0,
+        0,
+        0,
+        0,
+        1,
+        0,
+        0,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+    ],  # 25
+    [
+        0,
+        0,
+        0,
+        0,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+    ],  # 26
+    [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        1,
+        0,
+    ],  # 27
+    [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        1,
+        0,
+        0,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+    ],  # 28
+    [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        1,
+        0,
+        0,
+        0,
+    ],  # 29
+    [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        1,
+        0,
+        0,
+        0,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+    ],
+]  # 30
+# Double check the row sums match the number of edges expected,
+# Node                     1 1 1 1 1 1 1 1 1 1 2 2 2 2 2 2 2 2 2 2 3
 #       1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0
-assert [2,2,2,3,2,3,2,2,2,2,2,3,1,3,3,3,3,2,2,2,2,3,2,2,2,2,1,2,2,2] == \
-       [sum(row) for row in e1], [sum(row) for row in e1]
+assert [
+    2,
+    2,
+    2,
+    3,
+    2,
+    3,
+    2,
+    2,
+    2,
+    2,
+    2,
+    3,
+    1,
+    3,
+    3,
+    3,
+    3,
+    2,
+    2,
+    2,
+    2,
+    3,
+    2,
+    2,
+    2,
+    2,
+    1,
+    2,
+    2,
+    2,
+] == [sum(row) for row in e1], [sum(row) for row in e1]
 assert np.all(np.array(e1) == np.array(e1).T), "Not symmetric"
 go(CoupledCellNetwork(e1), "n9")
 
-#Modified version, remove edge between 4 and 17 (3 and 16 in Python
-#counting), replace with edge joining 13 and 27 (12 and 26 in Python
-#counting):
+# Modified version, remove edge between 4 and 17 (3 and 16 in Python
+# counting), replace with edge joining 13 and 27 (12 and 26 in Python
+# counting):
 e1[3][16] = 0
 e1[16][3] = 0
 e1[12][26] = 1
@@ -1924,294 +2945,1285 @@ go(CoupledCellNetwork(e1), "n9-modified")
 
 ##################################################################
 
-#This should match Figure 5 in in Belykh and Hasler (2011) Chaos,
-#Mesoscale and clusters of synchrony in networks of bursting neurons.
-e1 = [[0,1,1,0,0,0,0,0,0,0],
-      [1,0,0,1,1,1,0,0,0,0],
-      [1,0,0,1,1,1,0,0,0,0],
-      [0,1,1,0,0,0,1,1,1,1],
-      [0,1,1,0,0,0,1,1,1,1],
-      [0,1,1,0,0,0,1,1,1,1],
-      [0,0,0,1,1,1,0,0,0,0],
-      [0,0,0,1,1,1,0,0,0,0],
-      [0,0,0,1,1,1,0,0,0,0],
-      [0,0,0,1,1,1,0,0,0,0]]
+# This should match Figure 5 in in Belykh and Hasler (2011) Chaos,
+# Mesoscale and clusters of synchrony in networks of bursting neurons.
+e1 = [
+    [0, 1, 1, 0, 0, 0, 0, 0, 0, 0],
+    [1, 0, 0, 1, 1, 1, 0, 0, 0, 0],
+    [1, 0, 0, 1, 1, 1, 0, 0, 0, 0],
+    [0, 1, 1, 0, 0, 0, 1, 1, 1, 1],
+    [0, 1, 1, 0, 0, 0, 1, 1, 1, 1],
+    [0, 1, 1, 0, 0, 0, 1, 1, 1, 1],
+    [0, 0, 0, 1, 1, 1, 0, 0, 0, 0],
+    [0, 0, 0, 1, 1, 1, 0, 0, 0, 0],
+    [0, 0, 0, 1, 1, 1, 0, 0, 0, 0],
+    [0, 0, 0, 1, 1, 1, 0, 0, 0, 0],
+]
 assert np.all(np.array(e1) == np.array(e1).T), "Not symmetric"
 
 print("")
-print("="*50)
+print("=" * 50)
 print("Warning this next one prints out a lot... (big lattice!)")
 go(CoupledCellNetwork(e1), "n10")
 
 ######################################################
 
-#This row of six nodes is based on Zhang et al (2001) Physical Review E, vol 63
-e1 = [[1,1,0,0,0,0],
-      [1,0,1,0,0,0],
-      [0,1,0,1,0,0],
-      [0,0,1,0,1,0],
-      [0,0,0,1,0,1],
-      [0,0,0,0,1,1]]
+# This row of six nodes is based on Zhang et al (2001) Physical Review E, vol 63
+e1 = [
+    [1, 1, 0, 0, 0, 0],
+    [1, 0, 1, 0, 0, 0],
+    [0, 1, 0, 1, 0, 0],
+    [0, 0, 1, 0, 1, 0],
+    [0, 0, 0, 1, 0, 1],
+    [0, 0, 0, 0, 1, 1],
+]
 assert np.all(np.array(e1) == np.array(e1).T), "Not symmetric"
 go(CoupledCellNetwork(e1), "n11")
 
-#This row of seven nodes is based on Zhang et al (2001) Physical Review E, vol 63
-e1 = [[1,1,0,0,0,0,0],
-      [1,0,1,0,0,0,0],
-      [0,1,0,1,0,0,0],
-      [0,0,1,0,1,0,0],
-      [0,0,0,1,0,1,0],
-      [0,0,0,0,1,0,1],
-      [0,0,0,0,0,1,1]]
+# This row of seven nodes is based on Zhang et al (2001) Physical Review E, vol 63
+e1 = [
+    [1, 1, 0, 0, 0, 0, 0],
+    [1, 0, 1, 0, 0, 0, 0],
+    [0, 1, 0, 1, 0, 0, 0],
+    [0, 0, 1, 0, 1, 0, 0],
+    [0, 0, 0, 1, 0, 1, 0],
+    [0, 0, 0, 0, 1, 0, 1],
+    [0, 0, 0, 0, 0, 1, 1],
+]
 assert np.all(np.array(e1) == np.array(e1).T), "Not symmetric"
 go(CoupledCellNetwork(e1), "n12")
 
 ######################################################
 
-#Casado (2003) Figure 2, repeated in the review paper
-#Ibarz et al (2010) as Figure 61(a).
-e1 = [[0,1,0,0,0,0,0,0,0],
-      [0,0,0,0,1,0,0,0,0],
-      [0,0,0,0,1,0,0,0,0],
-      [0,1,0,0,0,0,1,1,0],
-      [0,0,0,1,0,1,0,0,1],
-      [0,1,1,0,0,0,0,1,0],
-      [0,0,0,0,1,0,0,0,0],
-      [0,0,0,0,1,0,0,0,0],
-      [0,0,0,0,0,0,0,1,0]]
+# Casado (2003) Figure 2, repeated in the review paper
+# Ibarz et al (2010) as Figure 61(a).
+e1 = [
+    [0, 1, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 1, 0, 0, 0, 0],
+    [0, 0, 0, 0, 1, 0, 0, 0, 0],
+    [0, 1, 0, 0, 0, 0, 1, 1, 0],
+    [0, 0, 0, 1, 0, 1, 0, 0, 1],
+    [0, 1, 1, 0, 0, 0, 0, 1, 0],
+    [0, 0, 0, 0, 1, 0, 0, 0, 0],
+    [0, 0, 0, 0, 1, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 1, 0],
+]
 go(CoupledCellNetwork(e1), "Casado_F2_original")
 
-#This is Fig. 2 from Rabinovich et al (2001), FitzHugh-Nagumo models in neuronal dynamics.
-#Same as Ibaraz example, but with an edge from node 1 to 5.
-e1 = [[0,1,0,0,0,0,0,0,0],
-      [0,0,0,0,1,0,0,0,0],
-      [0,0,0,0,1,0,0,0,0],
-      [0,1,0,0,0,0,1,1,0],
-      [1,0,0,1,0,1,0,0,1],
-      [0,1,1,0,0,0,0,1,0],
-      [0,0,0,0,1,0,0,0,0],
-      [0,0,0,0,1,0,0,0,0],
-      [0,0,0,0,0,0,0,1,0]]
+# This is Fig. 2 from Rabinovich et al (2001), FitzHugh-Nagumo models in neuronal dynamics.
+# Same as Ibaraz example, but with an edge from node 1 to 5.
+e1 = [
+    [0, 1, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 1, 0, 0, 0, 0],
+    [0, 0, 0, 0, 1, 0, 0, 0, 0],
+    [0, 1, 0, 0, 0, 0, 1, 1, 0],
+    [1, 0, 0, 1, 0, 1, 0, 0, 1],
+    [0, 1, 1, 0, 0, 0, 0, 1, 0],
+    [0, 0, 0, 0, 1, 0, 0, 0, 0],
+    [0, 0, 0, 0, 1, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 1, 0],
+]
 go(CoupledCellNetwork(e1), "Rabinovich_F2_original")
 
-#Modified version of Casado (2003) example to use two edge types,
-#those from n3 and n8 excitatory (edge type two), the rest are
-#inhibitory (edge type one).
-e1 = [[0,1,0,0,0,0,0,0,0],
-      [0,0,0,0,1,0,0,0,0],
-      [0,0,0,0,1,0,0,0,0],
-      [0,1,0,0,0,0,1,0,0],
-      [0,0,0,1,0,1,0,0,1],
-      [0,1,0,0,0,0,0,0,0],
-      [0,0,0,0,1,0,0,0,0],
-      [0,0,0,0,1,0,0,0,0],
-      [0,0,0,0,0,0,0,0,0]]
-e2 = [[0,0,0,0,0,0,0,0,0],
-      [0,0,0,0,0,0,0,0,0],
-      [0,0,0,0,0,0,0,0,0],
-      [0,0,0,0,0,0,0,1,0],
-      [0,0,0,0,0,0,0,0,0],
-      [0,0,1,0,0,0,0,1,0],
-      [0,0,0,0,0,0,0,0,0],
-      [0,0,0,0,0,0,0,0,0],
-      [0,0,0,0,0,0,0,1,0]]
-go(CoupledCellNetwork(e1,e2), "Casado_F2_mod_2e_i38")
+# Modified version of Casado (2003) example to use two edge types,
+# those from n3 and n8 excitatory (edge type two), the rest are
+# inhibitory (edge type one).
+e1 = [
+    [0, 1, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 1, 0, 0, 0, 0],
+    [0, 0, 0, 0, 1, 0, 0, 0, 0],
+    [0, 1, 0, 0, 0, 0, 1, 0, 0],
+    [0, 0, 0, 1, 0, 1, 0, 0, 1],
+    [0, 1, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 1, 0, 0, 0, 0],
+    [0, 0, 0, 0, 1, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0],
+]
+e2 = [
+    [0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 1, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 1, 0, 0, 0, 0, 1, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 1, 0],
+]
+go(CoupledCellNetwork(e1, e2), "Casado_F2_mod_2e_i38")
 
-#Modified from Rabinovich et al (2000), not Ibaraz et al. (2010)
-#Two edge types, outputs from n3 and n8 excitatory (edge type 2),
-#rest are inhibitory (edge type 1)
-#i.e. Like the above, but with an output from one to five.
-e1 = [[0,1,0,0,0,0,0,0,0],
-      [0,0,0,0,1,0,0,0,0],
-      [0,0,0,0,1,0,0,0,0],
-      [0,1,0,0,0,0,1,0,0],
-      [1,0,0,1,0,1,0,0,1],
-      [0,1,0,0,0,0,0,0,0],
-      [0,0,0,0,1,0,0,0,0],
-      [0,0,0,0,1,0,0,0,0],
-      [0,0,0,0,0,0,0,0,0]]
-e2 = [[0,0,0,0,0,0,0,0,0],
-      [0,0,0,0,0,0,0,0,0],
-      [0,0,0,0,0,0,0,0,0],
-      [0,0,0,0,0,0,0,1,0],
-      [0,0,0,0,0,0,0,0,0],
-      [0,0,1,0,0,0,0,1,0],
-      [0,0,0,0,0,0,0,0,0],
-      [0,0,0,0,0,0,0,0,0],
-      [0,0,0,0,0,0,0,1,0]]
-go(CoupledCellNetwork(e1,e2), "Rabinovich_F2_mod_2e_i38")
+# Modified from Rabinovich et al (2000), not Ibaraz et al. (2010)
+# Two edge types, outputs from n3 and n8 excitatory (edge type 2),
+# rest are inhibitory (edge type 1)
+# i.e. Like the above, but with an output from one to five.
+e1 = [
+    [0, 1, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 1, 0, 0, 0, 0],
+    [0, 0, 0, 0, 1, 0, 0, 0, 0],
+    [0, 1, 0, 0, 0, 0, 1, 0, 0],
+    [1, 0, 0, 1, 0, 1, 0, 0, 1],
+    [0, 1, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 1, 0, 0, 0, 0],
+    [0, 0, 0, 0, 1, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0],
+]
+e2 = [
+    [0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 1, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 1, 0, 0, 0, 0, 1, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 1, 0],
+]
+go(CoupledCellNetwork(e1, e2), "Rabinovich_F2_mod_2e_i38")
 
 ######################################################
 
-#To check Belykh's conjecture (2.8) in:
+# To check Belykh's conjecture (2.8) in:
 # Belykh et al. Hierarchy and stability of partially synchronous
 # oscillations of diffusively coupled dynamical systems.
 # Phys Rev E Stat Phys Plasmas Fluids Relat Interdiscip Topics
 # (2000) vol. 62 (5 Pt A) pp. 6332-45
-e1 = [[1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-      [1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-      [0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-      [0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-      [0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-      [0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-      [0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0],
-      [0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0],
-      [0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0],
-      [0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0],
-      [0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0],
-      [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0],
-      [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0],
-      [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0],
-      [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1],
-      [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1]]
-#i.e. make_chain(15)
-#Finding the full lattice (not just the top node) took 3.5 days.
+e1 = [
+    [1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1],
+]
+# i.e. make_chain(15)
+# Finding the full lattice (not just the top node) took 3.5 days.
 go(CoupledCellNetwork(e1), "Belykh_2000_chain15", top_only=True)
 
 ######################################################
 
-#From: 1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16   To:
-e1 = [[0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], #n1 yellow bottom
-      [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0], #n2 blue bottom
-      [0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], #n3 red bottom-right
-      [0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], #n4 green bottom-righ
-      [0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1], #n5 yellow right
-      [0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], #n6 blue right
-      [0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], #n7 red top-right
-      [0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0], #n8 green top-right
-      [0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0], #n9 yellow top
-      [0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0], #n10 blue top
-      [0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0], #n11 red top-left
-      [0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0], #n12 green top-left
-      [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0], #n13 yellow left
-      [0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0], #n14 blue left
-      [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0], #n15 red bottom-left
-      [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0]] #n16 green bottom-left
-assert [sum(row) for row in e1] == [1,2,1,1,2,1,1,1,1,1,2,2,1,2,1,1], \
-       [sum(row) for row in e1]
-assert [sum(e1[i][j] for i in range(16)) for j in range(16)] \
-   == [1, 1, 1, 2, 2, 1, 2, 1, 1, 1, 1, 1, 2, 2, 1, 1], \
-       [sum(e1[i][j] for j in range(16)) for i in range(16)]
+# From: 1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16   To:
+e1 = [
+    [0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],  # n1 yellow bottom
+    [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0],  # n2 blue bottom
+    [0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],  # n3 red bottom-right
+    [0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],  # n4 green bottom-righ
+    [0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],  # n5 yellow right
+    [0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],  # n6 blue right
+    [0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],  # n7 red top-right
+    [0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0],  # n8 green top-right
+    [0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0],  # n9 yellow top
+    [0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0],  # n10 blue top
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0],  # n11 red top-left
+    [0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0],  # n12 green top-left
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0],  # n13 yellow left
+    [0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0],  # n14 blue left
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0],  # n15 red bottom-left
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0],
+]  # n16 green bottom-left
+assert [sum(row) for row in e1] == [1, 2, 1, 1, 2, 1, 1, 1, 1, 1, 2, 2, 1, 2, 1, 1], [
+    sum(row) for row in e1
+]
+assert [sum(e1[i][j] for i in range(16)) for j in range(16)] == [
+    1,
+    1,
+    1,
+    2,
+    2,
+    1,
+    2,
+    1,
+    1,
+    1,
+    1,
+    1,
+    2,
+    2,
+    1,
+    1,
+], [sum(e1[i][j] for j in range(16)) for i in range(16)]
 go(CoupledCellNetwork(e1), "Lehnert_2010_Syncline_Poster")
 
-#Modified to include self coupling to make this a regular netork,
-#From: 1  2  3  4   5  6  7  8   9 10 11 12  13 14 15 16   To:
-e1 = [[0, 0, 0, 2,  0, 0, 0, 0,  0, 0, 0, 0,  0, 0, 0, 0], #n1 yellow bottom
-      [1, 0, 0, 0,  0, 0, 0, 0,  0, 0, 0, 0,  1, 0, 0, 0], #n2 blue bottom
-      [0, 2, 0, 0,  0, 0, 0, 0,  0, 0, 0, 0,  0, 0, 0, 0], #n3 red bottom-right
-      [0, 0, 2, 0,  0, 0, 0, 0,  0, 0, 0, 0,  0, 0, 0, 0], #n4 green bottom-right
-      ######################################################
-      [0, 0, 0, 1,  0, 0, 0, 0,  0, 0, 0, 0,  0, 0, 0, 1], #n5 yellow right
-      [0, 0, 0, 0,  2, 0, 0, 0,  0, 0, 0, 0,  0, 0, 0, 0], #n6 blue right
-      [0, 0, 0, 0,  0, 2, 0, 0,  0, 0, 0, 0,  0, 0, 0, 0], #n7 red top-right
-      [0, 0, 0, 0,  0, 0, 2, 0,  0, 0, 0, 0,  0, 0, 0, 0], #n8 green top-right
-      ######################################################
-      [0, 0, 0, 0,  0, 0, 0, 2,  0, 0, 0, 0,  0, 0, 0, 0], #n9 yellow top
-      [0, 0, 0, 0,  0, 0, 0, 0,  2, 0, 0, 0,  0, 0, 0, 0], #n10 blue top
-      [0, 0, 0, 0,  0, 0, 0, 0,  0, 1, 0, 0,  0, 1, 0, 0], #n11 red top-left
-      [0, 0, 0, 0,  0, 0, 1, 0,  0, 0, 1, 0,  0, 0, 0, 0], #n12 green top-left
-      ######################################################
-      [0, 0, 0, 0,  0, 0, 0, 0,  0, 0, 0, 2,  0, 0, 0, 0], #n13 yellow left
-      [0, 0, 0, 0,  1, 0, 0, 0,  0, 0, 0, 0,  1, 0, 0, 0], #n14 blue left
-      [0, 0, 0, 0,  0, 0, 0, 0,  0, 0, 0, 0,  0, 2, 0, 0], #n15 red bottom-left
-      [0, 0, 0, 0,  0, 0, 0, 0,  0, 0, 0, 0,  0, 0, 2, 0]] #n16 green bottom-left
-for row in e1: assert sum(row)==2
-assert [sum(e1[i][j] for i in range(16)) for j in range(16)] \
-   == [1, 2, 2, 3, 3, 2, 3, 2, 2, 1, 1, 2, 2, 3, 2, 1], \
-       [sum(e1[i][j] for j in range(16)) for i in range(16)]
+# Modified to include self coupling to make this a regular netork,
+# From: 1  2  3  4   5  6  7  8   9 10 11 12  13 14 15 16   To:
+e1 = [
+    [0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],  # n1 yellow bottom
+    [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0],  # n2 blue bottom
+    [0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],  # n3 red bottom-right
+    [0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],  # n4 green bottom-right
+    ######################################################
+    [0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],  # n5 yellow right
+    [0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],  # n6 blue right
+    [0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],  # n7 red top-right
+    [0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0],  # n8 green top-right
+    ######################################################
+    [0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0],  # n9 yellow top
+    [0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0],  # n10 blue top
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0],  # n11 red top-left
+    [0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0],  # n12 green top-left
+    ######################################################
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0],  # n13 yellow left
+    [0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0],  # n14 blue left
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0],  # n15 red bottom-left
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0],
+]  # n16 green bottom-left
+for row in e1:
+    assert sum(row) == 2
+assert [sum(e1[i][j] for i in range(16)) for j in range(16)] == [
+    1,
+    2,
+    2,
+    3,
+    3,
+    2,
+    3,
+    2,
+    2,
+    1,
+    1,
+    2,
+    2,
+    3,
+    2,
+    1,
+], [sum(e1[i][j] for j in range(16)) for i in range(16)]
 go(CoupledCellNetwork(e1), "Lehnert_2010_Syncline_Poster_reg", top_only=True)
 
 ###################################################################
 
-#30 node example from here:
-#http://jasss.soc.surrey.ac.uk/12/2/3.html
-e1= [[0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1],
-     [1,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
-     [1,1,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-     [0,1,1,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0],
-     [0,0,1,1,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-     [0,0,0,0,1,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-     [0,0,0,0,1,1,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-     [0,0,0,0,0,1,1,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-     [0,0,0,0,0,0,1,1,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-     [0,0,0,0,0,0,0,1,1,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0],
-     [0,0,0,0,0,0,0,0,1,0,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-     [0,0,0,0,0,0,0,0,0,1,1,0,1,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-     [0,0,0,0,0,0,0,0,0,0,1,1,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-     [0,0,0,0,0,0,0,0,0,0,0,0,1,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-     [0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0],
-     [0,0,0,0,0,0,0,0,0,0,0,1,0,1,1,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0],
-     [0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,1,1,0,0,0,0,0,0,0,0,0,0,0],
-     [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,1,1,0,0,0,0,0,0,0,0,0,0],
-     [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,1,1,0,0,0,1,0,0,0,0,0],
-     [0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,1,1,0,0,0,0,0,0,0,0],
-     [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,1,1,0,0,0,0,0,0,1],
-     [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,1,1,0,0,0,0,0,0],
-     [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,1,0,0,0,0,0,0],
-     [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,1,1,0,0,0,0],
-     [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,1,0,1,1,0,0,0],
-     [0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,1,1,0,0],
-     [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,1,1,0],
-     [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,1,0],
-     [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,1],
-     [1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,1,0]]
+# 30 node example from here:
+# http://jasss.soc.surrey.ac.uk/12/2/3.html
+e1 = [
+    [
+        0,
+        1,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        1,
+        1,
+    ],
+    [
+        1,
+        0,
+        1,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        1,
+    ],
+    [
+        1,
+        1,
+        0,
+        1,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+    ],
+    [
+        0,
+        1,
+        1,
+        0,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+    ],
+    [
+        0,
+        0,
+        1,
+        1,
+        0,
+        1,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+    ],
+    [
+        0,
+        0,
+        0,
+        0,
+        1,
+        0,
+        1,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+    ],
+    [
+        0,
+        0,
+        0,
+        0,
+        1,
+        1,
+        0,
+        1,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+    ],
+    [
+        0,
+        0,
+        0,
+        0,
+        0,
+        1,
+        1,
+        0,
+        1,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+    ],
+    [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        1,
+        1,
+        0,
+        1,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+    ],
+    [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        1,
+        1,
+        0,
+        0,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        1,
+        0,
+        0,
+        0,
+        0,
+    ],
+    [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        1,
+        0,
+        0,
+        1,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+    ],
+    [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        1,
+        1,
+        0,
+        1,
+        0,
+        0,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+    ],
+    [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        1,
+        1,
+        0,
+        1,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+    ],
+    [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        1,
+        0,
+        1,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+    ],
+    [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        1,
+        1,
+        0,
+        1,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+    ],
+    [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        1,
+        0,
+        1,
+        1,
+        0,
+        1,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+    ],
+    [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        1,
+        1,
+        0,
+        1,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+    ],
+    [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        1,
+        1,
+        0,
+        1,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+    ],
+    [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        1,
+        1,
+        0,
+        1,
+        1,
+        0,
+        0,
+        0,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0,
+    ],
+    [
+        0,
+        0,
+        0,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        1,
+        1,
+        0,
+        1,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+    ],
+    [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        1,
+        1,
+        0,
+        1,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        1,
+    ],
+    [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        1,
+        1,
+        0,
+        1,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+    ],
+    [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        1,
+        1,
+        0,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+    ],
+    [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        1,
+        1,
+        0,
+        1,
+        1,
+        0,
+        0,
+        0,
+        0,
+    ],
+    [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        1,
+        0,
+        0,
+        0,
+        0,
+        1,
+        0,
+        1,
+        1,
+        0,
+        0,
+        0,
+    ],
+    [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        1,
+        1,
+        0,
+        1,
+        1,
+        0,
+        0,
+    ],
+    [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        1,
+        1,
+        0,
+        1,
+        1,
+        0,
+    ],
+    [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        1,
+        1,
+        0,
+        1,
+        0,
+    ],
+    [
+        1,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        1,
+        1,
+        0,
+        1,
+    ],
+    [
+        1,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        1,
+        0,
+    ],
+]
 go(CoupledCellNetwork(e1), "sw30")
 
 ###################################################################
 
-#24 node example 
-e1= [[0,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1],
-     [1,0,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1],
-     [1,1,0,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
-     [1,1,1,0,1,1,1,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0],
-     [0,1,1,1,0,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-     [0,0,1,1,1,0,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-     [0,0,0,1,1,1,0,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
-     [0,0,0,0,1,1,1,0,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0],
-     [0,0,0,0,0,1,1,1,0,1,1,1,0,0,0,0,0,1,0,0,0,0,0,0],
-     [0,0,0,0,0,0,1,1,1,0,1,1,1,0,0,0,0,0,0,0,0,0,0,0],
-     [0,0,0,0,0,0,0,1,1,1,0,1,1,1,0,0,0,0,0,0,0,0,0,0],
-     [0,0,0,1,0,0,0,0,1,1,1,0,1,1,1,0,0,0,0,0,0,0,0,0],
-     [0,0,0,0,0,0,0,0,0,1,1,1,0,1,1,1,0,0,0,0,0,0,0,0],
-     [0,0,0,0,0,0,0,0,0,0,1,1,1,0,1,1,1,0,0,0,1,0,0,0],
-     [0,0,0,0,0,0,0,0,0,0,0,1,1,1,0,1,1,1,0,0,0,0,0,0],
-     [0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,0,1,1,1,0,0,0,0,0],
-     [0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,0,1,1,1,0,0,0,0],
-     [0,0,0,0,0,0,0,0,1,0,0,0,0,0,1,1,1,0,1,1,1,0,0,0],
-     [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,0,1,1,1,0,0],
-     [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,0,1,1,1,0],
-     [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,0,1,1,1],
-     [1,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,1,1,1,0,1,1],
-     [1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,0,1],
-     [1,1,1,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,0]]
+# 24 node example
+e1 = [
+    [0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1],
+    [1, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1],
+    [1, 1, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+    [1, 1, 1, 0, 1, 1, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 1, 1, 1, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 1, 1, 1, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 1, 1, 1, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+    [0, 0, 0, 0, 1, 1, 1, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 1, 1, 1, 0, 1, 1, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 1, 0, 0, 0, 0, 1, 1, 1, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 1, 1, 1, 0, 0, 0, 1, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 1, 1, 1, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 1, 1, 1, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 1, 1, 0, 1, 1, 1, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 1, 1, 1, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 1, 1, 1, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 1, 1, 1],
+    [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 1, 1, 0, 1, 1],
+    [1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 1],
+    [1, 1, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0],
+]
 go(CoupledCellNetwork(e1), "sw24")
 
 ###################################################################
 
-#22 node example 
-e1= [[0,1,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,0,1],
-     [1,0,1,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,0],
-     [0,1,0,1,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0],
-     [0,0,1,0,0,0,0,0,1,0,0,0,0,1,1,0,0,0,0,0,0,0],
-     [0,0,0,0,0,1,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0],
-     [0,0,0,0,1,0,1,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0],
-     [0,0,0,0,0,1,0,1,0,0,0,0,0,0,0,0,0,1,0,0,0,0],
-     [0,0,0,0,0,0,1,0,1,0,0,0,0,0,0,0,0,1,0,0,0,0],
-     [0,0,0,1,0,0,0,1,0,1,0,0,0,0,0,0,0,0,1,1,0,0],
-     [0,0,0,0,0,0,0,0,1,0,1,0,0,0,0,0,0,0,0,1,1,0],
-     [1,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,1,1],
-     [1,1,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,1,0,0],
-     [0,1,1,0,0,0,0,0,0,0,0,1,0,1,0,0,0,0,0,0,0,0],
-     [0,0,1,1,0,0,0,0,0,0,0,0,1,0,1,0,0,0,0,0,0,0],
-     [0,0,0,1,1,0,0,0,0,0,0,0,0,1,0,1,0,0,0,0,0,0],
-     [0,0,0,0,0,1,0,0,0,0,0,0,0,0,1,0,1,0,0,0,0,0],
-     [0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,1,0,1,0,0,0,1],
-     [0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,1,0,1,0,0,0],
-     [0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,1,0,1,0,0],
-     [0,0,0,0,0,0,0,0,1,1,0,1,0,0,0,0,0,0,1,0,0,0],
-     [0,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,0,0,1],
-     [1,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,1,0,0,0,1,0]]
+# 22 node example
+e1 = [
+    [0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+    [1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0],
+    [0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0],
+    [1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1],
+    [1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0],
+    [0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 1],
+    [0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+    [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0],
+]
 go(CoupledCellNetwork(e1), "tangled22")
 
 print("Done")
-

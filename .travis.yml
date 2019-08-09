@@ -11,7 +11,8 @@ before_install:
 # We need these to call GraphViz from Python:
  - "pip install --upgrade pip"
  - "pip install pydot-ng pyparsing"
-# We also need NumPy, which TravisCI should have by default now :)
+ - "pip install black"
+ - black --check .
 
 script:
  - "python graphs.py"
