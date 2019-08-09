@@ -23,14 +23,14 @@ History
 
 | Version | Description                                                      |
 |---------|------------------------------------------------------------------|
-| v1.0.0  | - Supported Python 2.4, 2.5, 2.6, 2.7 directly, and worked under |
-|         |   Python 3 via the 2to3 conversion script.                       |
-| v1.0.1  | - Dropped support for Python 2.4 and 2.5, but now runs unmodifed |
-|         |   on Python 2.6, 2.7 and Python 3.2, 3.3 and 3.4.                |
-| v1.0.2  | - Made the Python script executable; fixed typo.                 |
 | v1.0.3  | - Minor coding style updates.                                    |
 |         | - Can use pydot_ng as Python 3 alternative to pydot.             |
 |         | - Fix for graphical output under Python 3.                       |
+| v1.0.2  | - Made the Python script executable; fixed typo.                 |
+| v1.0.1  | - Dropped support for Python 2.4 and 2.5, but now runs unmodifed |
+|         |   on Python 2.6, 2.7 and Python 3.2, 3.3 and 3.4.                |
+| v1.0.0  | - Supported Python 2.4, 2.5, 2.6, 2.7 directly, and worked under |
+|         |   Python 3 via the 2to3 conversion script.                       |
 
 
 Requirements
