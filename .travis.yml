@@ -10,8 +10,8 @@ before_install:
 # We need these to call GraphViz from Python:
  - "pip install --upgrade pip"
  - "pip install pydot-ng pyparsing"
- - "pip install black"
- - black --check .
+ - "pip install flake8 flake8-black black flake8-comprehensions flake8-blind-except flake8-bugbear flake8-docstrings flake8-rst-docstrings"
+ - flake8 .
 
 script:
  - "python graphs.py"
