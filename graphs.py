@@ -277,6 +277,12 @@ except ImportError:
 MAXLAT = 42294  # Increase this if you have a big powerful computer and are patient ;)
 
 
+class NotBalancedError(ValueError):
+    """Not a balanced equivalence relation."""
+
+    pass
+
+
 def make_quotient(adj_matrix, partition):
     """Return quotient adjacency matrix, or raises an exception.
 
@@ -328,7 +334,7 @@ def make_quotient(adj_matrix, partition):
     >>> print(make_quotient(a, [0, 1, 1]))
     Traceback (most recent call last):
     ...
-    ValueError: Not a balanced equivalence relation
+    NotBalancedError: Not a balanced equivalence relation
     """
     n = len(adj_matrix)  # gives number of rows, but should be square matrix
     assert (n, n) == adj_matrix.shape, "Matrix not square"
@@ -360,7 +366,7 @@ def make_quotient(adj_matrix, partition):
         # We use the .all() to check if they are all True, thus all equal.
         if not (q_matrix_step_2[new_row, :] == q_matrix_step_1[old_row, :]).all():
             # Not a balanced colouring...
-            raise ValueError("Not a balanced equivalence relation")
+            raise NotBalancedError("Not a balanced equivalence relation")
     return q_matrix_step_2
 
 
@@ -1403,7 +1409,7 @@ class CoupledCellNetwork(AdjMatrixGraph):
         try:
             q = self.quotient(p)
             return p, q
-        except ValueError:
+        except NotBalancedError:
             raise RuntimeError("Top lattice node %r was not balanced" % p)
 
     def quotient(self, partition):
