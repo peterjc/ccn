@@ -343,7 +343,7 @@ def make_quotient(adj_matrix, partition):
     #Take column sums to go from n by n matrix to n by k matrix,
     q_matrix_step_1 = np.zeros([n,k], np.uint8)
     for (old_col, new_col) in enumerate(partition):
-        q_matrix_step_1[:,new_col] += adj_matrix[:,old_col]
+        q_matrix_step_1[:,new_col] += adj_matrix[:,old_col].astype(np.uint8)
     #Take representative rows to go from n by k matrix to k by k matrix,
     #note that we needlessly over-write n-k of the rows (simpler to just
     #do it rather than checking as it doesn't matter).
@@ -950,7 +950,7 @@ class CoupledCellLattice(AdjMatrixGraph):
         max_rank = max(ranks)
 
         try:
-            refinement = np.zeros((n, n), np.int8)
+            refinement = np.zeros((n, n), np.uint8)
             #Note this includes zeros (False)  on the diagonal:
             #refinement = np.array([[partition_refinement(a,b) for b in partitions]\
             #                        for a in partitions], np.bool)
@@ -1118,7 +1118,7 @@ class CoupledCellNetwork(AdjMatrixGraph):
                 n = len(matrix)
                 self.n = n
             #Turn it into a numpy array (in case it wasn't already)
-            matrix = np.array(matrix)
+            matrix = np.array(matrix, np.uint8)
             assert (n,n) == matrix.shape, "All edge matrices must be same size"
             self.matrices.append(matrix)
             
