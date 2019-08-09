@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-"""Algorithm to find balanced equivalence relations and lattices.
+r"""Algorithm to find balanced equivalence relations and lattices.
 
 Copyright 2010-2012 by Hiroko Kamei & Peter Cock.  All rights reserved.
 Revisions copyright 2012-2019 Peter Cock. All rights reserved.
@@ -61,7 +61,7 @@ with Python and the interactive Python prompt for simplicity we recommend
 simply modifying this file and running it as shown above.
 
 As a simple example, consider this regular network with just one edge type
-(Graph #7 in the manuscript):
+(Graph #7 in the manuscript)::
 
     *---------------------------*
     |                           |
@@ -134,7 +134,7 @@ undirected edges with the directionality of the partition cover relationship
 implicit in the vertical placement of the nodes. To obtain the lattice diagram
 as an image file, assuming GraphViz etc is setup, use lattice7.plot(filename),
 e.g lattice7.plot("n7_lattice.pdf") for a PDF file. Here is a simple text
-graphic of this lattice diagram:
+graphic of this lattice diagram::
 
     *--------------------------------------*
     |                                      |
@@ -157,7 +157,7 @@ graphic of this lattice diagram:
 For a multiple edge type example, consider this inhomogeneous version of the
 previous network, with two edge types (Graph #3 in the manuscript), where edge
 type one (single thickness) arrows run from node 1 to 5, 1 to 2 and 3 to 4,
-and edge type two (dotted) arrows run from node 4 to 1 and from 2 to 3.
+and edge type two (dotted) arrows run from node 4 to 1 and from 2 to 3::
 
     *---------------------------*
     |                           |
@@ -221,7 +221,7 @@ And using the balanced equivalence relations to build the lattice:
 
 The lattice is an undirected graph (here with four nodes, listed on the right
 of the output in cyclic notation) which is represented on the left as a lower
-triangular matrix. Graphically:
+triangular matrix. Graphically::
 
     *--------------------------------------*
     |                                      |
@@ -245,7 +245,7 @@ The idea is you can edit the examples in last section of this file to run this
 program on particular networks of interest.
 """
 
-
+import doctest
 import os
 import sys
 import time
@@ -286,13 +286,13 @@ def make_quotient(adj_matrix, partition):
     non-negative integer elements representing an adjacency matrix (single
     edge type), with the second argument (partition) a partition of the
     nodes.
-    
+
     For an n by n adjacency matrix (i.e. a graph with n nodes), the partition
     should be given as a list of n integers between 0 and k-1, where k is the
     number of equivalence classes. The function will return a k by k quotient
     matrix where the partition is a balanced equivalence relation (balanced
     colouring), or raise an exception if the partition is not balanced.
-    
+
     This partition representation was chosen to simplify this function. See
     function cyclic_partition for displaying such a partition representations
     in a human friendly way, and function possible_partitions for generating
@@ -391,7 +391,7 @@ def possible_partitions(n):
 
     Note that this outputs [0, 1, 1], but not [1, 0, 0] which is a different
     representation of the same node partition. The choice is arbitrary, but
-    was made since Python considers [0, 1, 1] < [1, 0, 0]. 
+    was made since Python considers [0, 1, 1] < [1, 0, 0].
 
     >>> for partition in possible_partitions(4):
     ...     print(partition)
@@ -419,7 +419,6 @@ def possible_partitions(n):
     representation of the same node partition. The choice is arbitrary, but
     was made since Python considers [0, 1, 1] < [1, 0, 0].
     """
-
     # This is a recursive function
     if n < 1:
         raise ValueError("Require n at least one, not %r" % n)
@@ -437,7 +436,7 @@ def possible_partitions(n):
 
 
 def possible_partitions_of_required_size(n, min_size):
-    """Specialised version of function possible_partitions
+    """Specialised version of function possible_partitions.
 
     >>> for partition in possible_partitions_of_required_size(2, 1):
     ...     print(partition)
@@ -499,7 +498,7 @@ def possible_partitions_of_required_size(n, min_size):
 
 
 def possible_partition_refinements(top):
-    """Given a partition of n nodes, how can it be sub-partitioned?
+    """Given a partition of n nodes, how can it be sub-partitioned.
 
     The main intended usage of this function is an optimisation in
     finding all possible balanced colourings. Given the top lattice
@@ -559,7 +558,7 @@ def possible_partition_refinements(top):
 
     >>> for partition in possible_partitions(len(top)):
     ...     if partition_refinement(partition, top) or partition==top:
-    ...         print("%s %s" % (partition, cyclic_partition(partition))) 
+    ...         print("%s %s" % (partition, cyclic_partition(partition)))
     [0, 0, 1, 1, 2] (12)(34)(5)
     [0, 0, 1, 2, 3] (12)(3)(4)(5)
     [0, 1, 2, 2, 3] (1)(2)(34)(5)
@@ -587,7 +586,10 @@ def possible_partition_refinements(top):
     assert set(range(k)) == set(top)
 
     # for i in range(k):
-    #    print "Class %i, count %i, sub-partitions %r" % (i, top.count(i), list(possible_partitions(top.count(i))))
+    #    print(
+    #        "Class %i, count %i, sub-partitions %r"
+    #        % (i, top.count(i), list(possible_partitions(top.count(i))))
+    # )
     pN = [possible_partitions(top.count(i)) for i in range(k)]
     for sub_parts in product(*pN):
         # print sub_parts, "-->"
@@ -670,9 +672,9 @@ def partition_refinement(partition_a, partition_b):
     True
     >>> partition_refinement([0,0,0,0],[0,1,2,3])
     False
-    
+
     Less trivially,
- 
+
     >>> partition_refinement([0,1,2,2,1],[0,0,1,1,0])
     True
     >>> partition_refinement([0,0,1,1,0],[0,1,2,2,1])
@@ -766,7 +768,7 @@ def go(a, name="", format="png", top_only=False):
     the adjacency matrix (and draws it to a file), those partitions which are
     balanced equivalence classes and their associated quotient networks, then
     the resulting lattice (which is also drawn to a file).
-    
+
     The optional name argument is used to assign image filenames (requires
     GraphViz etc), together with the optional the format argument which
     specifies the image type (e.g. png or pdf, defaulting to png).
@@ -841,7 +843,7 @@ class AdjMatrixGraph(object):
     """Object to represent a graph using an adjacency matrix."""
 
     def __init__(self, edge_matrix):
-        """This function is called when an AdjMatrixGraph object is created
+        """This function is called when an AdjMatrixGraph object is created.
 
         Note that init is short for initialise.
 
@@ -849,6 +851,7 @@ class AdjMatrixGraph(object):
                       Either a square numpy array object, square
                       numpy matrix object, or list of lists of integers.
                       Entries should be non-negative integers.
+
         e.g.
 
         >>> my_matrix = AdjMatrixGraph([[1,0,1],[1,1,0],[0,0,1]])
@@ -870,7 +873,7 @@ class AdjMatrixGraph(object):
         assert self.matrix.min() >= 0, "Entries should be non-negative"
 
     def __str__(self):
-        """String representation of the matrix, used by the print command"""
+        """String representation of the matrix, used by the print command."""
         answer = []
         n = self.n
         x = max(len(str(self.matrix[i, j])) for i in range(n) for j in range(n))
@@ -879,15 +882,15 @@ class AdjMatrixGraph(object):
         return "\n".join(answer)
 
     def __repr__(self):
+        """String representation of the matrix."""
         return "%s(%r)" % (self.__class__.__name__, self.matrix.tolist())
 
 
 class CoupledCellLattice(AdjMatrixGraph):
-    """Object for a balanced equivalence relation lattice.
-    """
+    """Object for a balanced equivalence relation lattice."""
 
     def __init__(self, *partitions):
-        """This function is called when an CoupledCellLattice object is created.
+        r"""This function is called when an CoupledCellLattice object is created.
 
         You can create a lattice object "by hand" if required. However, you are
         normally expected to create a CoupledCellNetwork object and use its
@@ -917,7 +920,7 @@ class CoupledCellLattice(AdjMatrixGraph):
         The output represents a four by four lower triangular adjacency matrix
         with 1 and 0 entries (with and without a connection) on the left, and
         the node captions on the right (in cyclic notation). Notice this has
-        just four edges, represented graphically:
+        just four edges, represented graphically::
 
             *--------------------------------------*
             |                                      |
@@ -1029,7 +1032,7 @@ class CoupledCellLattice(AdjMatrixGraph):
         self.captions = [cyclic_partition(p, sep) for p in partitions]
 
     def __str__(self):
-        """String representation of the matrix, used by the print command"""
+        """String representation of the matrix, used by the print command."""
         answer = []
         n = self.n
         x = max(len(str(self.matrix[i, j])) for i in range(n) for j in range(n))
@@ -1119,6 +1122,7 @@ class CoupledCellNetwork(AdjMatrixGraph):
                         object, square numpy matrix, or a list of lists of
                         integers. The matrix elements should be non-negative
                         integers.
+
         e.g.
 
         >>> ccn1 = CoupledCellNetwork([[1,0,1],[1,1,0],[0,0,1]])
@@ -1148,7 +1152,7 @@ class CoupledCellNetwork(AdjMatrixGraph):
             self.matrices.append(matrix)
 
     def __str__(self):
-        """String representation of the matrix, used by the print command"""
+        """String representation of the matrix, used by the print command."""
         answer = []
         n = self.n
         try:
@@ -1186,6 +1190,7 @@ class CoupledCellNetwork(AdjMatrixGraph):
         return "\n".join(answer)
 
     def __repr__(self):
+        """String representation for debugging."""
         answer = ", ".join(repr(m.tolist()) for m in self.matrices)
         return "%s(%s)" % (self.__class__.__name__, answer)
 
@@ -1240,15 +1245,6 @@ class CoupledCellNetwork(AdjMatrixGraph):
         ...                           [0, 0, 0, 0,  1, 0, 0, 0,  0, 0, 0, 0,  1, 0, 0, 0],
         ...                           [0, 0, 0, 0,  0, 0, 0, 0,  0, 0, 0, 0,  0, 2, 0, 0],
         ...                           [0, 0, 0, 0,  0, 0, 0, 0,  0, 0, 0, 0,  0, 0, 2, 0]])
-
-        #TODO - Remove this commented example,
-        #>>> def input_color_count(node, matrix, n, color, partition):
-        #...     return sum(matrix[node,i] for i in range(n) if partition[i]==color)
-        #>>> def single_edge_color_counts(node, matrix, n, colors, partition):
-        #...     return tuple(input_color_count(node, matrix, n, c, partition) for c in range(colors))
-        #>>> p = [0]*16
-        #>>> for i in range(16): print single_edge_color_counts(i, big.matrices[0], len(p), max(p)+1, p)
-        
         >>> print(big.input_driven_refinement([0]*16))
         [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
 
@@ -1313,7 +1309,7 @@ class CoupledCellNetwork(AdjMatrixGraph):
 
     def top_lattice_node(self):
         """Returns the top/minimal partition and its quotient matrix.
-        
+
         Uses an algorithm combining Aldis (2008) and Belykh and Hasler (2011)
         to find the lattice top node, which is the balanced equivalence relation
         using the fewest partition classes (aka balanced coloring with minimal
@@ -1465,7 +1461,7 @@ class CoupledCellNetwork(AdjMatrixGraph):
         """Generator function, returning smaller matrices and partitions.
 
         This allows you to iterate over all valid quotient networks:
-        
+
         >>> a = CoupledCellNetwork([[0,1,0,1],
         ...                         [0,0,1,0],
         ...                         [1,1,0,0],
@@ -1557,7 +1553,7 @@ class CoupledCellNetwork(AdjMatrixGraph):
         """Generator function, returning smaller matrices.
 
         This allows you to iterate over all valid quotient networks:
-        
+
         >>> a = CoupledCellNetwork([[0,1,0,1],
         ...                         [0,0,1,0],
         ...                         [1,1,0,0],
@@ -1583,7 +1579,7 @@ class CoupledCellNetwork(AdjMatrixGraph):
         """Generator function, returns those partitions which are balanced.
 
         This allows you to iterate over all valid balanced equivalence relations:
-        
+
         >>> a = CoupledCellNetwork([[0,1,0,1],
         ...                         [0,0,1,0],
         ...                         [1,1,0,0],
@@ -1665,7 +1661,7 @@ class CoupledCellNetwork(AdjMatrixGraph):
         # return (p for q,p in self.quotients_with_partitions())
 
     def lattice(self, caption_sep="+", resume_file=None):
-        """Finds balanced equivalence relations and builds lattice.
+        r"""Finds balanced equivalence relations and builds lattice.
 
         Consider graph #5 from the manuscript, which has two edge types:
 
@@ -1696,7 +1692,7 @@ class CoupledCellNetwork(AdjMatrixGraph):
 
         This 5 node graph has a 5 node lattice which includes both trivial
         node (12345) from merging all graph nodes (rank 1), and also node
-        (1)(2)(3)(4)(5) for merging no graph nodes (rank 5). Graphically:
+        (1)(2)(3)(4)(5) for merging no graph nodes (rank 5). Graphically::
 
             *--------------------------------------*
             |                                      |
@@ -1809,7 +1805,6 @@ class CoupledCellNetwork(AdjMatrixGraph):
 #########################################################################
 
 print("Runing self-tests...")
-import doctest
 
 tests = doctest.testmod()
 if tests.failed:
