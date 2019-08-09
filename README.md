@@ -23,6 +23,7 @@ History
 
 | Version | Description                                                      |
 |---------|------------------------------------------------------------------|
+| v1.1.0  | - Using SymPy (https://www.sympy.org - symbolic python).         |
 | v1.0.4  | - Testing Python 3.5 to 3.8 only; dropped Python 2 support.      |
 |         | - Fixed casting 'int64' to 'uint8' problem on recent numpy.      |
 | v1.0.3  | - Minor coding style updates.                                    |

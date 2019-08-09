@@ -252,7 +252,7 @@ import time
 from itertools import product
 
 if "-v" in sys.argv or "--version" in sys.argv:
-    print("Coupled Cell Network graphs.py v1.0.4")
+    print("Coupled Cell Network graphs.py v1.1.0")
     sys.exit(0)
 
 try:
@@ -260,6 +260,10 @@ try:
 except ImportError:
     sys.exit("Please install NumPy")
 
+try:
+    import sympy as sp
+except ImportError:
+    sys.exit("Please install SymPy")
 try:
     import pydot
 except ImportError:

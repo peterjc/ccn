@@ -8,10 +8,11 @@ python:
 before_install:
 # We need GraphViz to draw figures of graphs and lattices:
  - "sudo apt-get install graphviz"
+# We need numpy and sympy
+ - pip install numpy sympy
 # We need these to call GraphViz from Python:
  - "pip install --upgrade pip"
  - "pip install pydot-ng pyparsing"
-# We also need NumPy, which TravisCI should have by default now :)
 
 script:
  - "python graphs.py"
