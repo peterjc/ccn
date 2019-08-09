@@ -579,7 +579,6 @@ def possible_partition_refinements(top):
     8280
 
     """
-    n = len(top)
     size = max(top)
     k = size + 1
     assert top[0] == 0
@@ -943,7 +942,6 @@ class CoupledCellLattice(AdjMatrixGraph):
         The node captions and ranks are determined from the partitions (balanced
         equivalence relations, also known as balanced colourings) automatically.
         """
-        start = time.time()
         self.n = n = len(partitions)  # number of lattice nodes
         self.partitions = partitions
 
@@ -952,7 +950,8 @@ class CoupledCellLattice(AdjMatrixGraph):
                 "Excessive lattice size %i nodes, MAXLAT = %i" % (n, MAXLAT)
             )
 
-        trivial_partitions = [[0] * len(partitions[0]), range(len(partitions[0]))]
+        # trivial_partitions = [[0] * len(partitions[0]), range(len(partitions[0]))]
+
         colors = ["white"] * n
         # This assumes the partitions are sorted:
         if partitions[0] == [0] * len(partitions[0]):
@@ -962,7 +961,6 @@ class CoupledCellLattice(AdjMatrixGraph):
         self.colors = colors
 
         self.ranks = ranks = [len(set(p)) for p in partitions]
-        max_rank = max(ranks)
 
         try:
             refinement = np.zeros((n, n), np.uint8)
