@@ -812,9 +812,9 @@ def go(a, name="", format="png", top_only=False):
         # the a.quotients_with_partitions() method or similar if you didn't
         # want the lattice).
         start = time.time()
-        l = a.lattice()
+        lattice = a.lattice()
         taken = time.time() - start
-        for p in l.partitions:
+        for p in lattice.partitions:
             print("")
             print("Partition %s, quotient matrix:" % cyclic_partition(p, sep))
             q = a.quotient(p)
@@ -826,7 +826,7 @@ def go(a, name="", format="png", top_only=False):
         # l = a.lattice()
         print("")
         print("%s Lattice matrix:" % name)
-        print(l)
+        print(lattice)
         print("")
         if taken < 60:
             print("Lattice took %0.1fs" % taken)
@@ -835,8 +835,8 @@ def go(a, name="", format="png", top_only=False):
         else:
             print("Lattice took %0.1fhours" % (taken / 360))
         if name and not os.path.isfile("%s_lattice.%s" % (name, format)):
-            l.plot("%s_lattice.%s" % (name, format))
-        print("(%i lattice nodes)" % l.n)
+            lattice.plot("%s_lattice.%s" % (name, format))
+        print("(%i lattice nodes)" % lattice.n)
 
 
 class AdjMatrixGraph(object):
