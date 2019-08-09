@@ -1654,9 +1654,8 @@ class CoupledCellNetwork(AdjMatrixGraph):
                 h.close()
             # All done
         else:
-            for q, p in self.quotients_with_partitions():
+            for _q, p in self.quotients_with_partitions():
                 yield p
-        # return (p for q,p in self.quotients_with_partitions())
 
     def lattice(self, caption_sep="+", resume_file=None):
         r"""Finds balanced equivalence relations and builds lattice.
@@ -1783,7 +1782,7 @@ class CoupledCellNetwork(AdjMatrixGraph):
             for EdgeTo in range(n):
                 for EdgeFrom in range(n):
                     # We allow multiple edges of the same type
-                    for i in range(matrix[EdgeTo, EdgeFrom]):
+                    for _ in range(matrix[EdgeTo, EdgeFrom]):
                         g.add_edge(
                             pydot.Edge(
                                 captions[EdgeFrom],
