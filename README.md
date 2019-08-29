@@ -70,11 +70,11 @@ this code by typing:
 
     python graphs.py
 
-On Windows, assuming you have installed Python 2.7 in the default location,
+On Windows, assuming you have installed Python 3.7 in the default location,
 you would use the following in the command prompt (also called a "DOS box"
 or terminal window):
 
-    C:\Python27\python graphs.py
+    C:\Python37\python graphs.py
 
 The script should then run, printing output to the screen, and (assuming the
 GraphViz requirements are installed) also generate a number of image files.
