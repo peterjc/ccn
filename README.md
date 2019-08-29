@@ -21,19 +21,19 @@ https://github.com/peterjc/ccn
 History
 -------
 
-| Version | Description                                                      |
-|---------|------------------------------------------------------------------|
-| v1.0.5  | - Adopted black code style; using flake8 to check style etc.     |
-| v1.0.4  | - Testing Python 3.5 to 3.8 only; dropped Python 2 support.      |
-|         | - Fixed casting 'int64' to 'uint8' problem on recent numpy.      |
-| v1.0.3  | - Minor coding style updates.                                    |
-|         | - Can use pydot_ng as Python 3 alternative to pydot.             |
-|         | - Fix for graphical output under Python 3.                       |
-| v1.0.2  | - Made the Python script executable; fixed typo.                 |
-| v1.0.1  | - Dropped support for Python 2.4 and 2.5, but now runs unmodifed |
-|         |   on Python 2.6, 2.7 and Python 3.2, 3.3 and 3.4.                |
-| v1.0.0  | - Supported Python 2.4, 2.5, 2.6, 2.7 directly, and worked under |
-|         |   Python 3 via the 2to3 conversion script.                       |
+| Version | Released   | Description                                                      |
+|---------|------------|------------------------------------------------------------------|
+| v1.0.5  | 2019-08-10 | - Adopted black code style; using flake8 to check style etc.     |
+| v1.0.4  | 2019-08-09 | - Testing Python 3.5 to 3.8 only; dropped Python 2 support.      |
+|         |            | - Fixed casting 'int64' to 'uint8' problem on recent numpy.      |
+| v1.0.3  | 2015-09-28 | - Minor coding style updates.                                    |
+|         |            | - Can use pydot_ng as Python 3 alternative to pydot.             |
+|         |            | - Fix for graphical output under Python 3.                       |
+| v1.0.2  | 2014-12-02 | - Made the Python script executable; fixed typo.                 |
+| v1.0.1  | 2014-05-10 | - Dropped support for Python 2.4 and 2.5, but now runs unmodifed |
+|         |            |   on Python 2.6, 2.7 and Python 3.2, 3.3 and 3.4.                |
+| v1.0.0  | 2012-11-04 | - Supported Python 2.4, 2.5, 2.6, 2.7 directly, and worked under |
+|         |            |   Python 3 via the 2to3 conversion script.                       |
 
 
 Requirements
