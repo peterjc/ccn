@@ -377,7 +377,9 @@ def make_quotient(adj_matrix, partition):
 
 
 def make_reduced_lattice_eigenvalue_matrix(adj_matrix, partition):
-    """Used as part of reducing a lattice, returns a new matrix or an exception.
+    """Make a reduced lattice eigenvalue matrix.
+
+    Used as part of reducing a lattice, returns a new matrix or an exception.
 
     The operations are much like that for computing a quotient matrix
     or testing if an equivalence relation is balanced - see the function
@@ -1807,11 +1809,12 @@ class CoupledCellNetwork(object):
         return CoupledCellLattice(*partitions)
 
     def reduced_lattice(self, caption_sep="+", resume_file=None):
+        """Return reduced lattic."""
         q_and_p = list(self.quotients_with_partitions(resume_file))
         # Sort by rank (increasing), then by partition lexically.
         # rank(p) = max(p) + 1, thus equivalent to sort on max(p)
         q_and_p.sort(key=lambda q_p: (max(q_p[1]), q_p[1]))
-        n = len(q_and_p)
+        # n = len(q_and_p)
 
         PLACES = 6  # Used for fuzzy matching of eigenvalues
 
@@ -1878,8 +1881,7 @@ class CoupledCellNetwork(object):
                 # print(p, e)
                 try:
                     q = make_reduced_lattice_eigenvalue_matrix(m, p)
-                except ValueError as err:
-                    # print(p, ("<-- No: %s" % err))
+                except ValueError:
                     ok = False
                     break
             if not ok:
@@ -1919,8 +1921,10 @@ class CoupledCellNetwork(object):
                                 #       % (j, eta[j], omega[j]))
                                 e -= eta[j]
                                 omega[i] -= omega[j]
-                                # print("Reduced lattice node %s, revised eta %r, omega %r"
-                                #       % (i, e, omega[i]))
+                                # print(
+                                #     "Reduced lattice node %s, "
+                                #     "revised eta %r, omega %r"
+                                #     % (i, e, omega[i]))
                         eta[i] = e
             if min(eta) < 0 or min(omega[-1]) < 0:
                 continue
