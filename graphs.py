@@ -603,13 +603,13 @@ def possible_partition_refinements(top):
     # )
     pN = [possible_partitions(top.count(i)) for i in range(k)]
     for sub_parts in product(*pN):
-        # print sub_parts, "-->"
+        # print(sub_parts, "-->")
         new_partition = []
         old_index = [0] * k
         mapping = {}
         for old in top:
             sub = sub_parts[old][old_index[old]]
-            # print sub_parts, "-->", old, sub_parts[old], old_index[old], sub
+            # print(sub_parts, "-->", old, sub_parts[old], old_index[old], sub)
             if (old, sub) in mapping:
                 new_partition.append(mapping[old, sub])
             else:
@@ -620,7 +620,7 @@ def possible_partition_refinements(top):
                 new_partition.append(v)
                 mapping[old, sub] = v
             old_index[old] += 1
-        # print "-"*40, ">", new_partition
+        # print("-"*40, ">", new_partition)
         yield new_partition
 
 
@@ -1520,7 +1520,7 @@ class CoupledCellNetwork(AdjMatrixGraph):
             count = 0
             last_good_partition = None
             if os.path.isfile(resume_file):
-                # print "Resuming from %s" % resume_file
+                # print("Resuming from %s" % resume_file)
                 if resume_file.endswith(".gz"):
                     import gzip
 
@@ -1548,7 +1548,7 @@ class CoupledCellNetwork(AdjMatrixGraph):
                 if not done:
                     h = open(resume_file, "a")
             else:
-                # print "Checkpointing in %s" % resume_file
+                # print("Checkpointing in %s" % resume_file)
                 h = open(resume_file, "w")
                 h.write("%r\n" % self)
             if not done:
@@ -1619,7 +1619,7 @@ class CoupledCellNetwork(AdjMatrixGraph):
             count = 0
             last_good_partition = None
             if os.path.isfile(resume_file):
-                # print "Resuming from %s" % resume_file
+                # print("Resuming from %s" % resume_file)
                 if resume_file.endswith(".gz"):
                     import gzip
 
@@ -1647,7 +1647,7 @@ class CoupledCellNetwork(AdjMatrixGraph):
                 if not done:
                     h = open(resume_file, "a")
             else:
-                # print "Checkpointing in %s" % resume_file
+                # print("Checkpointing in %s" % resume_file)
                 h = open(resume_file, "w")
                 h.write("%r\n" % self)
             if not done:
