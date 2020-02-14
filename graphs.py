@@ -4,15 +4,16 @@ r"""Algorithm to find balanced equivalence relations and lattices.
 Copyright 2010-2012 by Hiroko Kamei & Peter Cock.  All rights reserved.
 Revisions copyright 2012-2019 Peter Cock. All rights reserved.
 
-This script is provided as a supplementary file for the manuscript:
+Version 1.0.0 of this code was a standalone Python script provided as a
+supplementary file for the manuscript:
 
-Hiroko Kamei and Peter Cock (2013) "Computation of Balanced Equivalence
-Relations and their Lattice for a Coupled Cell Network", SIAM Journal
-on Applied Dynamical Systems (SIADS) 12(1), pp. 352-382.
-http://dx.doi.org/10.1137/100819795 http://arxiv.org/abs/1211.6334
+    Hiroko Kamei and Peter Cock (2013) "Computation of Balanced Equivalence
+    Relations and their Lattice for a Coupled Cell Network", SIAM Journal
+    on Applied Dynamical Systems (SIADS) 12(1), pp. 352-382.
+    http://dx.doi.org/10.1137/100819795 http://arxiv.org/abs/1211.6334
 
 You are welcome to use and modify this code provided this copyright notice
-s retained, however we request you cite this manuscript in any scientific
+is retained, however we request you cite this manuscript in any scientific
 publications using it.
 
 This code and any public updates to it are available on GitHub, at:
