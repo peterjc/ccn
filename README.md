@@ -23,6 +23,7 @@ History
 
 | Version | Released   | Description                                         |
 |---------|------------|-----------------------------------------------------|
+| v1.1.0  | *Pending*  | - Split core into ``coupled_cell_network`` module.  |
 | v1.0.5  | 2019-08-10 | - Adopted black code style.                         |
 |         |            | - Using flake8 to check style etc.                  |
 | v1.0.4  | 2019-08-09 | - Testing Python 3.5 to 3.8 only                    |
