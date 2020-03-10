@@ -287,6 +287,93 @@ class NotBalancedError(ValueError):
     pass
 
 
+# These permutations and combinations functions are by Ulrich Hoffmann,
+# from ActiveState's python "Cookbook" online here:
+# http://aspn.activestate.com/ASPN/Cookbook/Python/Recipe/190465
+def xcombinations(items, n):
+    """Generator function, returns an iterator"""
+    # Small n are special cased to reduce function calls
+    if n == 0:
+        yield []
+    elif n == 1:
+        yield items
+    elif n == 2:
+        yield items
+        yield items[::-1]
+    elif n == 3:
+        a, b, c = items
+        yield items  # [a,b,c]
+        yield [a, c, b]
+        yield [b, a, c]
+        yield [b, c, a]
+        yield [c, b, a]
+        yield [c, a, b]
+    elif n == 4:
+        a, b, c, d = items
+        yield items  # [a,b,c,d]
+        yield [a, b, d, c]
+        yield [a, c, b, d]
+        yield [a, c, d, b]
+        yield [a, d, b, c]
+        yield [a, d, c, b]
+        yield [b, a, c, d]
+        yield [b, a, d, c]
+        yield [b, c, a, d]
+        yield [b, c, d, a]
+        yield [b, d, a, c]
+        yield [b, d, c, a]
+        yield [c, a, b, d]
+        yield [c, a, d, b]
+        yield [c, b, a, d]
+        yield [c, b, d, a]
+        yield [c, d, a, b]
+        yield [c, d, b, a]
+        yield [d, a, b, c]
+        yield [d, a, c, b]
+        yield [d, b, a, c]
+        yield [d, b, c, a]
+        yield [d, c, a, b]
+        yield [d, c, b, a]
+    else:
+        for i, item in enumerate(items):
+            for cc in xcombinations(items[:i] + items[i + 1 :], n - 1):
+                yield [item] + cc
+        # for i in xrange(len(items)):
+        #    for cc in xcombinations(items[:i]+items[i+1:],n-1):
+        #        yield [items[i]]+cc
+
+
+def xpermutations(items):
+    """Returns all the permutations of the items as an iterator"""
+    n_minus_one = len(items) - 1
+    for i, item in enumerate(items):
+        for cc in xcombinations(items[:i] + items[i + 1 :], n_minus_one):
+            yield [item] + cc
+    # return xcombinations(items, len(items))
+
+
+def xselections(items, n):
+    if n == 0:
+        yield []
+    else:
+        for item in items:
+            for ss in xselections(items, n - 1):
+                yield [item] + ss
+
+
+def matrix_valency_iter(n, v):
+    """Returns n by n matrices with valency v.
+
+    i.e. each row sums to v"""
+    possible_rows = []
+    for row in xselections(list(range(v + 1)), n):
+        if sum(row) == v:
+            possible_rows.append(row)
+    possible_rows.sort()
+    for edge_matrix in xselections(possible_rows, n):
+        yield AdjMatrixGraph(edge_matrix)
+
+
 def make_quotient(adj_matrix, partition):
     """Return quotient adjacency matrix, or raises an exception.
 
@@ -885,6 +972,7 @@ class AdjMatrixGraph(object):
             )
         if matrix.min() < 0:
             raise ValueError("Entries should be non-negative, %r" % matrix)
+        self.rebuild_concise_string()
 
     def __str__(self):
         """Return string representation of the matrix, used by the print command."""
@@ -899,6 +987,97 @@ class AdjMatrixGraph(object):
         """Return string representation of the matrix."""
         return "%s(%r)" % (self.__class__.__name__, self.matrix.tolist())
 
+    def rebuild_concise_string(self):
+        """Single line summary, for use in filenames
+
+        e.g. n3_001_001_001
+        """
+        self.concise_string = ("n%i_" % self.n) + "_".join(
+            ["".join(map(str, row)) for row in self.matrix.tolist()]
+        )
+
+    def permuted_concise_string(self, NewColumnOrder):
+        """Returns another a concise string, with the rows and columns permuted
+
+        NewColumnOrder - List of integers giving the new order.
+
+        Should be the same as object.permuted(NewColumnOrder).concise_string, but faster"""
+
+        # Check we have been give a permuation of the row/col numbers
+        # assert set(NewColumnOrder)==set(range(self.n)), "Use a permutation of integers " + str(list(range(self.n)))
+
+        # return ("n%i_" % self.n) + "_".join(["".join([str(self.matrix[NewColumnOrder[i],NewColumnOrder[j]]) for j in range(self.n)]) for i in range(self.n)])
+        answer = "n%i" % self.n
+        for i in NewColumnOrder:
+            row = self.matrix.tolist()[i]
+            answer += "_" + "".join(str(row[j]) for j in NewColumnOrder)
+        return answer
+
+    def connected(self):
+        """Is this a connected graph?
+
+        Works by counting considering powers of (undirected) adj matrix
+        giving connectivity using different length paths.
+        """
+        # Make a non-directed connection matrix, d
+        d = np.matrix(self.matrix.T | self.matrix)
+
+        # The matrix d^l (d**l, matrix multiplication l times)
+        # gives connectivity by paths of length l.
+        # Thus to consider connectivity, we need to look at paths of
+        # length 1, 2, ..., n
+
+        x = d.copy()
+        # Have got path length one done, must add l = 2, ..., n (inclusive)
+        for path_length in range(2, self.n + 1):
+            # Multiply d by itself l times to get connectivity by
+            # paths of length l...
+            x += d ** path_length
+
+        return 0 != np.min(x)
+
+    def is_partition_valid(self, partition):
+        """Returns a boolean (True/False)"""
+        # Get number of merged nodes:
+        k = max(partition) + 1
+
+        enumerate_partition = list(enumerate(partition))
+
+        # DON'T ignore trivial case (k=1) and situation where n==k
+
+        # print("Going from %ix%i to %ix%i to %ix%i" % (n,n,n,k,k,k))
+        q_matrix_step_1 = np.matrix(np.zeros([self.n, k], np.integer))
+
+        for (old_col, new_col) in enumerate_partition:
+            # print("Merging old col %i onto new col %i" % (old_col, new_col))
+            q_matrix_step_1[:, new_col] += np.matrix(self.matrix)[:, old_col]
+        """
+        q_matrix_step_2 = numpy.matrix(numpy.zeros([k,k], numpy.integer))
+        for (old_row, new_row) in enumerate_partition :
+            q_matrix_step_2[new_row,:] = q_matrix_step_1[old_row, :]
+        #Check that all the merged rows agreed:
+        for (old_row, new_row) in enumerate_partition :
+            if not (q_matrix_step_2[new_row,:] == q_matrix_step_1[old_row, :]).all() :
+                #Invalid colouring...
+                return False
+        return True
+        """
+        mapping = dict()
+        for old, new in enumerate_partition:
+            try:
+                mapping[new].append(old)
+            except KeyError:
+                mapping[new] = [old]
+        rows = q_matrix_step_1.tolist()
+        for old_rows in mapping.values():
+            if len(set(tuple(rows[old]) for old in old_rows)) > 1:
+                return False
+        return True
+
+    def valid_partitions(self):
+        for partition in possible_partitions(self.n):
+            if self.is_partition_valid(partition):
+                yield partition
 
 class CoupledCellLattice(AdjMatrixGraph):
     """Balanced equivalence relation lattice."""
@@ -2332,3 +2511,38 @@ e1 = [
 go(CoupledCellNetwork(e1), "tangled22")
 
 print("Done")
+
+###################################################################
+
+n = 5
+v = 1
+
+print("Connected matrices for n=%i, v=%i" % (n, v))
+out_dir = "lattices_n%i_v%i/" % (n, v)
+if not os.path.isdir(out_dir):
+    os.mkdir(out_dir)
+h = open("%s/networks_n%i_v%i.txt" % (out_dir, n, v), "w")
+
+# Reset the history of matrix permutations seen:
+recorded_permutations = set()
+record_lattices = dict()
+graph_number_to_lattice_number = dict()
+lattice_number = 1
+network_number = 0
+for adj_matrix in matrix_valency_iter(n, v):
+    # if not adj_matrix.is_simple_complex_eval_graph():
+    #    continue
+    if adj_matrix.concise_string in recorded_permutations:
+        #print("%s was a permutation of an already considered case" % adj_matrix.concise_string)
+        continue
+    if not adj_matrix.connected():
+        #print("%s was not connected" % adj_matrix.concise_string)
+        continue
+    print("%s" % adj_matrix.concise_string)
+    # adj_matrix.plot(filename="lattices_n%i_v%i/%s.png" % (n, v, adj_matrix.concise_string))
+    for permuted_nodes in xpermutations(list(range(n))):
+        recorded_permutations.add(adj_matrix.permuted_concise_string(permuted_nodes))
+    network_number += 1
+    h.write(adj_matrix.concise_string)
+h.close()
+print("Done %i" % network_number)
