@@ -2254,6 +2254,16 @@ network = make_bi_dir_ring(3)
 #                              [2, 0, 0, 0],
 #                              [2, 0, 0, 0]])
 
+network = CoupledCellNetwork(
+    [
+        [0, 0, 0, 0, 1],
+        [0, 0, 0, 1, 0],
+        [0, 1, 0, 0, 0],
+        [1, 0, 0, 0, 0],
+        [0, 0, 1, 0, 0],
+    ]
+)
+
 go(network, "reduction_test")
 print(network)
 lattice = network.lattice()
