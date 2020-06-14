@@ -1842,10 +1842,10 @@ class CoupledCellNetwork(object):
                 assert evals.count(e) <= all_eigen.count(e)
             eigenvalues.append(tuple(evals))  # Tuple is hashable, see make_partition
 
-        for p, q, e in zip(partitions, quotients, eigenvalues):
-            print("Partition", p, "eigenvalues", e)
-            print(q.matrices[0])
-            print("")
+        # for p, q, e in zip(partitions, quotients, eigenvalues):
+        #    print("Partition", p, "eigenvalues", e)
+        #    print(q.matrices[0])
+        #    print("")
 
         fat_lattice = CoupledCellLattice(*partitions)
         # Expand the captions with more details for exploration/debug use:
@@ -1855,17 +1855,18 @@ class CoupledCellNetwork(object):
         ]
         fat_lattice.plot("reduction_debug.png")
         sym_fat = fat_lattice.matrix + fat_lattice.matrix.T
-        print(sym_fat)
-        print("")
+        # print(sym_fat)
+        # print("")
         eigen_matrices = [
             sym_fat * np.array([evals.count(e) for evals in eigenvalues])
             for e in unique_eigen
         ]
-        print("")
-        for e, tmp in zip(unique_eigen, eigen_matrices):
-            print("E for eigenvalue", e)
-            print(tmp)
-            print("")
+        # print("")
+        # for e, tmp in zip(unique_eigen, eigen_matrices):
+        #    print("E for eigenvalue", e)
+        #    print(tmp)
+        #    print("")
+
         # Now do column combination (using a sort of 'or' operation)
         # and row comparison much like that used to identify if a
         # partition is balanced.
@@ -1875,7 +1876,7 @@ class CoupledCellNetwork(object):
         # need try merging nodes with same set of eigenvalues.
         print("Possible reductions:")
         for p in possible_partition_refinements(make_partition(eigenvalues)):
-            print("Possible reduction", p)
+            # print("Possible reduction", p)
             ok = True
             for m in eigen_matrices:
                 # for e, m in zip(sorted(set(all_eigen)), eigen_matrices):
@@ -1898,7 +1899,7 @@ class CoupledCellNetwork(object):
                 reduced_nodes[node_class].append(partitions[i])
                 reduced_eigens[node_class] = eigenvalues[i]
                 reduced_ranks[node_class] = max(partitions[i])  # !!!
-                print("reducing", i, node_class, partitions[i])
+                # print("reducing", i, node_class, partitions[i])
                 # Simple merge of lattice connectivity...
                 for j, tmp in enumerate(p):
                     if fat_lattice.matrix[i, j]:
@@ -1914,13 +1915,13 @@ class CoupledCellNetwork(object):
                 # start with eta = node's rank (i.e. partition size)
                 r = reduced_ranks[i]
                 e = r + 1
-                print("Reduced lattice node %s, start eta %r" % (i, e))
+                # print("Reduced lattice node %s, start eta %r" % (i, e))
                 for j in range(i):
                     assert reduced_ranks[j] <= r
                     if reduced_ranks[j] < r and parents[i, j]:
-                        print("Considering parent %s, with eta %r" % (j, eta[j]))
+                        # print("Considering parent %s, with eta %r" % (j, eta[j]))
                         e -= eta[j]
-                        print("Reduced lattice node %s, revised eta %r" % (i, e))
+                        # print("Reduced lattice node %s, revised eta %r" % (i, e))
                 eta[i] = e
             if min(eta) < 0:
                 continue
@@ -1928,7 +1929,7 @@ class CoupledCellNetwork(object):
             for i in range(new_n):
                 print("+".join(cyclic_partition(tmp) for tmp in reduced_nodes[i]))
                 print("evals=", reduced_eigens[i], "eta=", eta[i])
-            print(eta)
+            print(eta, "<-- eta")
             if min(eta) < 0:
                 print(p, "<-- Nice except eta negative")
                 continue
@@ -2250,6 +2251,8 @@ network = make_bi_dir_ring(3)
 #                              [2, 0, 0, 0],
 #                              [2, 0, 0, 0]])
 
+
+# 2 node lattice, no reduction
 network = CoupledCellNetwork(
     [
         [0, 0, 0, 0, 1],
@@ -2260,10 +2263,44 @@ network = CoupledCellNetwork(
     ]
 )
 
+# 7 node lattice post reduction
+network = CoupledCellNetwork(
+    [
+        [0, 0, 0, 0, 1],
+        [0, 0, 0, 0, 1],
+        [0, 0, 0, 1, 0],
+        [0, 1, 0, 0, 0],
+        [0, 0, 0, 1, 0],
+    ]
+)
+
+# Very slow, at least one reduction...
+network = CoupledCellNetwork(
+    [
+        [0, 0, 0, 0, 1],
+        [0, 0, 0, 0, 1],
+        [0, 0, 0, 0, 1],
+        [0, 0, 0, 0, 1],
+        [0, 0, 0, 1, 0],
+    ]
+)
+
+# 13 node lattice post reduction, 3 unique?
+network = CoupledCellNetwork(
+    [
+        [0, 0, 0, 0, 1],
+        [0, 0, 0, 0, 1],
+        [0, 1, 0, 0, 0],
+        [1, 0, 0, 0, 0],
+        [0, 0, 0, 0, 1],
+    ]
+)
+
 go(network, "reduction_test")
-print(network)
+# print(network)
 lattice = network.lattice()
-print(lattice)
+# print(lattice)
+print("")
 reduced = network.reduced_lattice()
 print(reduced)
 
