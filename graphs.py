@@ -1843,7 +1843,7 @@ class CoupledCellNetwork(object):
             eigenvalues.append(tuple(evals))  # Tuple is hashable, see make_partition
 
         for p, q, e in zip(partitions, quotients, eigenvalues):
-            print(p, e)
+            print("Partition", p, "eigenvalues", e)
             print(q.matrices[0])
             print("")
 
@@ -1875,6 +1875,7 @@ class CoupledCellNetwork(object):
         # need try merging nodes with same set of eigenvalues.
         print("Possible reductions:")
         for p in possible_partition_refinements(make_partition(eigenvalues)):
+            print("Possible reduction", p)
             ok = True
             for m in eigen_matrices:
                 # for e, m in zip(sorted(set(all_eigen)), eigen_matrices):
@@ -1896,31 +1897,31 @@ class CoupledCellNetwork(object):
             for i, node_class in enumerate(p):
                 reduced_nodes[node_class].append(partitions[i])
                 reduced_eigens[node_class] = eigenvalues[i]
-                reduced_ranks[node_class] = max(partitions[i])
+                reduced_ranks[node_class] = max(partitions[i])  # !!!
+                print("reducing", i, node_class, partitions[i])
                 # Simple merge of lattice connectivity...
                 for j, tmp in enumerate(p):
                     if fat_lattice.matrix[i, j]:
                         q[node_class, tmp] = 1
-            # Assign eta
+            # What are the ((great)grand)parents of each lattice node?
+            # Considering multiple path connections up the lattice.
             parents = np.identity(new_n, np.uint8)
-            eta = [0] * new_n
-            for r in range(new_n):
+            for _ in range(new_n):
                 parents += np.dot(q, parents)
-                for i in range(new_n):
-                    if reduced_ranks[i] == r:
-                        e = r + 1  # start with eta = node's rank
-                        print("Reduced lattice node %s, start eta %r" % (i, e))
-                        for j in range(i):
-                            assert reduced_ranks[j] <= r
-                            if reduced_ranks[j] < r and parents[i, j]:
-                                print(
-                                    "Considering parent %s, with eta %r" % (j, eta[j])
-                                )
-                                e -= eta[j]
-                                print(
-                                    "Reduced lattice node %s, revised eta %r" % (i, e)
-                                )
-                        eta[i] = e
+            # Assign eta
+            eta = [0] * new_n
+            for i in range(new_n):
+                # start with eta = node's rank (i.e. partition size)
+                r = reduced_ranks[i]
+                e = r + 1
+                print("Reduced lattice node %s, start eta %r" % (i, e))
+                for j in range(i):
+                    assert reduced_ranks[j] <= r
+                    if reduced_ranks[j] < r and parents[i, j]:
+                        print("Considering parent %s, with eta %r" % (j, eta[j]))
+                        e -= eta[j]
+                        print("Reduced lattice node %s, revised eta %r" % (i, e))
+                eta[i] = e
             if min(eta) < 0:
                 continue
             print("")
