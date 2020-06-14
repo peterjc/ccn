@@ -1904,42 +1904,38 @@ class CoupledCellNetwork(object):
             # Assign eta
             parents = np.identity(new_n, np.uint8)
             eta = [0] * new_n
-            omega = np.zeros((new_n, len(unique_eigen)), np.int)
             for r in range(new_n):
                 parents += np.dot(q, parents)
                 for i in range(new_n):
                     if reduced_ranks[i] == r:
-                        for j in range(len(unique_eigen)):
-                            omega[i, j] = reduced_eigens[i].count(unique_eigen[j])
                         e = r + 1  # start with eta = node's rank
-                        # print("Reduced lattice node %s, start eta %r, omega %r"
-                        #      % (i, e, omega[i]))
+                        print("Reduced lattice node %s, start eta %r" % (i, e))
                         for j in range(i):
                             assert reduced_ranks[j] <= r
                             if reduced_ranks[j] < r and parents[i, j]:
-                                # print("Considering parent %s, with eta %r, omega %r"
-                                #       % (j, eta[j], omega[j]))
+                                print(
+                                    "Considering parent %s, with eta %r" % (j, eta[j])
+                                )
                                 e -= eta[j]
-                                omega[i] -= omega[j]
-                                # print(
-                                #     "Reduced lattice node %s, "
-                                #     "revised eta %r, omega %r"
-                                #     % (i, e, omega[i]))
+                                print(
+                                    "Reduced lattice node %s, revised eta %r" % (i, e)
+                                )
                         eta[i] = e
-            if min(eta) < 0 or min(omega[-1]) < 0:
+            if min(eta) < 0:
                 continue
             print("")
             for i in range(new_n):
                 print("+".join(cyclic_partition(tmp) for tmp in reduced_nodes[i]))
-                print("evals=", reduced_eigens[i], "eta=", eta[i], "omega=", omega[i])
+                print("evals=", reduced_eigens[i], "eta=", eta[i])
             print(eta)
             if min(eta) < 0:
                 print(p, "<-- Nice except eta negative")
                 continue
-            assert sum(eta) == self.n, eta
-            if omega.min() < 0:
-                print(p, "<-- Nice except omega negative")
-                continue
+            assert sum(eta) == self.n, "eta=%r, sum=%i, but n=%i" % (
+                eta,
+                sum(eta),
+                self.n,
+            )
             print(p, "<-- Good, %i nodes post reduction" % (max(p) + 1))
 
             # Pick first of each merged node set as representative...
@@ -1948,12 +1944,11 @@ class CoupledCellNetwork(object):
             )
             assert tmp_lattice2.n == new_n, tmp_lattice2
             tmp_lattice2.captions = [
-                "%s\n%s\neta=%s\nomega=%s"
+                "%s\n%s\neta=%s"
                 % (
                     "+".join("#%i" % partitions.index(tmp) for tmp in reduced_nodes[i]),
                     "+".join(cyclic_partition(tmp) for tmp in reduced_nodes[i]),
                     eta[i],
-                    omega[i],
                 )
                 for i in range(new_n)
             ]
