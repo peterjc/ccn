@@ -1921,8 +1921,8 @@ class CoupledCellNetwork(object):
         partitions.sort(key=lambda p: (max(p), p))
         return CoupledCellLattice(*partitions)
 
-    def reduced_lattice(self, caption_sep="+", resume_file=None):
-        """Return reduced lattice."""
+    def reduced_lattices(self, caption_sep="+", resume_file=None):
+        """Return reduced lattices."""
         q_and_p = list(self.quotients_with_partitions(resume_file))
         # Sort by rank (increasing), then by partition lexically.
         # rank(p) = max(p) + 1, thus equivalent to sort on max(p)
@@ -2068,7 +2068,12 @@ class CoupledCellNetwork(object):
                 for i in range(new_n)
             ]
             tmp_lattice2.plot("reduction_debug2.png")
-        print("Done")
+            # Simplify captions
+            tmp_lattice2.captions = [
+                "+".join(cyclic_partition(tmp) for tmp in reduced_nodes[i])
+                for i in range(new_n)
+            ]
+            yield tmp_lattice2
 
     def plot(self, filename):
         """Use this function to produce an image file of the graph.
@@ -2157,7 +2162,7 @@ class CoupledCellNetwork(object):
 ##########################################################
 
 # 2 node lattice, no reduction
-#network = CoupledCellNetwork(
+# network = CoupledCellNetwork(
 #    [
 #        [0, 0, 0, 0, 1],
 #        [0, 0, 0, 1, 0],
@@ -2165,10 +2170,10 @@ class CoupledCellNetwork(object):
 #        [1, 0, 0, 0, 0],
 #        [0, 0, 1, 0, 0],
 #    ]
-#)
+# )
 
 # 7 node lattice post reduction
-#network = CoupledCellNetwork(
+# network = CoupledCellNetwork(
 #    [
 #        [0, 0, 0, 0, 1],
 #        [0, 0, 0, 0, 1],
@@ -2176,10 +2181,10 @@ class CoupledCellNetwork(object):
 #        [0, 1, 0, 0, 0],
 #        [0, 0, 0, 1, 0],
 #    ]
-#)
+# )
 
 # Very slow, at least one reduction...
-#network = CoupledCellNetwork(
+# network = CoupledCellNetwork(
 #    [
 #        [0, 0, 0, 0, 1],
 #        [0, 0, 0, 0, 1],
@@ -2187,10 +2192,10 @@ class CoupledCellNetwork(object):
 #        [0, 0, 0, 0, 1],
 #        [0, 0, 0, 1, 0],
 #    ]
-#)
+# )
 
 # 9 node lattice post reduction, 3 unique?
-#network = CoupledCellNetwork(
+# network = CoupledCellNetwork(
 #    [
 #        [0, 0, 0, 0, 1],
 #        [0, 0, 0, 0, 1],
@@ -2198,20 +2203,13 @@ class CoupledCellNetwork(object):
 #        [1, 0, 0, 0, 0],
 #        [0, 0, 0, 0, 1],
 #    ]
-#)
+# )
 
 # Example 6.1 Reduction of lattice for 4-cell regular network
-network = CoupledCellNetwork(
-    [
-        [0, 0, 0, 2],
-        [0, 0, 0, 2],
-        [0, 1, 0, 1],
-        [0, 1, 0, 1],
-    ]
-)
+network = CoupledCellNetwork([[0, 0, 0, 2], [0, 0, 0, 2], [0, 1, 0, 1], [0, 1, 0, 1],])
 
 # 20 node lattice to speed up,
-# includes 6 node and 8 node reductions
+# includes 6, 8, 8, 8, 7, 7, ... node reductions
 network = CoupledCellNetwork(
     [
         [0, 0, 0, 0, 1],
@@ -2228,8 +2226,8 @@ go(network, "reduction_test")
 lattice = network.lattice()
 # print(lattice)
 print("")
-reduced = network.reduced_lattice()
-print(reduced)
+for reduced in network.reduced_lattices():
+    print(reduced)
 
 sys.exit(0)
 
