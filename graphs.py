@@ -1922,7 +1922,7 @@ class CoupledCellNetwork(object):
         return CoupledCellLattice(*partitions)
 
     def reduced_lattices(self, caption_sep="+", resume_file=None):
-        """Return reduced lattices."""
+        """Return pairs of reduced lattice & eta (generator)."""
         q_and_p = list(self.quotients_with_partitions(resume_file))
         # Sort by rank (increasing), then by partition lexically.
         # rank(p) = max(p) + 1, thus equivalent to sort on max(p)
@@ -1966,7 +1966,7 @@ class CoupledCellNetwork(object):
             "#%i\n%s\n%r\n%r" % (i, caption, partitions[i], eigenvalues[i])
             for (i, caption) in enumerate(fat_lattice.captions)
         ]
-        fat_lattice.plot("reduction_debug.png")
+        # fat_lattice.plot("reduction_debug.png")
         sym_fat = fat_lattice.matrix + fat_lattice.matrix.T
         # print(sym_fat)
         # print("")
@@ -1987,7 +1987,8 @@ class CoupledCellNetwork(object):
         # i.e. sub-partitions of the rank induced partition,
         # In fact, can go further in reducing the scope, and only
         # need try merging nodes with same set of eigenvalues.
-        print("Possible reductions:")
+
+        # print("Possible reductions:")
         for p in possible_partition_refinements(make_partition(eigenvalues)):
             # print("Possible reduction", p)
             ok = True
@@ -2038,42 +2039,32 @@ class CoupledCellNetwork(object):
                 eta[i] = e
             if min(eta) < 0:
                 continue
-            print("")
-            for i in range(new_n):
-                print("+".join(cyclic_partition(tmp) for tmp in reduced_nodes[i]))
-                print("evals=", reduced_eigens[i], "eta=", eta[i])
-            print(eta, "<-- eta")
+            # print("")
+            # for i in range(new_n):
+            #    print("+".join(cyclic_partition(tmp) for tmp in reduced_nodes[i]))
+            #    print("evals=", reduced_eigens[i], "eta=", eta[i])
+            # print(eta, "<-- eta")
             if min(eta) < 0:
-                print(p, "<-- Nice except eta negative")
+                # print(p, "<-- Nice except eta negative")
                 continue
             assert sum(eta) == self.n, "eta=%r, sum=%i, but n=%i" % (
                 eta,
                 sum(eta),
                 self.n,
             )
-            print(p, "<-- Good, %i nodes post reduction" % (max(p) + 1))
+            # print(p, "<-- Good, %i nodes post reduction" % (max(p) + 1))
 
             # Pick first of each merged node set as representative...
-            tmp_lattice2 = CoupledCellLattice(
+            reduced_lattice = CoupledCellLattice(
                 *[reduced_nodes[i][0] for i in range(new_n)]
             )
-            assert tmp_lattice2.n == new_n, tmp_lattice2
-            tmp_lattice2.captions = [
-                "%s\n%s\neta=%s"
-                % (
-                    "+".join("#%i" % partitions.index(tmp) for tmp in reduced_nodes[i]),
-                    "+".join(cyclic_partition(tmp) for tmp in reduced_nodes[i]),
-                    eta[i],
-                )
+            assert reduced_lattice.n == new_n, reduced_lattice
+            reduced_lattice.captions = [
+                "%s eta=%s"
+                % ("+".join(cyclic_partition(tmp) for tmp in reduced_nodes[i]), eta[i],)
                 for i in range(new_n)
             ]
-            tmp_lattice2.plot("reduction_debug2.png")
-            # Simplify captions
-            tmp_lattice2.captions = [
-                "+".join(cyclic_partition(tmp) for tmp in reduced_nodes[i])
-                for i in range(new_n)
-            ]
-            yield tmp_lattice2
+            yield reduced_lattice, eta
 
     def plot(self, filename):
         """Use this function to produce an image file of the graph.
@@ -2226,7 +2217,10 @@ go(network, "reduction_test")
 lattice = network.lattice()
 # print(lattice)
 print("")
-for reduced in network.reduced_lattices():
+print("Possible reductions:")
+for reduced, eta in network.reduced_lattices():
+    print("")
+    print("%i nodes" % reduced.n)
     print(reduced)
 
 sys.exit(0)
