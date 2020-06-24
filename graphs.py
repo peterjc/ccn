@@ -1,27 +1,30 @@
 #!/usr/bin/env python
 """Algorithm to find lattices of synchrony subspaces and their reduced lattices.
 
-Version 1.0.0 of this code was a standalone Python script provided as a
-supplementary file for the manuscript:
+Copyright 2010-2014 by Hiroko Kamei & Peter J. A. Cock. Revisions copyright
+2014-2022 by Peter Cock, based on work by Hiroko Kamei and Haibo Ruan.
 
-    Hiroko Kamei and Peter Cock (2013) "Computation of Balanced Equivalence
-    Relations and their Lattice for a Coupled Cell Network", SIAM Journal
-    on Applied Dynamical Systems (SIADS) 12(1), pp. 352-382.
-    http://dx.doi.org/10.1137/100819795 http://arxiv.org/abs/1211.6334
+The initial version (v1.0.0) was originally pubished as a supplimentary file
+for the manuscript:
 
-The current version was extended to construct a reduced lattice, and the
-modified script provided as a supplimentary file for the manuscript:
+  Hiroko Kamei and Peter Cock (2013) "Computation of Balanced Equivalence
+  Relations and their Lattice for a Coupled Cell Network", SIAM Journal
+  on Applied Dynamical Systems (SIADS) 12(1), pp. 352-382.
+  http://dx.doi.org/10.1137/100819795 http://arxiv.org/abs/1211.6334
 
-    Hiroko Kamei and Haibo Ruan (2020) "Reduced Lattices of Synchrony
-    Subspaces and their Indices", submitted to SIAM Journal on Applied
-    Dynamical Systems (SIADS).
+The current version (v1.1.0) was extended to construct a reduced lattice, and
+the modified script provided as a supplimentary file for the manuscript:
 
-Copyright 2010-2014 by Hiroko Kamei & Peter J. A. Cock.
-Revisions copyright 2014-2022 by Hiroko Kamei, Haibo Ruan, and Peter Cock.
+  Hiroko Kamei and Haibo Ruan (2020) "Reduced Lattices of Synchrony Subspaces
+  and their Indices", submitted to SIAM Journal on Applied Dynamical Systems
+  (SIADS).
 
 You are welcome to use and modify this code provided this copyright notice
-retained, however we request you cite this manuscript in any scientific
+retained, however we request you cite the manuscripts in any scientific
 publications using it. It is released under the 3-clause BSD license.
+
+Public releases of this code are available on GitHub, at:
+https://github.com/peterjc/ccn
 
 
 History & Requirements
@@ -2208,6 +2211,29 @@ network = CoupledCellNetwork(
         [0, 0, 0, 0, 1],
         [0, 0, 0, 1, 0],
         [0, 0, 0, 1, 0],
+    ]
+)
+
+# n5_00001_00001_00001_00100_00100
+# No reductions, over 3 hours
+network = CoupledCellNetwork(
+    [
+        [0, 0, 0, 0, 1],
+        [0, 0, 0, 0, 1],
+        [0, 0, 0, 0, 1],
+        [0, 0, 1, 0, 0],
+        [0, 0, 1, 0, 0],
+    ]
+)
+
+# n5_00001_00001_00001_00100_00001 too large lattice (25 nodes)
+network = CoupledCellNetwork(
+    [
+        [0, 0, 0, 0, 1],
+        [0, 0, 0, 0, 1],
+        [0, 0, 0, 0, 1],
+        [0, 0, 1, 0, 0],
+        [0, 0, 0, 0, 1],
     ]
 )
 
