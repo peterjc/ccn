@@ -23,6 +23,7 @@ History
 
 | Version | Released   | Description                                         |
 |---------|------------|-----------------------------------------------------|
+| v1.1.0  | *Pending*  | - Lattice reduction algorithm added.                |
 | v1.0.5  | 2019-08-10 | - Adopted black code style.                         |
 |         |            | - Using flake8 to check style etc.                  |
 | v1.0.4  | 2019-08-09 | - Testing Python 3.5 to 3.8 only                    |
@@ -36,6 +37,7 @@ History
 |         |            | - Supported Python 2.6, 2.7 and 3.2, 3.3, 3.4.      |
 | v1.0.0  | 2012-11-04 | - Supported Python 2.4, 2.5, 2.6, 2.7 directly.     |
 |         |            | - Worked on Python 3 via 2to3 conversion script.    |
+
 
 Requirements
 ------------
