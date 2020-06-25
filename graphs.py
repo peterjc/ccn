@@ -919,7 +919,7 @@ def make_partition(classifiers):
     return partition
 
 
-def go(a, name="", format="png", top_only=False):
+def go(a, name="", format="png", top_only=False, reduce=False):
     """Take a graph, draw it, then print and draw the lattice.
 
     Given a CoupledCellNetwork object (and an optional name for it), it shows
@@ -931,9 +931,12 @@ def go(a, name="", format="png", top_only=False):
     GraphViz etc), together with the optional the format argument which
     specifies the image type (e.g. png or pdf, defaulting to png).
 
-    If the optional argumet top_only is set to True, rather than computing all
+    If the optional argument top_only is set to True, rather than computing all
     the balanced colourings and the lattice, only the top lattice node is found
     using an algorithm combining Aldis (2008) and Belykh and Hasler (2011).
+
+    If the optional argument reduce is set to True (not compatible with using
+    the top_only setting), then any candidate lattice reductions are found.
     """
     if not isinstance(a, CoupledCellNetwork):
         raise TypeError("Expected a CoupledCellNetwork object.")
@@ -995,6 +998,28 @@ def go(a, name="", format="png", top_only=False):
         if name and not os.path.isfile("%s_lattice.%s" % (name, format)):
             lattice.plot("%s_lattice.%s" % (name, format))
         print("(%i lattice nodes)" % lattice.n)
+        if reduce:
+            print("")
+            print("Looking for lattice reductions...")
+            start = time.time()
+            candidates = 0
+            for reduction, eta in a.reduced_lattices():
+                candidates += 1
+                print("")
+                print(
+                    "Reduction candidate %i, with %i nodes:" % (candidates, reduction.n)
+                )
+                print(reduction)
+                # Could draw it too, e.g.
+                # reduction.plot("%s_lattice_reduction_%i.%s" % (name, candidate, format))")
+            taken = time.time() - start
+            print("")
+            if taken < 60:
+                print("Lattice reduction took %0.1fs" % taken)
+            elif taken < 360:
+                print("Lattice reduction took %0.1fmins" % (taken / 60))
+            else:
+                print("Lattice reduction took %0.1fhours" % (taken / 360))
 
 
 class CoupledCellLattice(object):
@@ -2098,6 +2123,7 @@ class CoupledCellNetwork(object):
         except pydot.InvocationException:
             sys.stderr.write("Please check graphviz is installed\n")
 
+
 print("Runing self-tests...")
 
 tests = doctest.testmod()
@@ -2609,17 +2635,6 @@ go(CoupledCellNetwork(e1), "tangled22")
 # Reduction examples below
 ##########################################################
 
-# 2 node lattice, no reduction
-# network = CoupledCellNetwork(
-#    [
-#        [0, 0, 0, 0, 1],
-#        [0, 0, 0, 1, 0],
-#        [0, 1, 0, 0, 0],
-#        [1, 0, 0, 0, 0],
-#        [0, 0, 1, 0, 0],
-#    ]
-# )
-
 # 7 node lattice post reduction
 # network = CoupledCellNetwork(
 #    [
@@ -2631,16 +2646,6 @@ go(CoupledCellNetwork(e1), "tangled22")
 #    ]
 # )
 
-# Very slow, at least one reduction...
-# network = CoupledCellNetwork(
-#    [
-#        [0, 0, 0, 0, 1],
-#        [0, 0, 0, 0, 1],
-#        [0, 0, 0, 0, 1],
-#        [0, 0, 0, 0, 1],
-#        [0, 0, 0, 1, 0],
-#    ]
-# )
 
 # 9 node lattice post reduction, 3 unique?
 # network = CoupledCellNetwork(
@@ -2656,53 +2661,7 @@ go(CoupledCellNetwork(e1), "tangled22")
 # Example 6.1 Reduction of lattice for 4-cell regular network
 network = CoupledCellNetwork([[0, 0, 0, 2], [0, 0, 0, 2], [0, 1, 0, 1], [0, 1, 0, 1],])
 
-# 20 node lattice to speed up,
-# includes 6, 8, 8, 8, 7, 7, ... node reductions
-network = CoupledCellNetwork(
-    [
-        [0, 0, 0, 0, 1],
-        [0, 0, 0, 0, 1],
-        [0, 0, 0, 0, 1],
-        [0, 0, 0, 1, 0],
-        [0, 0, 0, 1, 0],
-    ]
-)
+go(network, "reduction_test", reduce=True)
 
-# n5_00001_00001_00001_00100_00100
-# No reductions, over 3 hours
-network = CoupledCellNetwork(
-    [
-        [0, 0, 0, 0, 1],
-        [0, 0, 0, 0, 1],
-        [0, 0, 0, 0, 1],
-        [0, 0, 1, 0, 0],
-        [0, 0, 1, 0, 0],
-    ]
-)
-
-# n5_00001_00001_00001_00100_00001 too large lattice (25 nodes)
-network = CoupledCellNetwork(
-    [
-        [0, 0, 0, 0, 1],
-        [0, 0, 0, 0, 1],
-        [0, 0, 0, 0, 1],
-        [0, 0, 1, 0, 0],
-        [0, 0, 0, 0, 1],
-    ]
-)
-
-
-go(network, "reduction_test")
-# print(network)
-lattice = network.lattice()
-# print(lattice)
-print("")
-print("Possible reductions:")
-for reduced, eta in network.reduced_lattices():
-    print("")
-    print("%i nodes" % reduced.n)
-    print(reduced)
-
-sys.exit(0)
-
+print("=" * 50)
 print("Done")
