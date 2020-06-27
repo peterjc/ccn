@@ -1,21 +1,30 @@
-Algorithm to find balanced equivalence relations and lattices
-=============================================================
+Algorithm to find lattices of synchrony subspaces, and their reduced lattices
+=============================================================================
 
-Copyright 2010-2021 by Hiroko Kamei & Peter Cock.  All rights reserved.
-This script was provided as a supplementary file for the manuscript:
+Copyright 2010-2014 by Hiroko Kamei & Peter J. A. Cock.
+Revisions copyright 2014-2022 by Hiroko Kamei, Haibo Ruan, and Peter Cock.
+
+The initial version (v1.0.0) was originally pubished as a supplementary file
+for the manuscript:
 
 > Hiroko Kamei and Peter Cock (2013) "Computation of Balanced Equivalence
-> Relations and their Lattice for a Coupled Cell Network", SIAM Journal on
-> Applied Dynamical Systems (SIADS) 12(1), pp. 352-382.
-> http://dx.doi.org/10.1137/100819795
-> http://arxiv.org/abs/1211.6334
+> Relations and their Lattice for a Coupled Cell Network", SIAM Journal
+> on Applied Dynamical Systems (SIADS) 12(1), pp. 352-382.
+> http://dx.doi.org/10.1137/100819795 http://arxiv.org/abs/1211.6334
+
+Public releases of version (v1.0.0) are available on GitHub, at:
+https://github.com/peterjc/ccn
+
+The current version (v1.1.0) was extended to construct a reduced lattice, and
+the modified script provided as a supplementary file for the manuscript:
+
+> Hiroko Kamei and Haibo Ruan (2020) "Reduced Lattices of Synchrony Subspaces
+> and their Indices", submitted to SIAM Journal on Applied Dynamical Systems
+> (SIADS).
 
 You are welcome to use and modify this code provided this copyright notice
-is retained (see the open source license for full details), however we
-request you cite this manuscript in any scientific publications using it.
-
-This code and any public updates to it are available on GitHub, at:
-https://github.com/peterjc/ccn
+retained, however we request you cite the manuscripts in any scientific
+publications using it. It is released under the 3-clause BSD license.
 
 
 History
