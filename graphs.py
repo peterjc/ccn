@@ -1932,6 +1932,12 @@ class CoupledCellNetwork(object):
         the eta list has N entries, the lattice index eta for each node.
         """
 
+        if len(self.matrices) > 1:
+            raise NotImplementedError("Only one edge type implemented so far!")
+        if len(set(sum(row) for row in self.matrices[0])) != 1:
+            # In regular network of valency r, all nodes have r inputs.
+            raise NotImplementedError("Only regular networks can be reduced so far!")
+
         # If the lattice (self) is the partition lattice of n elements,
         # then the reduced lattice is given by L(1,...,1).
         # If the network size is more than 4, we return L(1,...,1) as an output without
@@ -1947,6 +1953,7 @@ class CoupledCellNetwork(object):
 
         if self.n > 4 and lattice.n == b_number:
             print("Reduced lattice is given by L(1,...,1)")
+            # TODO - Can we build the appropriate lattice matrix?
             return
 
         q_and_p = list(self.quotients_with_partitions(resume_file))
@@ -1956,9 +1963,6 @@ class CoupledCellNetwork(object):
         # n = len(q_and_p)
 
         PLACES = 6  # Used for fuzzy matching of eigenvalues
-
-        if len(self.matrices) > 1:
-            raise NotImplementedError("Only one edge type implemented so far!")
         all_eigen = sorted(
             round(e, PLACES) for e in np.linalg.eigvals(self.matrices[0])
         )
