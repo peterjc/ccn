@@ -851,56 +851,7 @@ def go(a, name="", format="png", top_only=False):
         print("(%i lattice nodes)" % lattice.n)
 
 
-class AdjMatrixGraph(object):
-    """Object to represent a graph using an adjacency matrix."""
-
-    def __init__(self, edge_matrix):
-        """Initialise an AdjMatrixGraph object.
-
-        edge_matrix - adjacency matrix to define the connections.
-                      Either a square numpy array object, square
-                      numpy matrix object, or list of lists of integers.
-                      Entries should be non-negative integers.
-
-        e.g.
-
-        >>> my_matrix = AdjMatrixGraph([[1,0,1],[1,1,0],[0,0,1]])
-        >>> my_matrix
-        AdjMatrixGraph([[1, 0, 1], [1, 1, 0], [0, 0, 1]])
-        >>> print(my_matrix)
-        1 0 1
-        1 1 0
-        0 0 1
-
-        """
-        n = len(edge_matrix)
-        self.n = n
-        # Turn the edges into a NumPy array (if they are not already),
-        # could be a list of lists of ints for example:
-        # Assuming a number of (repeat) edges is limited to 255 (saves RAM)
-        self.matrix = matrix = np.array(edge_matrix, np.uint8)
-        if (n, n) != matrix.shape:
-            raise ValueError(
-                "Adjacency matrix should be square, not %s" % repr(matrix.shape)
-            )
-        if matrix.min() < 0:
-            raise ValueError("Entries should be non-negative, %r" % matrix)
-
-    def __str__(self):
-        """Return string representation of the matrix, used by the print command."""
-        answer = []
-        n = self.n
-        x = max(len(str(self.matrix[i, j])) for i in range(n) for j in range(n))
-        for i in range(self.n):
-            answer.append(" ".join([str(self.matrix[i, j]).ljust(x) for j in range(n)]))
-        return "\n".join(answer)
-
-    def __repr__(self):
-        """Return string representation of the matrix."""
-        return "%s(%r)" % (self.__class__.__name__, self.matrix.tolist())
-
-
-class CoupledCellLattice(AdjMatrixGraph):
+class CoupledCellLattice(object):
     """Balanced equivalence relation lattice."""
 
     def __init__(self, *partitions):
@@ -958,12 +909,17 @@ class CoupledCellLattice(AdjMatrixGraph):
         equivalence relations, also known as balanced colourings) automatically.
         """
         self.n = n = len(partitions)  # number of lattice nodes
-        self.partitions = partitions
-
         if n > MAXLAT:
             raise ValueError(
                 "Excessive lattice size %i nodes, MAXLAT = %i" % (n, MAXLAT)
             )
+
+        self.partitions = partitions
+        if max(max(p) for p in partitions) > 9:
+            sep = "+"
+        else:
+            sep = ""
+        self.captions = [cyclic_partition(p, sep) for p in partitions]
 
         # trivial_partitions = [[0] * len(partitions[0]), range(len(partitions[0]))]
 
@@ -1040,12 +996,7 @@ class CoupledCellLattice(AdjMatrixGraph):
                             edge_matrix[row, col] = False
                             break
 
-        AdjMatrixGraph.__init__(self, edge_matrix)
-        if max(max(p) for p in partitions) > 9:
-            sep = "+"
-        else:
-            sep = ""
-        self.captions = [cyclic_partition(p, sep) for p in partitions]
+        self.matrix = edge_matrix
 
     def __str__(self):
         """Return string representation of the matrix, used by the print command."""
@@ -1058,6 +1009,10 @@ class CoupledCellLattice(AdjMatrixGraph):
                 + " %s" % self.captions[i]
             )
         return "\n".join(answer)
+
+    def __repr__(self):
+        """Return string representation of the matrix."""
+        return "%s(%r)" % (self.__class__.__name__, self.matrix.tolist())
 
     def plot(self, filename):
         """Use this function to produce an image file of the graph.
