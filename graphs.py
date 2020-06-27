@@ -1120,7 +1120,7 @@ class CoupledCellLattice(AdjMatrixGraph):
             sys.stderr.write("Please check graphviz is installed\n")
 
 
-class CoupledCellNetwork(AdjMatrixGraph):
+class CoupledCellNetwork(object):
     """Class to represent a Couple Cell Network (CCN) with multiple edge types.
 
     Multiple edge types are supported, specified and represented internally
