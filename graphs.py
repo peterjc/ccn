@@ -1,8 +1,7 @@
 #!/usr/bin/env python
 r"""Algorithm to find balanced equivalence relations and lattices.
 
-Copyright 2010-2012 by Hiroko Kamei & Peter Cock.  All rights reserved.
-Revisions copyright 2012-2019 Peter Cock. All rights reserved.
+Copyright 2010-2020 by Hiroko Kamei & Peter Cock.  All rights reserved.
 
 Version 1.0.0 of this code was a standalone Python script provided as a
 supplementary file for the manuscript:

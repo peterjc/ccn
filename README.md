@@ -1,7 +1,7 @@
 Algorithm to find balanced equivalence relations and lattices
 =============================================================
 
-Copyright 2010-2012 by Hiroko Kamei & Peter Cock.  All rights reserved.
+Copyright 2010-2020 by Hiroko Kamei & Peter Cock.  All rights reserved.
 This script was provided as a supplementary file for the manuscript:
 
 > Hiroko Kamei and Peter Cock (2013) "Computation of Balanced Equivalence
