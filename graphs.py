@@ -1966,7 +1966,7 @@ class CoupledCellNetwork(object):
         all_eigen = sorted(
             round(e, PLACES) for e in np.linalg.eigvals(self.matrices[0])
         )
-        unique_eigen = sorted(set(all_eigen))
+        unique_eigen = sorted(set(all_eigen), key=lambda c: (c.real, c.imag))
 
         partitions = [q_p[1] for q_p in q_and_p]
         assert partitions == sorted(partitions, key=lambda p: (max(p), p))
