@@ -22,7 +22,7 @@ https://github.com/peterjc/ccn
 History & Requirements
 ======================
 
-See the README file. This script requires Python, NumPy, and additional
+See the README file. This script requires Python 3, NumPy, and additional
 libraries for drawing the graphs and lattices as images.
 
 

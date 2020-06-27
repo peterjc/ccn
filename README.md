@@ -40,13 +40,10 @@ History
 Requirements
 ------------
 
-This script requires Python. Python is pre-installed on Apple Mac OS X, and on
-Linux distributions is easily installable via the package manager. For Windows
-use one of the installers available from http://www.python.org
-
-While it originally supported older versions of Python, this script has been
-updated to work unmodified on Python 2.6, 2.7, and Python 3.2, 3.3, 3.4 (and
-is expected to work on future Python 3 releases).
+This script requires Python 3. Python is pre-installed on Apple Mac OS X and
+Linux, but you may have to explicitly use `python3` rather than just `python`
+if the default is still Python 2.  On Windows you can install Python using an
+installer from http://www.python.org.
 
 It requires NumPy (Numerical Python), available from http://numpy.scipy.org
 This is used for array support, in particular matrix multiplication. This
