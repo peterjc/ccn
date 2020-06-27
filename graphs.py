@@ -907,6 +907,24 @@ class CoupledCellLattice(object):
 
         The node captions and ranks are determined from the partitions (balanced
         equivalence relations, also known as balanced colourings) automatically.
+
+        You can access a number of key properties as attributes of the object:
+
+        >>> lattice.n  # number of nodes
+        4
+        >>> lattice.matrix  # edge matrix as numpy integer array
+        array([[0, 0, 0, 0],
+               [1, 0, 0, 0],
+               [1, 0, 0, 0],
+               [0, 1, 1, 0]], dtype=uint8)
+        >>> lattice.partitions  # partitions for each node
+        ([0, 1, 0, 1, 1], [0, 1, 0, 1, 2], [0, 1, 2, 3, 1], [0, 1, 2, 3, 4])
+        >>> lattice.ranks  # rank for each node
+        [2, 3, 4, 5]
+        >>> lattice.colors  # automatically assigned for use in plotting
+        ['white', 'white', 'white', 'grey']
+        >>> lattice.captions  # automatically assigned for printing & plotting
+        ['(13)(245)', '(13)(24)(5)', '(1)(25)(3)(4)', '(1)(2)(3)(4)(5)']
         """
         self.n = n = len(partitions)  # number of lattice nodes
         if n > MAXLAT:
@@ -923,11 +941,11 @@ class CoupledCellLattice(object):
 
         # trivial_partitions = [[0] * len(partitions[0]), range(len(partitions[0]))]
 
-        colors = ["white"] * n
+        colors = ["white"] * n  # default white, grey for top and bottom nodes
         # This assumes the partitions are sorted:
         if partitions[0] == [0] * len(partitions[0]):
             colors[0] = "grey"
-        if partitions[-1] == range(len(partitions[0])):
+        if partitions[-1] == list(range(len(partitions[0]))):
             colors[-1] = "grey"
         self.colors = colors
 
@@ -1106,6 +1124,13 @@ class CoupledCellNetwork(object):
         (1,0) (0,2) (1,1) node 1
         (1,0) (1,0) (0,0) node 2
         (0,2) (0,0) (1,0) node 3
+
+        You can access two key properties as attributes of the object:
+
+        >>> ccn2.n  # number of nodes
+        3
+        >>> len(ccn2.matrices)  # one numpy integer array per edge type
+        2
         """
         assert isinstance(edge_matrices, tuple), edge_matrices
         assert edge_matrices
