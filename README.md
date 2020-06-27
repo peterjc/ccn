@@ -4,11 +4,11 @@ Algorithm to find balanced equivalence relations and lattices
 Copyright 2010-2012 by Hiroko Kamei & Peter Cock.  All rights reserved.
 This script was provided as a supplementary file for the manuscript:
 
-  Hiroko Kamei and Peter Cock (2013) "Computation of Balanced Equivalence
-  Relations and their Lattice for a Coupled Cell Network", SIAM Journal on
-  Applied Dynamical Systems (SIADS) 12(1), pp. 352-382.
-  http://dx.doi.org/10.1137/100819795
-  http://arxiv.org/abs/1211.6334
+> Hiroko Kamei and Peter Cock (2013) "Computation of Balanced Equivalence
+> Relations and their Lattice for a Coupled Cell Network", SIAM Journal on
+> Applied Dynamical Systems (SIADS) 12(1), pp. 352-382.
+> http://dx.doi.org/10.1137/100819795
+> http://arxiv.org/abs/1211.6334
 
 You are welcome to use and modify this code provided this copyright notice
 is retained (see the open source license for full details), however we
@@ -85,8 +85,8 @@ The structure of the script is as follows:
  3. A few classes
  4. Code for self testing
  5. User editable section, as provided this computes the balanced equivalence
-    relations and lattices for the graphs in the manuscript. Please copy or edit
-    these entries to look at other graphs of interest.
+    relations and lattices for the graphs in the manuscript. Please copy or
+    edit these entries to look at other graphs of interest.
 
 
 Testing
@@ -105,10 +105,10 @@ Introduction
 ------------
 
 The file includes a number of embedded examples (which double as self-tests
-using the Python doctest facility). These start with >>> which represents the
-Python prompt, and ... for continued lines. If you are not already familiar
-with Python and the interactive Python prompt for simplicity we recommend
-simply modifying this file and running it as shown above.
+using the Python doctest facility). These start with `>>>` which represents
+the Python prompt, and `...` for continued lines. If you are not already
+familiar with Python and the interactive Python prompt for simplicity we
+recommend simply modifying this file and running it as shown above.
 
 As a simple example, consider this regular network with just one edge type
 (Graph #7 in the manuscript):
