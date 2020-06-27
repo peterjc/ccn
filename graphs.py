@@ -1,10 +1,10 @@
 #!/usr/bin/env python
 """Algorithm to find lattices of synchrony subspaces and their reduced lattices.
 
-Copyright 2010-2014 by Hiroko Kamei & Peter J. A. Cock. Revisions copyright
-2014-2022 by Peter Cock, based on work by Hiroko Kamei and Haibo Ruan.
+Copyright 2010-2014 by Hiroko Kamei & Peter J. A. Cock.
+Revisions copyright 2014-2022 by Hiroko Kamei, Haibo Ruan and Peter J. A. Cock.
 
-The initial version (v1.0.0) was originally pubished as a supplimentary file
+The initial version (v1.0.0) was originally pubished as a supplementary file
 for the manuscript:
 
   Hiroko Kamei and Peter Cock (2013) "Computation of Balanced Equivalence
@@ -12,8 +12,11 @@ for the manuscript:
   on Applied Dynamical Systems (SIADS) 12(1), pp. 352-382.
   http://dx.doi.org/10.1137/100819795 http://arxiv.org/abs/1211.6334
 
+Public releases of version (v1.0.0) are available on GitHub, at:
+https://github.com/peterjc/ccn
+
 The current version (v1.1.0) was extended to construct a reduced lattice, and
-the modified script provided as a supplimentary file for the manuscript:
+the modified script provided as a supplementary file for the manuscript:
 
   Hiroko Kamei and Haibo Ruan (2020) "Reduced Lattices of Synchrony Subspaces
   and their Indices", submitted to SIAM Journal on Applied Dynamical Systems
@@ -22,9 +25,6 @@ the modified script provided as a supplimentary file for the manuscript:
 You are welcome to use and modify this code provided this copyright notice
 retained, however we request you cite the manuscripts in any scientific
 publications using it. It is released under the 3-clause BSD license.
-
-Public releases of this code are available on GitHub, at:
-https://github.com/peterjc/ccn
 
 
 History & Requirements
@@ -271,9 +271,10 @@ Building a reduced lattice (Example 6.1 in the 2020 manuscript):
     0 1 0 1 1 0 0 0 0 (1)(24)(3)
     0 0 1 0 1 0 0 0 0 (1)(2)(34)
     0 0 0 0 0 1 1 1 0 (1)(2)(3)(4)
-    >>> for reduced, eta in network.reduced_lattices():
+    >>> for reduced, eta_list in network.reduced_lattices():
     ...     print("Reduction to %i nodes:" % reduced.n)
-    ...     print(reduced)
+    ...     print(reduced)  # reduced lattice
+    ...     print("Eta:", eta_list)  # eta for each node in reduction
     ...
     Reduction to 7 nodes:
     0 0 0 0 0 0 0 (1234) eta=1
@@ -283,6 +284,11 @@ Building a reduced lattice (Example 6.1 in the 2020 manuscript):
     0 1 1 0 0 0 0 (12)(3)(4)+(1)(2)(34) eta=0
     0 1 0 1 0 0 0 (1)(24)(3) eta=0
     0 0 0 0 1 1 0 (1)(2)(3)(4) eta=0
+    Eta: [1, 1, 1, 1, 0, 0, 0]
+
+As an alternative, the example function "go" can be used to do this and
+additional output and graph plotting, go(network, "file_name", reduce=True),
+as shown in the user-editable section below.
 
 The reduced lattice is an undirected graph, here with seven nodes, drawn by
 hand::
@@ -317,7 +323,7 @@ import time
 from itertools import product
 
 if "-v" in sys.argv or "--version" in sys.argv:
-    print("Coupled Cell Network graphs.py v1.1.0")
+    print("Coupled Cell Network graphs.py v1.0.5")
     sys.exit(0)
 
 try:
@@ -1003,13 +1009,14 @@ def go(a, name="", format="png", top_only=False, reduce=False):
             print("Looking for lattice reductions...")
             start = time.time()
             candidates = 0
-            for reduction, eta in a.reduced_lattices():
+            for reduction, eta_list in a.reduced_lattices():
                 candidates += 1
                 print("")
                 print(
                     "Reduction candidate %i, with %i nodes:" % (candidates, reduction.n)
                 )
                 print(reduction)
+                print("Eta:", eta_list)
                 # Could draw it too, e.g.
                 # reduction.plot("%s_lattice_reduction_%i.%s" % (name, candidate, format))")
             taken = time.time() - start
@@ -1897,8 +1904,51 @@ class CoupledCellNetwork(object):
         partitions.sort(key=lambda p: (max(p), p))
         return CoupledCellLattice(*partitions)
 
+    def BellNumber(self):
+        """Return bell numbers (numbe of ways to partition a set of n elements).
+           The size of a lattice of balanced equivalence relations for n-cell
+           regular network is the bell number of a set of n elements when the
+           adjacency matrix of the regular network has only two distinct eigenvalues
+           lambda_1 (valency) and lambda_2, where the geometric multiplicity of lambda_2
+           is the same as the algebraic multiplicity of lambda_2.
+        """
+        n = self.n
+        bell = np.zeros((n + 1, n + 1), np.int)
+        bell[0, 0] = 1
+
+        for i in range(n):
+            bell[i + 1, 0] = bell[i, i]
+
+            for j in range(i + 1):
+                bell[i + 1, j + 1] = bell[i, j] + bell[i + 1, j]
+
+        return bell[n, 0]
+
     def reduced_lattices(self, caption_sep="+", resume_file=None):
-        """Return pairs of reduced lattice & eta (generator)."""
+        """Return pairs of reduced lattice & its eta-list.
+
+        Will return zero or more pairs, depending how many candidate
+        reductions are found. If the reduced lattice has N nodes, then
+        the eta list has N entries, the lattice index eta for each node.
+        """
+
+        # If the lattice (self) is the partition lattice of n elements,
+        # then the reduced lattice is given by L(1,...,1).
+        # If the network size is more than 4, we return L(1,...,1) as an output without
+        # searching candidates of reduced lattice.
+
+        # print("Network size is %i" % self.n)
+
+        lattice = self.lattice()
+        # print("Lattice size is %i" % lattice.n)
+
+        b_number = self.BellNumber()
+        # print("Bell number is %i" % b_number)
+
+        if self.n > 4 and lattice.n == b_number:
+            print("Reduced lattice is given by L(1,...,1)")
+            return
+
         q_and_p = list(self.quotients_with_partitions(resume_file))
         # Sort by rank (increasing), then by partition lexically.
         # rank(p) = max(p) + 1, thus equivalent to sort on max(p)
@@ -2129,510 +2179,13 @@ print("Runing self-tests...")
 tests = doctest.testmod()
 if tests.failed:
     raise RuntimeError("%i/%i tests failed" % tests)
-print("Tests done")
 
 ##########################################################
 # User editable section below
 ##########################################################
-#
-# As supplied, this first shows the seven graphs from the manuscript Table 2.1
-#
-##########################################################
-
-# Network one has three edge types,
-e1 = [[0, 0, 0, 0], [1, 0, 0, 1], [0, 0, 0, 0], [0, 0, 0, 0]]
-e2 = [[0, 0, 0, 0], [0, 0, 0, 0], [1, 0, 0, 1], [0, 0, 0, 0]]
-e3 = [[0, 0, 0, 0], [0, 0, 0, 0], [0, 1, 0, 0], [0, 0, 0, 0]]
-go(CoupledCellNetwork(e1, e2, e3), "n1")
 
 ##########################################################
-
-e1 = [[0, 0, 0, 0], [1, 0, 0, 0], [1, 0, 0, 0], [0, 0, 0, 0]]
-e2 = [[0, 0, 1, 0], [0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0]]
-e3 = [[0, 0, 0, 1], [0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0]]
-e4 = [[0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0], [0, 1, 1, 0]]
-go(CoupledCellNetwork(e1, e2, e3, e4), "n2")
-
-##########################################################
-
-e1 = [
-    [0, 0, 0, 0, 0],
-    [1, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0],
-    [0, 0, 1, 0, 0],
-    [1, 0, 0, 0, 0],
-]
-e2 = [
-    [0, 0, 0, 1, 0],
-    [0, 0, 0, 0, 0],
-    [0, 1, 0, 0, 0],
-    [0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0],
-]
-go(CoupledCellNetwork(e1, e2), "n3")
-
-##########################################################
-
-e1 = [[0, 1, 0, 0], [0, 0, 1, 0], [0, 0, 0, 1], [1, 0, 0, 0]]
-e2 = [[0, 0, 0, 1], [1, 0, 0, 0], [0, 1, 0, 0], [0, 0, 1, 0]]
-e3 = [[0, 0, 1, 0], [0, 0, 0, 1], [1, 0, 0, 0], [0, 1, 0, 0]]
-go(CoupledCellNetwork(e1, e2, e3), "n4")
-
-##########################################################
-
-e1 = [
-    [0, 1, 0, 1, 0],
-    [1, 0, 0, 1, 0],
-    [0, 0, 1, 0, 1],
-    [1, 1, 0, 0, 0],
-    [0, 0, 1, 0, 1],
-]
-e2 = [
-    [0, 1, 0, 0, 0],
-    [0, 0, 0, 1, 0],
-    [1, 0, 0, 0, 0],
-    [1, 0, 0, 0, 0],
-    [1, 0, 0, 0, 0],
-]
-go(CoupledCellNetwork(e1, e2), "n5")
-
-##########################################################
-
-e1 = [
-    [0, 0, 0, 1, 1],
-    [1, 0, 0, 1, 0],
-    [1, 0, 0, 0, 1],
-    [1, 1, 0, 0, 0],
-    [1, 0, 1, 0, 0],
-]
-go(CoupledCellNetwork(e1), "n6")
-
-##########################################################
-
-e1 = [
-    [0, 0, 0, 1, 0],
-    [1, 0, 0, 0, 0],
-    [0, 1, 0, 0, 0],
-    [0, 0, 1, 0, 0],
-    [1, 0, 0, 0, 0],
-]
-go(CoupledCellNetwork(e1), "n7")
-
-##########################################################
-
-e1 = [
-    [0, 0, 0, 0, 0, 1, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 1, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 1],
-    [0, 0, 0, 0, 1, 0, 0, 0],
-    [1, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 1, 0, 0, 0, 0, 0],
-]
-e2 = [
-    [0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 1, 0, 0, 0, 1, 0],
-    [0, 1, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 1, 0, 0, 1],
-    [0, 0, 0, 1, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0],
-]
-# go(CoupledCellNetwork(e1,e2), "n8")
-
-##########################################################
-# fmt: off
-# This should match Figure 3(b) in Belykh and Hasler (2011) Chaos,
-# Mesoscale and clusters of synchrony in networks of bursting neurons.
-#                      1 1 1 1 1 1 1 1 1 1 2 2 2 2 2 2 2 2 2 2 3
-#    1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0
-e1 = [
-    [0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0],  # 1  # noqa: E231
-    [0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0],  # 2  # noqa: E231
-    [0,1,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],  # 3  # noqa: E231
-    [0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,1,0,0,0,0,0,1,0,0,0,0,0,0,0],  # 4  # noqa: E231
-    [0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0],  # 5  # noqa: E231
-    [0,0,0,0,0,0,1,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0],  # 6  # noqa: E231
-    [0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0],  # 7  # noqa: E231
-    [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,1],  # 8  # noqa: E231
-    [0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0],  # 9  # noqa: E231
-    [0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0],  # 10 # noqa: E231
-    [0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0],  # 11 # noqa: E231
-    [0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,1],  # 12 # noqa: E231
-    [0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],  # 13 # noqa: E231
-    [1,0,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],  # 14 # noqa: E231
-    [0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,1,0,0,0,0,0,0],  # 15 # noqa: E231
-    [0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,1,0,0],  # 16 # noqa: E231
-    [0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,1,0,0,0,0,0,0,0,0,0,0],  # 17 # noqa: E231
-    [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0],  # 18 # noqa: E231
-    [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,1,0,0],  # 19 # noqa: E231
-    [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,1,0,0,0,0,0,0,0],  # 20 # noqa: E231
-    [0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0],  # 21 # noqa: E231
-    [0,1,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0],  # 22 # noqa: E231
-    [0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0],  # 23 # noqa: E231
-    [0,0,0,0,0,0,0,0,0,0,1,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],  # 24 # noqa: E231
-    [0,0,0,0,0,1,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],  # 25 # noqa: E231
-    [0,0,0,0,1,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],  # 26 # noqa: E231
-    [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0],  # 27 # noqa: E231
-    [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,1,0,0,0,0,0,0,0,0,0,0,0],  # 28 # noqa: E231
-    [0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0],  # 29 # noqa: E231
-    [0,0,0,0,0,0,0,1,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],  # 30 # noqa: E231
-]
-# Double check the row sums match the number of edges expected,
-# Node                1 1 1 1 1 1 1 1 1 1 2 2 2 2 2 2 2 2 2 2 3
-#   1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0
-assert [
-    2,2,2,3,2,3,2,2,2,2,2,3,1,3,3,3,3,2,2,2,2,3,2,2,2,2,1,2,2,2,  # noqa: E231
-] == [sum(row) for row in e1], [sum(row) for row in e1]
-# fmt: off
-assert np.all(np.array(e1) == np.array(e1).T), "Not symmetric"
-go(CoupledCellNetwork(e1), "n9")
-
-# Modified version, remove edge between 4 and 17 (3 and 16 in Python
-# counting), replace with edge joining 13 and 27 (12 and 26 in Python
-# counting):
-e1[3][16] = 0
-e1[16][3] = 0
-e1[12][26] = 1
-e1[26][12] = 1
-assert np.all(np.array(e1) == np.array(e1).T), "Not symmetric"
-go(CoupledCellNetwork(e1), "n9-modified")
-
-##################################################################
-
-# This should match Figure 5 in in Belykh and Hasler (2011) Chaos,
-# Mesoscale and clusters of synchrony in networks of bursting neurons.
-e1 = [
-    [0, 1, 1, 0, 0, 0, 0, 0, 0, 0],
-    [1, 0, 0, 1, 1, 1, 0, 0, 0, 0],
-    [1, 0, 0, 1, 1, 1, 0, 0, 0, 0],
-    [0, 1, 1, 0, 0, 0, 1, 1, 1, 1],
-    [0, 1, 1, 0, 0, 0, 1, 1, 1, 1],
-    [0, 1, 1, 0, 0, 0, 1, 1, 1, 1],
-    [0, 0, 0, 1, 1, 1, 0, 0, 0, 0],
-    [0, 0, 0, 1, 1, 1, 0, 0, 0, 0],
-    [0, 0, 0, 1, 1, 1, 0, 0, 0, 0],
-    [0, 0, 0, 1, 1, 1, 0, 0, 0, 0],
-]
-assert np.all(np.array(e1) == np.array(e1).T), "Not symmetric"
-
-print("")
-print("=" * 50)
-print("Warning this next one prints out a lot... (big lattice!)")
-go(CoupledCellNetwork(e1), "n10")
-
-######################################################
-
-# This row of six nodes is based on Zhang et al (2001) Physical Review E, vol 63
-e1 = [
-    [1, 1, 0, 0, 0, 0],
-    [1, 0, 1, 0, 0, 0],
-    [0, 1, 0, 1, 0, 0],
-    [0, 0, 1, 0, 1, 0],
-    [0, 0, 0, 1, 0, 1],
-    [0, 0, 0, 0, 1, 1],
-]
-assert np.all(np.array(e1) == np.array(e1).T), "Not symmetric"
-go(CoupledCellNetwork(e1), "n11")
-
-# This row of seven nodes is based on Zhang et al (2001) Physical Review E, vol 63
-e1 = [
-    [1, 1, 0, 0, 0, 0, 0],
-    [1, 0, 1, 0, 0, 0, 0],
-    [0, 1, 0, 1, 0, 0, 0],
-    [0, 0, 1, 0, 1, 0, 0],
-    [0, 0, 0, 1, 0, 1, 0],
-    [0, 0, 0, 0, 1, 0, 1],
-    [0, 0, 0, 0, 0, 1, 1],
-]
-assert np.all(np.array(e1) == np.array(e1).T), "Not symmetric"
-go(CoupledCellNetwork(e1), "n12")
-
-######################################################
-
-# Casado (2003) Figure 2, repeated in the review paper
-# Ibarz et al (2010) as Figure 61(a).
-e1 = [
-    [0, 1, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 1, 0, 0, 0, 0],
-    [0, 0, 0, 0, 1, 0, 0, 0, 0],
-    [0, 1, 0, 0, 0, 0, 1, 1, 0],
-    [0, 0, 0, 1, 0, 1, 0, 0, 1],
-    [0, 1, 1, 0, 0, 0, 0, 1, 0],
-    [0, 0, 0, 0, 1, 0, 0, 0, 0],
-    [0, 0, 0, 0, 1, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 1, 0],
-]
-go(CoupledCellNetwork(e1), "Casado_F2_original")
-
-# This is Fig. 2 from Rabinovich et al (2001),
-# FitzHugh-Nagumo models in neuronal dynamics.
-# Same as Ibaraz example, but with an edge from node 1 to 5.
-e1 = [
-    [0, 1, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 1, 0, 0, 0, 0],
-    [0, 0, 0, 0, 1, 0, 0, 0, 0],
-    [0, 1, 0, 0, 0, 0, 1, 1, 0],
-    [1, 0, 0, 1, 0, 1, 0, 0, 1],
-    [0, 1, 1, 0, 0, 0, 0, 1, 0],
-    [0, 0, 0, 0, 1, 0, 0, 0, 0],
-    [0, 0, 0, 0, 1, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 1, 0],
-]
-go(CoupledCellNetwork(e1), "Rabinovich_F2_original")
-
-# Modified version of Casado (2003) example to use two edge types,
-# those from n3 and n8 excitatory (edge type two), the rest are
-# inhibitory (edge type one).
-e1 = [
-    [0, 1, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 1, 0, 0, 0, 0],
-    [0, 0, 0, 0, 1, 0, 0, 0, 0],
-    [0, 1, 0, 0, 0, 0, 1, 0, 0],
-    [0, 0, 0, 1, 0, 1, 0, 0, 1],
-    [0, 1, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 1, 0, 0, 0, 0],
-    [0, 0, 0, 0, 1, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0],
-]
-e2 = [
-    [0, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 1, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 1, 0, 0, 0, 0, 1, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 1, 0],
-]
-go(CoupledCellNetwork(e1, e2), "Casado_F2_mod_2e_i38")
-
-# Modified from Rabinovich et al (2000), not Ibaraz et al. (2010)
-# Two edge types, outputs from n3 and n8 excitatory (edge type 2),
-# rest are inhibitory (edge type 1)
-# i.e. Like the above, but with an output from one to five.
-e1 = [
-    [0, 1, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 1, 0, 0, 0, 0],
-    [0, 0, 0, 0, 1, 0, 0, 0, 0],
-    [0, 1, 0, 0, 0, 0, 1, 0, 0],
-    [1, 0, 0, 1, 0, 1, 0, 0, 1],
-    [0, 1, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 1, 0, 0, 0, 0],
-    [0, 0, 0, 0, 1, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0],
-]
-e2 = [
-    [0, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 1, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 1, 0, 0, 0, 0, 1, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 1, 0],
-]
-go(CoupledCellNetwork(e1, e2), "Rabinovich_F2_mod_2e_i38")
-
-######################################################
-
-# To check Belykh's conjecture (2.8) in:
-# Belykh et al. Hierarchy and stability of partially synchronous
-# oscillations of diffusively coupled dynamical systems.
-# Phys Rev E Stat Phys Plasmas Fluids Relat Interdiscip Topics
-# (2000) vol. 62 (5 Pt A) pp. 6332-45
-e1 = [
-    [1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    [1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1],
-]
-# i.e. make_chain(15)
-# Finding the full lattice (not just the top node) took 3.5 days.
-go(CoupledCellNetwork(e1), "Belykh_2000_chain15", top_only=True)
-
-######################################################
-
-# From: 1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16   To:
-e1 = [
-    [0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],  # n1 yellow bottom
-    [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0],  # n2 blue bottom
-    [0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],  # n3 red bottom-right
-    [0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],  # n4 green bottom-righ
-    [0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],  # n5 yellow right
-    [0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],  # n6 blue right
-    [0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],  # n7 red top-right
-    [0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0],  # n8 green top-right
-    [0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0],  # n9 yellow top
-    [0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0],  # n10 blue top
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0],  # n11 red top-left
-    [0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0],  # n12 green top-left
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0],  # n13 yellow left
-    [0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0],  # n14 blue left
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0],  # n15 red bottom-left
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0],  # n16 green bottom-left
-]
-assert [sum(row) for row in e1] == [1, 2, 1, 1, 2, 1, 1, 1, 1, 1, 2, 2, 1, 2, 1, 1], [
-    sum(row) for row in e1
-]
-# fmt: off
-assert [sum(e1[i][j] for i in range(16)) for j in range(16)] == [
-    1, 1, 1, 2, 2, 1, 2, 1, 1, 1, 1, 1, 2, 2, 1, 1
-], [sum(e1[i][j] for j in range(16)) for i in range(16)]
-# fmt: on
-go(CoupledCellNetwork(e1), "Lehnert_2010_Syncline_Poster")
-
-# Modified to include self coupling to make this a regular netork,
-# From:
-#    1  2  3  4  5  6  7  8  9  10 11 12 13 14 15 16   To:
-e1 = [
-    [0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],  # n1 yellow bottom
-    [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0],  # n2 blue bottom
-    [0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],  # n3 red bottom-right
-    [0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],  # n4 green bottom-right
-    ######################################################
-    [0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],  # n5 yellow right
-    [0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],  # n6 blue right
-    [0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],  # n7 red top-right
-    [0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0],  # n8 green top-right
-    ######################################################
-    [0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0],  # n9 yellow top
-    [0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0],  # n10 blue top
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0],  # n11 red top-left
-    [0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0],  # n12 green top-left
-    ######################################################
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0],  # n13 yellow left
-    [0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0],  # n14 blue left
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0],  # n15 red bottom-left
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0],  # n16 green bottom-left
-]
-for row in e1:
-    assert sum(row) == 2
-# fmt: off
-assert [sum(e1[i][j] for i in range(16)) for j in range(16)] == [
-    1, 2, 2, 3, 3, 2, 3, 2, 2, 1, 1, 2, 2, 3, 2, 1,
-], [sum(e1[i][j] for j in range(16)) for i in range(16)]
-# fmt: on
-go(CoupledCellNetwork(e1), "Lehnert_2010_Syncline_Poster_reg", top_only=True)
-
-###################################################################
-
-# 30 node example from here:
-# http://jasss.soc.surrey.ac.uk/12/2/3.html
-# fmt: off
-e1 = [
-    [0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1],  # noqa: E231
-    [1,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],  # noqa: E231
-    [1,1,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],  # noqa: E231
-    [0,1,1,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0],  # noqa: E231
-    [0,0,1,1,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],  # noqa: E231
-    [0,0,0,0,1,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],  # noqa: E231
-    [0,0,0,0,1,1,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],  # noqa: E231
-    [0,0,0,0,0,1,1,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],  # noqa: E231
-    [0,0,0,0,0,0,1,1,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],  # noqa: E231
-    [0,0,0,0,0,0,0,1,1,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0],  # noqa: E231
-    [0,0,0,0,0,0,0,0,1,0,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],  # noqa: E231
-    [0,0,0,0,0,0,0,0,0,1,1,0,1,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0],  # noqa: E231
-    [0,0,0,0,0,0,0,0,0,0,1,1,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],  # noqa: E231
-    [0,0,0,0,0,0,0,0,0,0,0,0,1,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0],  # noqa: E231
-    [0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0],  # noqa: E231
-    [0,0,0,0,0,0,0,0,0,0,0,1,0,1,1,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0],  # noqa: E231
-    [0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,1,1,0,0,0,0,0,0,0,0,0,0,0],  # noqa: E231
-    [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,1,1,0,0,0,0,0,0,0,0,0,0],  # noqa: E231
-    [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,1,1,0,0,0,1,0,0,0,0,0],  # noqa: E231
-    [0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,1,1,0,0,0,0,0,0,0,0],  # noqa: E231
-    [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,1,1,0,0,0,0,0,0,1],  # noqa: E231
-    [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,1,1,0,0,0,0,0,0],  # noqa: E231
-    [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,1,0,0,0,0,0,0],  # noqa: E231
-    [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,1,1,0,0,0,0],  # noqa: E231
-    [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,1,0,1,1,0,0,0],  # noqa: E231
-    [0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,1,1,0,0],  # noqa: E231
-    [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,1,1,0],  # noqa: E231
-    [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,1,0],  # noqa: E231
-    [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,1],  # noqa: E231
-    [1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,1,0],  # noqa: E231
-]
-# fmt: on
-go(CoupledCellNetwork(e1), "sw30")
-
-###################################################################
-
-# 24 node example
-e1 = [
-    [0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1],
-    [1, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1],
-    [1, 1, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-    [1, 1, 1, 0, 1, 1, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 1, 1, 1, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 1, 1, 1, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 1, 1, 1, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-    [0, 0, 0, 0, 1, 1, 1, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 1, 1, 1, 0, 1, 1, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 1, 0, 0, 0, 0, 1, 1, 1, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 1, 1, 1, 0, 0, 0, 1, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 1, 1, 1, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 1, 1, 1, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 1, 1, 0, 1, 1, 1, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 1, 1, 1, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 1, 1, 1, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 1, 1, 1],
-    [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 1, 1, 0, 1, 1],
-    [1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 1],
-    [1, 1, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0],
-]
-go(CoupledCellNetwork(e1), "sw24")
-
-###################################################################
-
-# 22 node example
-e1 = [
-    [0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-    [1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0],
-    [0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0],
-    [1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1],
-    [1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0],
-    [0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 1],
-    [0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-    [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0],
-]
-go(CoupledCellNetwork(e1), "tangled22")
-
-##########################################################
-# Reduction examples below
+# Reduction examples from the 2020 manuscript
 ##########################################################
 
 # 7 node lattice post reduction
@@ -2658,8 +2211,58 @@ go(CoupledCellNetwork(e1), "tangled22")
 #    ]
 # )
 
-# Example 6.1 Reduction of lattice for 4-cell regular network
-network = CoupledCellNetwork([[0, 0, 0, 2], [0, 0, 0, 2], [0, 1, 0, 1], [0, 1, 0, 1],])
+# Example 6.1 Unique reduced lattice (in the 2020 manuscript)
+##network = CoupledCellNetwork(
+##    [
+##        [0, 0, 0, 2],
+##        [0, 0, 0, 2],
+##        [0, 1, 0, 1],
+##        [0, 1, 0, 1],
+##        ]
+##    )
+
+
+# Example 6.2 Multiple reduced lattices
+##network = CoupledCellNetwork(
+##    [
+##        [0, 0, 0, 2],
+##        [0, 0, 0, 2],
+##        [0, 0, 0, 2],
+##        [0, 0, 1, 1],
+##    ]
+##)
+
+# Example 6.3 Counter example
+##network = CoupledCellNetwork(
+##    [
+##        [0, 1, 0, 1, 0],
+##        [1, 0, 0, 0, 1],
+##        [1, 0, 0, 1, 0],
+##        [1, 0, 1, 0, 0],
+##        [1, 1, 0, 0, 0],
+##    ]
+##)
+
+# 5-cell regular network - partition lattice of 5 elements
+network = CoupledCellNetwork(
+    [
+        [0, 0, 0, 0, 1],
+        [0, 0, 0, 0, 1],
+        [0, 0, 0, 0, 1],
+        [0, 0, 0, 0, 1],
+        [0, 0, 0, 0, 1],
+    ]
+)
+
+### 4-cell regular network - partition lattice of 4 elements
+##network = CoupledCellNetwork(
+##    [
+##        [0, 0, 0, 1],
+##        [0, 0, 0, 1],
+##        [0, 0, 0, 1],
+##        [0, 0, 0, 1],
+##        ]
+##    )
 
 go(network, "reduction_test", reduce=True)
 
