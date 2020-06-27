@@ -354,6 +354,26 @@ class NotBalancedError(ValueError):
     pass
 
 
+def bell_number(n):
+    """Return bell number (number of ways to partition a set of n elements).
+
+    The size of a lattice of balanced equivalence relations for n-cell
+    regular network is the bell number of a set of n elements when the
+    adjacency matrix of the regular network has only two distinct eigenvalues
+    lambda_1 (valency) and lambda_2, where the geometric multiplicity of lambda_2
+    is the same as the algebraic multiplicity of lambda_2.
+    """
+    bell = np.zeros((n + 1, n + 1), np.int)
+    bell[0, 0] = 1
+
+    for i in range(n):
+        bell[i + 1, 0] = bell[i, i]
+        for j in range(i + 1):
+            bell[i + 1, j + 1] = bell[i, j] + bell[i + 1, j]
+
+    return bell[n, 0]
+
+
 def make_quotient(adj_matrix, partition):
     """Return quotient adjacency matrix, or raises an exception.
 
@@ -1904,26 +1924,6 @@ class CoupledCellNetwork(object):
         partitions.sort(key=lambda p: (max(p), p))
         return CoupledCellLattice(*partitions)
 
-    def BellNumber(self):
-        """Return bell numbers (numbe of ways to partition a set of n elements).
-           The size of a lattice of balanced equivalence relations for n-cell
-           regular network is the bell number of a set of n elements when the
-           adjacency matrix of the regular network has only two distinct eigenvalues
-           lambda_1 (valency) and lambda_2, where the geometric multiplicity of lambda_2
-           is the same as the algebraic multiplicity of lambda_2.
-        """
-        n = self.n
-        bell = np.zeros((n + 1, n + 1), np.int)
-        bell[0, 0] = 1
-
-        for i in range(n):
-            bell[i + 1, 0] = bell[i, i]
-
-            for j in range(i + 1):
-                bell[i + 1, j + 1] = bell[i, j] + bell[i + 1, j]
-
-        return bell[n, 0]
-
     def reduced_lattices(self, caption_sep="+", resume_file=None):
         """Return pairs of reduced lattice & its eta-list.
 
@@ -1942,7 +1942,7 @@ class CoupledCellNetwork(object):
         lattice = self.lattice()
         # print("Lattice size is %i" % lattice.n)
 
-        b_number = self.BellNumber()
+        b_number = bell_number(self.n)
         # print("Bell number is %i" % b_number)
 
         if self.n > 4 and lattice.n == b_number:
