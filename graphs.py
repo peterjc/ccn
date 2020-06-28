@@ -1728,7 +1728,7 @@ class CoupledCellNetwork(object):
         n = self.n
         if pydot is None:
             sys.stderr.write(
-                "Please install graphviz, pydot and pyparsing " "to draw graphs\n"
+                "Please install graphviz, pydot and pyparsing to draw graphs\n"
             )
             return
 
