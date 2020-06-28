@@ -2241,8 +2241,63 @@ if tests.failed:
 ##########################################################
 
 ##########################################################
-# Reduction examples from the 2020 manuscript
+# Reduction examples from the 2020 manuscript and some extra
 ##########################################################
+
+
+# Example 6.1 Unique reduced lattice (in the 2020 manuscript)
+network = CoupledCellNetwork(
+    [
+        [0, 0, 0, 2],
+        [0, 0, 0, 2],
+        [0, 1, 0, 1],
+        [0, 1, 0, 1],
+    ]
+)
+
+
+# Example 6.2 Multiple reduced lattices
+# network = CoupledCellNetwork(
+#    [
+#        [0, 0, 0, 2],
+#        [0, 0, 0, 2],
+#        [0, 0, 0, 2],
+#        [0, 0, 1, 1],
+#    ]
+# )
+
+# Example 6.3 Counter example
+# network = CoupledCellNetwork(
+#    [
+#        [0, 1, 0, 1, 0],
+#        [1, 0, 0, 0, 1],
+#        [1, 0, 0, 1, 0],
+#        [1, 0, 1, 0, 0],
+#        [1, 1, 0, 0, 0],
+#    ]
+# )
+
+# 4-cell regular network - partition lattice of 4 elements
+#network = CoupledCellNetwork(
+#   [
+#       [0, 0, 0, 1],
+#       [0, 0, 0, 1],
+#       [0, 0, 0, 1],
+#       [0, 0, 0, 1],
+#       ]
+#)
+
+# 5-cell regular network - partition lattice of 5 elements
+#network = CoupledCellNetwork(
+#    [
+#        [0, 0, 0, 0, 1],
+#        [0, 0, 0, 0, 1],
+#        [0, 0, 0, 0, 1],
+#        [0, 0, 0, 0, 1],
+#        [0, 0, 0, 0, 1],
+#    ]
+#)
+
 
 # 7 node lattice post reduction
 # network = CoupledCellNetwork(
@@ -2267,58 +2322,6 @@ if tests.failed:
 #    ]
 # )
 
-# Example 6.1 Unique reduced lattice (in the 2020 manuscript)
-# network = CoupledCellNetwork(
-#    [
-#        [0, 0, 0, 2],
-#        [0, 0, 0, 2],
-#        [0, 1, 0, 1],
-#        [0, 1, 0, 1],
-#        ]
-# )
-
-
-# Example 6.2 Multiple reduced lattices
-# network = CoupledCellNetwork(
-#    [
-#        [0, 0, 0, 2],
-#        [0, 0, 0, 2],
-#        [0, 0, 0, 2],
-#        [0, 0, 1, 1],
-#    ]
-# )
-
-# Example 6.3 Counter example
-# network = CoupledCellNetwork(
-#    [
-#        [0, 1, 0, 1, 0],
-#        [1, 0, 0, 0, 1],
-#        [1, 0, 0, 1, 0],
-#        [1, 0, 1, 0, 0],
-#        [1, 1, 0, 0, 0],
-#    ]
-# )
-
-# 5-cell regular network - partition lattice of 5 elements
-network = CoupledCellNetwork(
-    [
-        [0, 0, 0, 0, 1],
-        [0, 0, 0, 0, 1],
-        [0, 0, 0, 0, 1],
-        [0, 0, 0, 0, 1],
-        [0, 0, 0, 0, 1],
-    ]
-)
-
-# 4-cell regular network - partition lattice of 4 elements
-# network = CoupledCellNetwork(
-#    [
-#        [0, 0, 0, 1],
-#        [0, 0, 0, 1],
-#        [0, 0, 0, 1],
-#        [0, 0, 0, 1],
-#        ]
-# )
 
 go(network, "reduction_test", reduce=True)
 
