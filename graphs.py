@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-"""Algorithm to find lattices of synchrony subspaces & their reduced lattices.
+r"""Algorithm to find lattices of synchrony subspaces & their reduced lattices.
 
 Copyright 2010-2014 by Hiroko Kamei & Peter J. A. Cock.
 Revisions copyright 2014-2022 by Hiroko Kamei, Haibo Ruan, and Peter Cock.
@@ -1038,7 +1038,7 @@ def go(a, name="", format="png", top_only=False, reduce=False):
                 print(reduction)
                 print("Eta:", eta_list)
                 # Could draw it too, e.g.
-                # reduction.plot("%s_lattice_reduction_%i.%s" % (name, candidate, format))")
+                # reduction.plot("%s_reduced_lattice_%i.png" % (name, candidate))")
             taken = time.time() - start
             print("")
             if taken < 60:
@@ -1931,10 +1931,9 @@ class CoupledCellNetwork(object):
         reductions are found. If the reduced lattice has N nodes, then
         the eta list has N entries, the lattice index eta for each node.
         """
-
         if len(self.matrices) > 1:
             raise NotImplementedError("Only one edge type implemented so far!")
-        if len(set(sum(row) for row in self.matrices[0])) != 1:
+        if len({sum(row) for row in self.matrices[0]}) != 1:
             # In regular network of valency r, all nodes have r inputs.
             raise NotImplementedError("Only regular networks can be reduced so far!")
 
@@ -2216,36 +2215,36 @@ if tests.failed:
 # )
 
 # Example 6.1 Unique reduced lattice (in the 2020 manuscript)
-##network = CoupledCellNetwork(
-##    [
-##        [0, 0, 0, 2],
-##        [0, 0, 0, 2],
-##        [0, 1, 0, 1],
-##        [0, 1, 0, 1],
-##        ]
-##    )
+# network = CoupledCellNetwork(
+#    [
+#        [0, 0, 0, 2],
+#        [0, 0, 0, 2],
+#        [0, 1, 0, 1],
+#        [0, 1, 0, 1],
+#        ]
+# )
 
 
 # Example 6.2 Multiple reduced lattices
-##network = CoupledCellNetwork(
-##    [
-##        [0, 0, 0, 2],
-##        [0, 0, 0, 2],
-##        [0, 0, 0, 2],
-##        [0, 0, 1, 1],
-##    ]
-##)
+# network = CoupledCellNetwork(
+#    [
+#        [0, 0, 0, 2],
+#        [0, 0, 0, 2],
+#        [0, 0, 0, 2],
+#        [0, 0, 1, 1],
+#    ]
+# )
 
 # Example 6.3 Counter example
-##network = CoupledCellNetwork(
-##    [
-##        [0, 1, 0, 1, 0],
-##        [1, 0, 0, 0, 1],
-##        [1, 0, 0, 1, 0],
-##        [1, 0, 1, 0, 0],
-##        [1, 1, 0, 0, 0],
-##    ]
-##)
+# network = CoupledCellNetwork(
+#    [
+#        [0, 1, 0, 1, 0],
+#        [1, 0, 0, 0, 1],
+#        [1, 0, 0, 1, 0],
+#        [1, 0, 1, 0, 0],
+#        [1, 1, 0, 0, 0],
+#    ]
+# )
 
 # 5-cell regular network - partition lattice of 5 elements
 network = CoupledCellNetwork(
@@ -2258,15 +2257,15 @@ network = CoupledCellNetwork(
     ]
 )
 
-### 4-cell regular network - partition lattice of 4 elements
-##network = CoupledCellNetwork(
-##    [
-##        [0, 0, 0, 1],
-##        [0, 0, 0, 1],
-##        [0, 0, 0, 1],
-##        [0, 0, 0, 1],
-##        ]
-##    )
+# 4-cell regular network - partition lattice of 4 elements
+# network = CoupledCellNetwork(
+#    [
+#        [0, 0, 0, 1],
+#        [0, 0, 0, 1],
+#        [0, 0, 0, 1],
+#        [0, 0, 0, 1],
+#        ]
+# )
 
 go(network, "reduction_test", reduce=True)
 
