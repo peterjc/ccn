@@ -1934,10 +1934,10 @@ class CoupledCellNetwork(object):
         In an ideal case there will be a single unique reduction. In this
         example a seven node lattice has a unique six node reduction:
 
-        >>> network = network = CoupledCellNetwork([[0, 0, 0, 2],
-        ...                                         [0, 0, 0, 2],
-        ...                                         [0, 1, 1, 0],
-        ...                                         [0, 0, 0, 2]])
+        >>> network = CoupledCellNetwork([[0, 0, 0, 2],
+        ...                               [0, 0, 0, 2],
+        ...                               [0, 1, 1, 0],
+        ...                               [0, 0, 0, 2]])
         >>> lattice = network.lattice()
         >>> print(lattice)
         0 0 0 0 0 0 0 (1234)
