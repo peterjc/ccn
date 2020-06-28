@@ -1027,14 +1027,13 @@ def go(a, name="", format="png", top_only=False, reduce=False):
             print("Looking for lattice reductions...")
             start = time.time()
             candidates = 0
-            for reduction, eta_list in a.reduced_lattices():
+            for reduction in a.reduced_lattices():
                 candidates += 1
                 print("")
                 print(
                     "Reduction candidate %i, with %i nodes:" % (candidates, reduction.n)
                 )
                 print(reduction)
-                print("Eta:", eta_list)
                 # Could draw it too, e.g.
                 # reduction.plot("%s_reduced_lattice_%i.png" % (name, candidate))")
             taken = time.time() - start
