@@ -1861,7 +1861,8 @@ class CoupledCellNetwork(object):
     def lattice(self, caption_sep="+", resume_file=None):
         r"""Find balanced equivalence relations and build lattice.
 
-        Consider graph #5, which has two edge types:
+        This method implements an alogrithm described in Kamei & Cock (2013).
+        Consider graph #5 from that paper, which has two edge types:
 
         >>> e1 = [[0,1,0,1,0],
         ...       [1,0,0,1,0],
@@ -1929,6 +1930,59 @@ class CoupledCellNetwork(object):
         and returns zero or more candidate lattice reductions. i.e. Smaller
         lattices created by merging nodes in the lattice constructed as per
         the alogrithm described in Kamei & Cock (2013).
+
+        In an ideal case there will be a single unique reduction. In this
+        example a seven node lattice has a unique six node reduction:
+
+        >>> network = network = CoupledCellNetwork([[0, 0, 0, 2],
+        ...                                         [0, 0, 0, 2],
+        ...                                         [0, 1, 1, 0],
+        ...                                         [0, 0, 0, 2]])
+        >>> lattice = network.lattice()
+        >>> print(lattice)
+        0 0 0 0 0 0 0 (1234)
+        1 0 0 0 0 0 0 (124)(3)
+        1 0 0 0 0 0 0 (1)(234)
+        0 1 0 0 0 0 0 (12)(3)(4)
+        0 1 0 0 0 0 0 (14)(2)(3)
+        0 1 1 0 0 0 0 (1)(24)(3)
+        0 0 0 1 1 1 0 (1)(2)(3)(4)
+        >>> for reduced in network.reduced_lattices():
+        ...     print("Reduction to %i nodes:" % reduced.n)
+        ...     print(reduced)
+        Reduction to 6 nodes:
+        0 0 0 0 0 0 (1234) eta=1
+        1 0 0 0 0 0 (124)(3) eta=1
+        1 0 0 0 0 0 (1)(234) eta=1
+        0 1 0 0 0 0 (12)(3)(4)+(14)(2)(3) eta=1
+        0 1 1 0 0 0 (1)(24)(3) eta=0
+        0 0 0 1 1 0 (1)(2)(3)(4) eta=0
+
+        In general there will be multiple candidate reductions returned.
+        Sometimes a network has a lattice with no reductions:
+
+        >>> network = CoupledCellNetwork([[0, 1, 0, 1, 0],
+        ...                               [1, 0, 0, 0, 1],
+        ...                               [1, 0, 0, 1, 0],
+        ...                               [1, 0, 1, 0, 0],
+        ...                               [1, 1, 0, 0, 0]])
+        >>> lattice = network.lattice()
+        >>> print(lattice)
+        0 0 0 0 0 0 0 0 0 0 (12345)
+        1 0 0 0 0 0 0 0 0 0 (123)(45)
+        1 0 0 0 0 0 0 0 0 0 (145)(23)
+        1 0 0 0 0 0 0 0 0 0 (1)(2345)
+        0 1 1 1 0 0 0 0 0 0 (1)(23)(45)
+        0 0 0 1 0 0 0 0 0 0 (1)(24)(35)
+        0 0 0 1 0 0 0 0 0 0 (1)(25)(34)
+        0 0 0 0 0 0 1 0 0 0 (1)(2)(34)(5)
+        0 0 0 0 0 0 1 0 0 0 (1)(25)(3)(4)
+        0 0 0 0 1 1 0 1 1 0 (1)(2)(3)(4)(5)
+        >>> for reduced in network.reduced_lattices():
+        ...     print("Reduction to %i nodes:" % reduced.n)
+        ...     print(reduced)
+
+        i.e. No output from calling reduced_lattices here.
         """
         if len(self.matrices) > 1:
             raise NotImplementedError("Only one edge type implemented so far!")
