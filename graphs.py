@@ -31,13 +31,13 @@ Usage
 
 At the command prompt (terminal window), assuming this file has been saved
 as graphs.py in the current directory, on Mac or Linux you would run this
-code by typing:
+code by typing::
 
     python graphs.py
 
 On Windows, assuming you have installed Python 3.7 in the default location,
 you would use the following in the command prompt (also called a "DOS box"
-or terminal window):
+or terminal window)::
 
     C:\Python37\python graphs.py
 
