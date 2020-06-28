@@ -271,10 +271,9 @@ Building a reduced lattice (Example 6.1 in the 2020 manuscript):
     0 1 0 1 1 0 0 0 0 (1)(24)(3)
     0 0 1 0 1 0 0 0 0 (1)(2)(34)
     0 0 0 0 0 1 1 1 0 (1)(2)(3)(4)
-    >>> for reduced, eta_list in network.reduced_lattices():
+    >>> for reduced in network.reduced_lattices():
     ...     print("Reduction to %i nodes:" % reduced.n)
     ...     print(reduced)  # reduced lattice
-    ...     print("Eta:", eta_list)  # eta for each node in reduction
     ...
     Reduction to 7 nodes:
     0 0 0 0 0 0 0 (1234) eta=1
@@ -284,7 +283,6 @@ Building a reduced lattice (Example 6.1 in the 2020 manuscript):
     0 1 1 0 0 0 0 (12)(3)(4)+(1)(2)(34) eta=0
     0 1 0 1 0 0 0 (1)(24)(3) eta=0
     0 0 0 0 1 1 0 (1)(2)(3)(4) eta=0
-    Eta: [1, 1, 1, 1, 0, 0, 0]
 
 As an alternative, the example function "go" can be used to do this and
 additional output and graph plotting, go(network, "file_name", reduce=True),
@@ -1925,11 +1923,12 @@ class CoupledCellNetwork(object):
         return CoupledCellLattice(*partitions)
 
     def reduced_lattices(self, caption_sep="+", resume_file=None):
-        """Return pairs of reduced lattice & its eta-list.
+        """Return zero or more reduced lattices.
 
-        Will return zero or more pairs, depending how many candidate
-        reductions are found. If the reduced lattice has N nodes, then
-        the eta list has N entries, the lattice index eta for each node.
+        This method implements an alogrithm described in Kamei & Ruan (2020),
+        and returns zero or more candidate lattice reductions. i.e. Smaller
+        lattices created by merging nodes in the lattice constructed as per
+        the alogrithm described in Kamei & Cock (2013).
         """
         if len(self.matrices) > 1:
             raise NotImplementedError("Only one edge type implemented so far!")
@@ -2093,7 +2092,8 @@ class CoupledCellNetwork(object):
                 % ("+".join(cyclic_partition(tmp) for tmp in reduced_nodes[i]), eta[i],)
                 for i in range(new_n)
             ]
-            yield reduced_lattice, eta
+            reduced_lattice.eta = eta  # one value per node
+            yield reduced_lattice
 
     def plot(self, filename):
         """Use this function to produce an image file of the graph.
