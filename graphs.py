@@ -2246,25 +2246,25 @@ if tests.failed:
 
 
 # Example 6.1 Unique reduced lattice (in the 2020 manuscript)
+##network = CoupledCellNetwork(
+##    [
+##        [0, 0, 0, 2],
+##        [0, 0, 0, 2],
+##        [0, 1, 0, 1],
+##        [0, 1, 0, 1],
+##    ]
+##)
+
+
+# Example 6.2 Multiple reduced lattices
 network = CoupledCellNetwork(
     [
         [0, 0, 0, 2],
         [0, 0, 0, 2],
-        [0, 1, 0, 1],
-        [0, 1, 0, 1],
+        [0, 0, 0, 2],
+        [0, 0, 1, 1],
     ]
 )
-
-
-# Example 6.2 Multiple reduced lattices
-# network = CoupledCellNetwork(
-#    [
-#        [0, 0, 0, 2],
-#        [0, 0, 0, 2],
-#        [0, 0, 0, 2],
-#        [0, 0, 1, 1],
-#    ]
-# )
 
 # Example 6.3 Counter example
 # network = CoupledCellNetwork(
