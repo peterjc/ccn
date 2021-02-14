@@ -18,9 +18,9 @@ https://github.com/peterjc/ccn
 The current version (v1.1.0) was extended to construct a reduced lattice, and
 the modified script provided as a supplementary file for the manuscript:
 
-  Hiroko Kamei and Haibo Ruan (2020) "Reduced Lattices of Synchrony Subspaces
+  Hiroko Kamei and Haibo Ruan (2021) "Reduced Lattices of Synchrony Subspaces
   and their Indices", submitted to SIAM Journal on Applied Dynamical Systems
-  (SIADS).
+  (SIADS). https://arxiv.org/abs/2007.07414
 
 You are welcome to use and modify this code provided this copyright notice
 retained, however we request you cite the manuscripts in any scientific
@@ -255,7 +255,7 @@ triangular matrix. Graphically::
 The idea is you can edit the examples in last section of this file to run this
 program on particular networks of interest.
 
-Building a reduced lattice (Example 6.1 in the 2020 manuscript):
+Building a reduced lattice (Example 6.1 in the 2021 manuscript):
 
     >>> network = CoupledCellNetwork([[0, 0, 0, 2],
     ...                               [0, 0, 0, 2],
@@ -1925,7 +1925,7 @@ class CoupledCellNetwork(object):
     def reduced_lattices(self, caption_sep="+", resume_file=None):
         """Return zero or more reduced lattices.
 
-        This method implements an alogrithm described in Kamei & Ruan (2020),
+        This method implements an alogrithm described in Kamei & Ruan (2021),
         and returns zero or more candidate lattice reductions. i.e. Smaller
         lattices created by merging nodes in the lattice constructed as per
         the alogrithm described in Kamei & Cock (2013).
@@ -2241,11 +2241,11 @@ if tests.failed:
 ##########################################################
 
 ##########################################################
-# Reduction examples from the 2020 manuscript and some extra
+# Reduction examples from the 2021 manuscript and some extra
 ##########################################################
 
 
-# Example 6.1 Unique reduced lattice (in the 2020 manuscript)
+# Example 6.1 Unique reduced lattice (in the 2021 manuscript)
 network = CoupledCellNetwork(
     [
         [0, 0, 0, 2],
@@ -2278,17 +2278,17 @@ network = CoupledCellNetwork(
 # )
 
 # 4-cell regular network - partition lattice of 4 elements
-#network = CoupledCellNetwork(
-#   [
-#       [0, 0, 0, 1],
-#       [0, 0, 0, 1],
-#       [0, 0, 0, 1],
-#       [0, 0, 0, 1],
-#       ]
-#)
+# network = CoupledCellNetwork(
+#    [
+#        [0, 0, 0, 1],
+#        [0, 0, 0, 1],
+#        [0, 0, 0, 1],
+#        [0, 0, 0, 1],
+#        ]
+# )
 
 # 5-cell regular network - partition lattice of 5 elements
-#network = CoupledCellNetwork(
+# network = CoupledCellNetwork(
 #    [
 #        [0, 0, 0, 0, 1],
 #        [0, 0, 0, 0, 1],
@@ -2296,7 +2296,7 @@ network = CoupledCellNetwork(
 #        [0, 0, 0, 0, 1],
 #        [0, 0, 0, 0, 1],
 #    ]
-#)
+# )
 
 
 # 7 node lattice post reduction

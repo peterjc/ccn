@@ -18,9 +18,9 @@ https://github.com/peterjc/ccn
 The current version (v1.1.0) was extended to construct a reduced lattice, and
 the modified script provided as a supplementary file for the manuscript:
 
-> Hiroko Kamei and Haibo Ruan (2020) "Reduced Lattices of Synchrony Subspaces
+> Hiroko Kamei and Haibo Ruan (2021) "Reduced Lattices of Synchrony Subspaces
 > and their Indices", submitted to SIAM Journal on Applied Dynamical Systems
-> (SIADS).
+> (SIADS). https://arxiv.org/abs/2007.07414
 
 You are welcome to use and modify this code provided this copyright notice
 retained, however we request you cite the manuscripts in any scientific
