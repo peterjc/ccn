@@ -2145,6 +2145,7 @@ class CoupledCellNetwork(object):
                 % ("+".join(cyclic_partition(tmp) for tmp in reduced_nodes[i]), eta[i],)
                 for i in range(new_n)
             ]
+            reduced_lattice.matrix = q  # adjacency as calculated above
             reduced_lattice.eta = eta  # one value per node
             yield reduced_lattice
 
@@ -2298,6 +2299,16 @@ network = CoupledCellNetwork(
 #    ]
 # )
 
+# 5-cell regular network with 13 possible reductions
+# network = CoupledCellNetwork(
+#    [
+#        [0, 0, 0, 0, 1],
+#        [0, 0, 0, 0, 1],
+#        [0, 1, 0, 0, 0],
+#        [1, 0, 0, 0, 0],
+#        [0, 0, 0, 0, 1],
+#    ]
+# )
 
 # 7 node lattice post reduction
 # network = CoupledCellNetwork(
