@@ -1,7 +1,7 @@
 Algorithm to find balanced equivalence relations and lattices
 =============================================================
 
-Copyright 2010-2020 by Hiroko Kamei & Peter Cock.  All rights reserved.
+Copyright 2010-2021 by Hiroko Kamei & Peter Cock.  All rights reserved.
 This script was provided as a supplementary file for the manuscript:
 
 > Hiroko Kamei and Peter Cock (2013) "Computation of Balanced Equivalence
@@ -53,9 +53,6 @@ In order to draw the graphs or lattices, it requires the free tool GraphViz
 available from http://www.graphviz.org and a small python library to call
 GraphViz called pydot from https://github.com/erocarrera/pydot which in turn
 requires pyparsing from http://sourceforge.net/projects/pyparsing/
-
-Currently pydot has not been updated to work on Python 3, instead you can
-install pydot_ng https://github.com/pydot/pydot-ng
 
 
 Usage
