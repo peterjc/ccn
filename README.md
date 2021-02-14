@@ -2,7 +2,7 @@ Algorithm to find lattices of synchrony subspaces, and their reduced lattices
 =============================================================================
 
 Copyright 2010-2014 by Hiroko Kamei & Peter J. A. Cock.
-Revisions copyright 2014-2022 by Hiroko Kamei, Haibo Ruan, and Peter Cock.
+Revisions copyright 2014-2021 by Hiroko Kamei, Haibo Ruan, and Peter Cock.
 
 The initial version (v1.0.0) was originally published as a supplementary file
 for the manuscript:
