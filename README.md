@@ -12,15 +12,14 @@ for the manuscript:
 > on Applied Dynamical Systems (SIADS) 12(1), pp. 352-382.
 > http://dx.doi.org/10.1137/100819795 http://arxiv.org/abs/1211.6334
 
-Public releases of version (v1.0.0) are available on GitHub, at:
-https://github.com/peterjc/ccn
-
-The current version (v1.1.0) was extended to construct a reduced lattice, and
+The current version (v1.1.0) was extended to construct reduced lattices, and
 the modified script provided as a supplementary file for the manuscript:
 
 > Hiroko Kamei and Haibo Ruan (2021) "Reduced Lattices of Synchrony Subspaces
 > and their Indices", submitted to SIAM Journal on Applied Dynamical Systems
 > (SIADS). https://arxiv.org/abs/2007.07414
+
+Public releases are available on GitHub, at: https://github.com/peterjc/ccn
 
 You are welcome to use and modify this code provided this copyright notice
 retained, however we request you cite the manuscripts in any scientific
@@ -32,7 +31,7 @@ History
 
 | Version | Released   | Description                                         |
 |---------|------------|-----------------------------------------------------|
-| v1.1.0  | *Pending*  | - Lattice reduction algorithm added.                |
+| v1.1.0  | 2021-02-16 | - Lattice reduction algorithm added.                |
 | v1.0.5  | 2019-08-10 | - Adopted black code style.                         |
 |         |            | - Using flake8 to check style etc.                  |
 | v1.0.4  | 2019-08-09 | - Testing Python 3.5 to 3.8 only                    |
