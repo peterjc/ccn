@@ -18,9 +18,10 @@ https://github.com/peterjc/ccn
 The current version (v1.1.0) was extended to construct a reduced lattice, and
 the modified script provided as a supplementary file for the manuscript:
 
-  Hiroko Kamei and Haibo Ruan (2020) "Reduced Lattices of Synchrony Subspaces
-  and their Indices", submitted to SIAM Journal on Applied Dynamical Systems
-  (SIADS).
+  Hiroko Kamei and Haibo Ruan (2021) "Reduced Lattices of Synchrony Subspaces
+  and their Indices", SIAM Journal on Applied Dynamical Systems (SIADS) 20(2),
+  pp. 636-670. https://doi.org/10.1137/20M1348832
+  https://arxiv.org/abs/2007.07414v1
 
 You are welcome to use and modify this code provided this copyright notice
 retained, however we request you cite the manuscripts in any scientific
@@ -321,7 +322,7 @@ import time
 from itertools import product
 
 if "-v" in sys.argv or "--version" in sys.argv:
-    print("Coupled Cell Network graphs.py v1.0.5")
+    print("Coupled Cell Network graphs.py v1.1.0")
     sys.exit(0)
 
 try:

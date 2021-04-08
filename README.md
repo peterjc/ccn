@@ -18,9 +18,10 @@ https://github.com/peterjc/ccn
 The current version (v1.1.0) was extended to construct a reduced lattice, and
 the modified script provided as a supplementary file for the manuscript:
 
-> Hiroko Kamei and Haibo Ruan (2020) "Reduced Lattices of Synchrony Subspaces
-> and their Indices", submitted to SIAM Journal on Applied Dynamical Systems
-> (SIADS).
+> Hiroko Kamei and Haibo Ruan (2021) "Reduced Lattices of Synchrony Subspaces
+> and their Indices", SIAM Journal on Applied Dynamical Systems (SIADS) 20(2),
+> pp. 636-670. https://doi.org/10.1137/20M1348832
+> https://arxiv.org/abs/2007.07414v1
 
 You are welcome to use and modify this code provided this copyright notice
 retained, however we request you cite the manuscripts in any scientific
@@ -32,7 +33,7 @@ History
 
 | Version | Released   | Description                                         |
 |---------|------------|-----------------------------------------------------|
-| v1.1.0  | *Pending*  | - Lattice reduction algorithm added.                |
+| v1.1.0  | 2021-04-08 | - Lattice reduction algorithm added.                |
 | v1.0.5  | 2019-08-10 | - Adopted black code style.                         |
 |         |            | - Using flake8 to check style etc.                  |
 | v1.0.4  | 2019-08-09 | - Testing Python 3.5 to 3.8 only                    |
