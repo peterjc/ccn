@@ -12,9 +12,6 @@ for the manuscript:
 > on Applied Dynamical Systems (SIADS) 12(1), pp. 352-382.
 > http://dx.doi.org/10.1137/100819795 http://arxiv.org/abs/1211.6334
 
-Public releases of version (v1.0.0) are available on GitHub, at:
-https://github.com/peterjc/ccn
-
 The current version (v1.1.0) was extended to construct a reduced lattice, and
 the modified script provided as a supplementary file for the manuscript:
 
@@ -22,6 +19,8 @@ the modified script provided as a supplementary file for the manuscript:
 > and their Indices", SIAM Journal on Applied Dynamical Systems (SIADS) 20(2),
 > pp. 636-670. https://doi.org/10.1137/20M1348832
 > https://arxiv.org/abs/2007.07414v1
+
+Public releases are available on GitHub, at https://github.com/peterjc/ccn
 
 You are welcome to use and modify this code provided this copyright notice
 retained, however we request you cite the manuscripts in any scientific
