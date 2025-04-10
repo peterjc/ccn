@@ -362,7 +362,7 @@ def bell_number(n):
     lambda_1 (valency) and lambda_2, where the geometric multiplicity of lambda_2
     is the same as the algebraic multiplicity of lambda_2.
     """
-    bell = np.zeros((n + 1, n + 1), np.int)
+    bell = np.zeros((n + 1, n + 1), int)
     bell[0, 0] = 1
 
     for i in range(n):
@@ -444,17 +444,17 @@ def make_quotient(adj_matrix, partition):
 
     # Take column sums to go from n by n matrix to n by k matrix,
     q_matrix_step_1 = np.zeros([n, k], np.uint8)
-    for (old_col, new_col) in enumerate(partition):
+    for old_col, new_col in enumerate(partition):
         q_matrix_step_1[:, new_col] += adj_matrix[:, old_col].astype(np.uint8)
     # Take representative rows to go from n by k matrix to k by k matrix,
     # note that we needlessly over-write n-k of the rows (simpler to just
     # do it rather than checking as it doesn't matter).
     q_matrix_step_2 = np.zeros([k, k], np.uint8)
-    for (old_row, new_row) in enumerate(partition):
+    for old_row, new_row in enumerate(partition):
         q_matrix_step_2[new_row, :] = q_matrix_step_1[old_row, :]
     # Check that all the merged rows agreed (by comparing them to the
     # representative row picked above):
-    for (old_row, new_row) in enumerate(partition):
+    for old_row, new_row in enumerate(partition):
         # NumPy's == gives element wise equality, giving k True/False values
         # We use the .all() to check if they are all True, thus all equal.
         if not (q_matrix_step_2[new_row, :] == q_matrix_step_1[old_row, :]).all():
@@ -491,7 +491,7 @@ def make_reduced_lattice_eigenvalue_matrix(adj_matrix, partition):
 
     # Take column 'sums' to go from n by n matrix to n by k matrix,
     q_matrix_step_1 = np.zeros([n, k], np.uint8)
-    for (old_col, new_col) in enumerate(partition):
+    for old_col, new_col in enumerate(partition):
         for row in range(n):
             if adj_matrix[row, old_col] == 0:
                 pass
@@ -503,11 +503,11 @@ def make_reduced_lattice_eigenvalue_matrix(adj_matrix, partition):
     # note that we needlessly over-write n-k of the rows (simpler to just
     # do it rather than checking as it doesn't matter).
     q_matrix_step_2 = np.zeros([k, k], np.uint8)
-    for (old_row, new_row) in enumerate(partition):
+    for old_row, new_row in enumerate(partition):
         q_matrix_step_2[new_row, :] = q_matrix_step_1[old_row, :]
     # Check that all the merged rows agreed (by comparing them to the
     # representative row picked above):
-    for (old_row, new_row) in enumerate(partition):
+    for old_row, new_row in enumerate(partition):
         if not (q_matrix_step_2[new_row, :] == q_matrix_step_1[old_row, :]).all():
             raise ValueError("Not a valid lattice reduction")
     return q_matrix_step_2
@@ -2143,7 +2143,10 @@ class CoupledCellNetwork(object):
             assert reduced_lattice.n == new_n, reduced_lattice
             reduced_lattice.captions = [
                 "%s eta=%s"
-                % ("+".join(cyclic_partition(tmp) for tmp in reduced_nodes[i]), eta[i],)
+                % (
+                    "+".join(cyclic_partition(tmp) for tmp in reduced_nodes[i]),
+                    eta[i],
+                )
                 for i in range(new_n)
             ]
             reduced_lattice.eta = eta  # one value per node
@@ -2205,8 +2208,7 @@ class CoupledCellNetwork(object):
 
         if len(self.matrices) > len(LINE_COLOR_STYLES):
             raise ValueError(
-                "Too many edge types, define some more valid "
-                "graphviz styles or colors!"
+                "Too many edge types, define some more valid graphviz styles or colors!"
             )
 
         # Now that we have added all the nodes, we can do the edges:
@@ -2279,17 +2281,17 @@ network = CoupledCellNetwork(
 # )
 
 # 4-cell regular network - partition lattice of 4 elements
-#network = CoupledCellNetwork(
+# network = CoupledCellNetwork(
 #   [
 #       [0, 0, 0, 1],
 #       [0, 0, 0, 1],
 #       [0, 0, 0, 1],
 #       [0, 0, 0, 1],
 #       ]
-#)
+# )
 
 # 5-cell regular network - partition lattice of 5 elements
-#network = CoupledCellNetwork(
+# network = CoupledCellNetwork(
 #    [
 #        [0, 0, 0, 0, 1],
 #        [0, 0, 0, 0, 1],
@@ -2297,7 +2299,7 @@ network = CoupledCellNetwork(
 #        [0, 0, 0, 0, 1],
 #        [0, 0, 0, 0, 1],
 #    ]
-#)
+# )
 
 
 # 7 node lattice post reduction
