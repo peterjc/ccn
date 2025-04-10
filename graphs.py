@@ -1287,7 +1287,7 @@ class CoupledCellLattice(object):
         # Now get the graph object to write itself to an image file.
         try:
             g.write(filename, prog="dot", format=extension)
-        except pydot.InvocationException:
+        except FileNotFoundError:
             sys.stderr.write("Please check graphviz is installed\n")
 
 
@@ -2229,7 +2229,7 @@ class CoupledCellNetwork(object):
         # Now get the graph object to write itself to an image file.
         try:
             g.write(filename, prog="dot", format=extension)
-        except pydot.InvocationException:
+        except FileNotFoundError:
             sys.stderr.write("Please check graphviz is installed\n")
 
 
