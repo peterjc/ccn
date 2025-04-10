@@ -100,10 +100,10 @@ Testing
 The graphs.py script includes its own basic self tests, run automatically when
 you execute `python graphs.py` on your computer.
 
-[![Build Status](https://secure.travis-ci.org/peterjc/ccn.png?branch=master)](https://travis-ci.org/peterjc/ccn)
+[![Build Status](https://github.com/github/docs/actions/workflows/test.yml/badge.svg)](https://github.com/peterjc/ccn/actions)
 
 These tests are also run automatically whenever changes are uploaded to this
-repository using TravisCI, a continuous testing service.
+repository using GitHub Actions, a continuous testing service.
 
 
 Introduction
