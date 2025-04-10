@@ -1,4 +1,5 @@
-Copyright 2010-2012 by Hiroko Kamei & Peter J. A. Cock.  All rights reserved.
+Copyright 2010-2014 by Hiroko Kamei & Peter J. A. Cock.  All rights reserved.
+Revisions copyright 2014-2022 by Hiroko Kamei, Haibo Ruan, and Peter Cock.
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are met:
