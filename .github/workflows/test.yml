@@ -1,0 +1,36 @@
+name: test
+
+on: [push, pull_request]
+
+jobs:
+  run-tests:
+    runs-on: ${{ matrix.os }}
+    defaults:
+      run:
+        shell: bash
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [windows-latest, macos-latest, ubuntu-latest]
+        python-version: ["3.8", "3.9", "3.10", "3.11", "3.12", "3.13"]
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: Git configuration
+      run: |
+        git config core.autocrlf false
+        git reset --hard
+    - name: Code style
+      run: |
+        pip install flake8 flake8-black black flake8-comprehensions flake8-blind-except flake8-bugbear flake8-docstrings flake8-rst-docstrings
+        flake8 .
+    - name: Dependencies
+      run: |
+        pip install build numpy pydot pyparsing
+    - name: Run tests
+      run: |
+        python graphs.py
+
