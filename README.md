@@ -12,7 +12,7 @@ for the manuscript:
 > on Applied Dynamical Systems (SIADS) 12(1), pp. 352-382.
 > http://dx.doi.org/10.1137/100819795 http://arxiv.org/abs/1211.6334
 
-The current version (v1.1.0) was extended to construct a reduced lattice, and
+The minor version (v1.1.0) was extended to construct a reduced lattice, and
 the modified script provided as a supplementary file for the manuscript:
 
 > Hiroko Kamei and Haibo Ruan (2021) "Reduced Lattices of Synchrony Subspaces
@@ -32,6 +32,7 @@ History
 
 | Version | Released   | Description                                         |
 |---------|------------|-----------------------------------------------------|
+| v1.1.1  | 2025-04-10 | - Updates for numpy and pydot dependencies.         |
 | v1.1.0  | 2021-04-08 | - Lattice reduction algorithm added.                |
 | v1.0.5  | 2019-08-10 | - Adopted black code style.                         |
 |         |            | - Using flake8 to check style etc.                  |
@@ -52,21 +53,17 @@ Requirements
 ------------
 
 This script requires Python 3. Python is pre-installed on Apple Mac OS X and
-Linux, but you may have to explicitly use `python3` rather than just `python`
-if the default is still Python 2.  On Windows you can install Python using an
-installer from http://www.python.org.
+Linux. On Windows you can install Python using an installer from
+https://www.python.org.
 
-It requires NumPy (Numerical Python), available from http://numpy.scipy.org
+It requires NumPy (Numerical Python), available from https://numpy.org
 This is used for array support, in particular matrix multiplication. This
 should work with NumPy 1.6 or later.
 
 In order to draw the graphs or lattices, it requires the free tool GraphViz
 available from http://www.graphviz.org and a small python library to call
 GraphViz called pydot from https://github.com/erocarrera/pydot which in turn
-requires pyparsing from http://sourceforge.net/projects/pyparsing/
-
-Currently pydot has not been updated to work on Python 3, instead you can
-install pydot_ng https://github.com/pydot/pydot-ng
+requires pyparsing from https://github.com/pyparsing/pyparsing
 
 
 Usage
@@ -78,11 +75,11 @@ this code by typing:
 
     python graphs.py
 
-On Windows, assuming you have installed Python 3.7 in the default location,
+On Windows, assuming you have installed Python 3.9 in the default location,
 you would use the following in the command prompt (also called a "DOS box"
 or terminal window):
 
-    C:\Python37\python graphs.py
+    C:\Python39\python graphs.py
 
 The script should then run, printing output to the screen, and (assuming the
 GraphViz requirements are installed) also generate a number of image files.
