@@ -2016,7 +2016,7 @@ class CoupledCellNetwork(object):
 
         PLACES = 6  # Used for fuzzy matching of eigenvalues
         all_eigen = sorted(
-            round(e, PLACES) for e in np.linalg.eigvals(self.matrices[0])
+            np.round(e, PLACES) for e in np.linalg.eigvals(self.matrices[0])
         )
         unique_eigen = sorted(set(all_eigen), key=lambda c: (c.real, c.imag))
 
@@ -2031,7 +2031,9 @@ class CoupledCellNetwork(object):
 
         eigenvalues = []
         for q in quotients:
-            evals = sorted(round(e, PLACES) for e in np.linalg.eigvals(q.matrices[0]))
+            evals = sorted(
+                np.round(e, PLACES) for e in np.linalg.eigvals(q.matrices[0])
+            )
             for e in evals:
                 assert e in all_eigen
                 assert evals.count(e) <= all_eigen.count(e)
