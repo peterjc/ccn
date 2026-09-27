@@ -32,17 +32,24 @@ History
 
 | Version | Released   | Description                                         |
 |---------|------------|-----------------------------------------------------|
+| v1.1.2  | 2026-09-27 | - Fix for rounding complex numbers with numpy 2.5.  |
+|         |            | - Tested on Python 3.8 to 3.15.                     |
 | v1.1.1  | 2025-04-10 | - Updates for numpy and pydot dependencies.         |
+|         |            | - Tested on Python 3.8 to 3.13.                     |
 | v1.1.0  | 2021-04-08 | - Lattice reduction algorithm added.                |
+|         |            | - Tested on Python 3.6 to 3.8.                      |
 | v1.0.5  | 2019-08-10 | - Adopted black code style.                         |
 |         |            | - Using flake8 to check style etc.                  |
-| v1.0.4  | 2019-08-09 | - Testing Python 3.5 to 3.8 only                    |
-|         |            | - Dropped Python 2 support.                         |
+|         |            | - Tested on Python 3.6 to 3.8.                      |
+| v1.0.4  | 2019-08-09 | - Dropped Python 2 support.                         |
 |         |            | - Fixed casting 'int64' to 'uint8' on recent numpy. |
+|         |            | - Tested on Python 3.5 to 3.8.                      |
 | v1.0.3  | 2015-09-28 | - Minor coding style updates.                       |
 |         |            | - Can use pydot_ng as Python 3 pydot alternative.   |
 |         |            | - Fix for graphical output under Python 3.          |
+|         |            | - Tested on Python 2.6, 2.7 and 3.2 to 3.5.         |
 | v1.0.2  | 2014-12-02 | - Made the Python script executable; fixed typo.    |
+|         |            | - Tested on Python 2.6, 2.7 and 3.2 to 3.4.         |
 | v1.0.1  | 2014-05-10 | - Dropped support for Python 2.4 and 2.5            |
 |         |            | - Supported Python 2.6, 2.7 and 3.2, 3.3, 3.4.      |
 | v1.0.0  | 2012-11-04 | - Supported Python 2.4, 2.5, 2.6, 2.7 directly.     |
