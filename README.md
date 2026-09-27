@@ -146,15 +146,15 @@ be typed as a nested list of integers:
 The printed output shows the adjacency matrix on the left (5 by 5) with the
 node captions on the right.
 
-To handle typical usage there is a go() function provided which will print the
-matrix, draw it (if GraphViz is setup), compute the lattice, print it, and
-draw it. Just pass a CoupledCellNetwork object to the go function with a name
-(a string), e.g. go(network7, "n7")
+To handle typical usage there is a `go()` function provided which will print
+the matrix, draw it (if GraphViz is setup), compute the lattice, print it,
+and draw it. Just pass a `CoupledCellNetwork` object to the `go` function
+with a name (a string), e.g. `go(network7, "n7")`
 
 We will now briefly explain some of the details here, in case you want to
-modify this.  To obtain the network as an image file, assuming GraphViz etc is
-setup, use network7.plot(filename), where the filename can end with ".png",
-".pdf", etc. For instance, network7.plot("n7.pdf")
+modify this.  To obtain the network as an image file, assuming GraphViz etc
+is setup, use `network7.plot(filename)`, where the filename can end with
+`".png"`, `".pdf"`, etc. For instance, `network7.plot("n7.pdf")`
 
 The network object has a method to calculate those cell partitions which are
 balanced equivalence relations (balanced colourings):
@@ -186,10 +186,10 @@ six nodes, listed on the right of the output in cyclic notation) which is
 shown on the left as a lower triangular matrix. Rather than being drawn as a
 directed graph with arrows, it is conventional to use lattice diagrams with
 undirected edges with the directionality of the partition cover relationship
-implicit in the vertical placement of the nodes. To obtain the lattice diagram
-as an image file, assuming GraphViz etc is setup, use lattice7.plot(filename),
-e.g lattice7.plot("n7_lattice.pdf") for a PDF file. Here is a simple text
-graphic of this lattice diagram:
+implicit in the vertical placement of the nodes. To obtain the lattice
+diagram as an image file, assuming GraphViz etc is setup, use
+`lattice7.plot(filename)`, e.g `lattice7.plot("n7_lattice.pdf")` for a PDF
+file. Here is a simple text graphic of this lattice diagram:
 
     *--------------------------------------*
     |                                      |
@@ -210,7 +210,7 @@ graphic of this lattice diagram:
     *--------------------------------------*
 
 For a multiple edge type example, consider this inhomogeneous version of the
-previous network, with two edge types (Graph #3 in the manuscript), where edge
+previous network, with two edge types (Graph #3 in the manuscript). Here edge
 type one (single thickness) arrows run from node 1 to 5, 1 to 2 and 3 to 4,
 and edge type two (dotted) arrows run from node 4 to 1 and from 2 to 3.
 
@@ -245,11 +245,11 @@ edge types):
     (1,0) (0,0) (0,0) (0,0) (0,0) node 5
 
 When printed as shown above, the network adjacency matrix is represented as a
-single combined matrix where each element shows the edge types, e.g. (1,0) for
-one edge of the first type, no edges of the second type. Internally however
-the data remains as two separate matrices. The network object works just the
-same as before, for example notice how there are only 4 balanced equivalence
-relations (compared to the regular network #7 used above with 6):
+single combined matrix where each element shows the edge types, e.g. `(1,0)`
+for one edge of the first type, no edges of the second type. Internally
+however the data remains as two separate matrices. The network object works
+just the same as before, for example notice how there are only 4 balanced
+equivalence relations (compared to the regular network #7 used above with 6):
 
     >>> for p in network3.partitions():
     ...     print "%r or %s" % (p, cyclic_partition(p))
@@ -296,7 +296,8 @@ triangular matrix. Graphically:
     |                                      |
     *--------------------------------------*
 
-The idea is you can edit the examples in last section of the graphs.py file to
-run this program on particular networks of interest. In the long term if the
-tool is extended, restructuring this into a typical Python library would be
-sensible. For now however, a single self contained Python file was simplest.
+The idea is you can edit the examples in last section of the `graphs.py` file
+to run this program on particular networks of interest. In the long term if
+the tool is extended, restructuring this into a typical Python library would
+be sensible. For now however, a single self contained Python file is
+simplest.
