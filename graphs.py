@@ -662,7 +662,7 @@ def possible_partition_refinements(top):
     finding all possible balanced colourings. Given the top lattice
     node via the Aldis (2008) / Belykh and Hasler (2011) algorithm
     or otherwise, all the other latticed nodes (balanced colourings)
-    will be partitions which are refinements of the top node patition.
+    will be partitions which are refinements of the top node partition.
 
     For example, consider 4 nodes and their partitions:
 
@@ -1690,7 +1690,7 @@ class CoupledCellNetwork(object):
         """
         top = self.top_lattice_node()[0]
         if top == [0] * self.n:
-            # Trival top node, this is faster:
+            # Trivial top node, this is faster:
             partitions = possible_partitions(self.n)
         else:
             partitions = possible_partition_refinements(top)
@@ -1731,7 +1731,7 @@ class CoupledCellNetwork(object):
                 if not done:
                     h = open_file(resume_file, "at")
             else:
-                # print("Checkpointing in %s" % resume_file)
+                # print("Check pointing in %s" % resume_file)
                 h = open_file(resume_file, "wt")
                 h.write("%r\n" % self)
             if not done:
@@ -1824,14 +1824,14 @@ class CoupledCellNetwork(object):
                 if not done:
                     h = open_file(resume_file, "at")
             else:
-                # print("Checkpointing in %s" % resume_file)
+                # print("Check pointing in %s" % resume_file)
                 h = open_file(resume_file, "wt")
                 h.write("%r\n" % self)
             if not done:
                 # TODO - Jump the known partitions from the file?
                 top = self.top_lattice_node()[0]
                 if top == [0] * self.n:
-                    # Trival top node, this is faster:
+                    # Trivial top node, this is faster:
                     partitions = possible_partitions(self.n)
                 else:
                     partitions = possible_partition_refinements(top)
@@ -1859,7 +1859,7 @@ class CoupledCellNetwork(object):
     def lattice(self, caption_sep="+", resume_file=None):
         r"""Find balanced equivalence relations and build lattice.
 
-        This method implements an alogrithm described in Kamei & Cock (2013).
+        This method implements an algorithm described in Kamei & Cock (2013).
         Consider graph #5 from that paper, which has two edge types:
 
         >>> e1 = [[0,1,0,1,0],
@@ -1924,10 +1924,10 @@ class CoupledCellNetwork(object):
     def reduced_lattices(self, caption_sep="+", resume_file=None):
         """Return zero or more reduced lattices.
 
-        This method implements an alogrithm described in Kamei & Ruan (2020),
+        This method implements an algorithm described in Kamei & Ruan (2020),
         and returns zero or more candidate lattice reductions. i.e. Smaller
         lattices created by merging nodes in the lattice constructed as per
-        the alogrithm described in Kamei & Cock (2013).
+        the algorithm described in Kamei & Cock (2013).
 
         In an ideal case there will be a single unique reduction. In this
         example a seven node lattice has a unique six node reduction:
@@ -2233,7 +2233,7 @@ class CoupledCellNetwork(object):
             sys.stderr.write("Please check graphviz is installed\n")
 
 
-print("Runing self-tests...")
+print("Running self-tests...")
 
 tests = doctest.testmod()
 if tests.failed:
