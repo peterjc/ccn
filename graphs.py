@@ -3,6 +3,7 @@ r"""Algorithm to find lattices of synchrony subspaces & their reduced lattices.
 
 Copyright 2010-2014 by Hiroko Kamei & Peter J. A. Cock.
 Revisions copyright 2014-2022 by Hiroko Kamei, Haibo Ruan, and Peter Cock.
+Revisions copyright 2023-2026 by Peter Cock.
 
 The initial version (v1.0.0) was originally published as a supplementary file
 for the manuscript:
@@ -12,11 +13,11 @@ for the manuscript:
   on Applied Dynamical Systems (SIADS) 12(1), pp. 352-382.
   http://dx.doi.org/10.1137/100819795 http://arxiv.org/abs/1211.6334
 
-Public releases of version (v1.0.0) are available on GitHub, at:
-https://github.com/peterjc/ccn
+This and subsequent revisions are available at https://github.com/peterjc/ccn
+(GitHub repository).
 
-The current version (v1.1.0) was extended to construct a reduced lattice, and
-the modified script provided as a supplementary file for the manuscript:
+For v1.1.0, this was extended to construct a reduced lattice, and the
+modified script provided as a supplementary file for the manuscript:
 
   Hiroko Kamei and Haibo Ruan (2021) "Reduced Lattices of Synchrony Subspaces
   and their Indices", SIAM Journal on Applied Dynamical Systems (SIADS) 20(2),
