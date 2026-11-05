@@ -569,13 +569,11 @@ def possible_partitions(n):
     [0, 1, 2, 2]
     [0, 1, 2, 3]
 
-    In this example we have five partitions: All three nodes merged ([0,0,0]),
-    two cases where two nodes are merged, and the other trivial case of no
-    nodes merged ([0,1,2]).
-
-    Note that this outputs [0, 1, 1], but not [1, 0, 0] which is a different
-    representation of the same node partition. The choice is arbitrary, but
-    was made since Python considers [0, 1, 1] < [1, 0, 0].
+    In this example we have 15 partitions: All four nodes merged ([0,0,0,0]),
+    seven cases where the nodes are merged into two classes (eg [0,1,1,1]
+    or [0,0,1,1]), six cases where only two nodes are merged giving three
+    classes (eg [0,0,1,2] or [0,1,2,2]), and the other trivial case of no
+    nodes merged ([0,1,2,3]).
     """
     # This is a recursive function
     if n < 1:
