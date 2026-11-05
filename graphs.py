@@ -1735,8 +1735,6 @@ class CoupledCellNetwork(object):
                 h = open_file(resume_file, "wt")
                 h.write("%r\n" % self)
             if not done:
-                # TODO - Jump the known partitions from the file?
-                # i.e. avoid rechecking they are balanced
                 for partition in partitions:
                     if not last_good_partition:
                         try:
@@ -1748,6 +1746,7 @@ class CoupledCellNetwork(object):
                             pass
                     elif partition == last_good_partition:
                         last_good_partition = None
+                    # else it was an early partition already considered
                 h.write("DONE\t%i\n" % count)
                 h.close()
             # All done
