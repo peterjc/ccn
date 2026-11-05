@@ -535,7 +535,7 @@ def possible_partitions(n):
     [0, 1, 2]
 
     In this example we have five partitions: All three nodes merged ([0,0,0]),
-    two cases where two nodes are merged, and the other trivial case of no
+    three cases where two nodes are merged, and the other trivial case of no
     nodes merged ([0,1,2]).
 
     Note that this outputs [0, 1, 1], but not [1, 0, 0] which is a different
