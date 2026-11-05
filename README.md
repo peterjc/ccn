@@ -34,7 +34,8 @@ History
 
 | Version | Released   | Description                                         |
 |---------|------------|-----------------------------------------------------|
-| *TBC*   | *Pending*  | - Tested on Python 3.10 to 3.15.                    |
+| v1.1.3  | *Pending*  | - Fix for (undocumented) resume_file functionality. |
+|         |            | - Tested on Python 3.10 to 3.15.                    |
 | v1.1.2  | 2026-09-27 | - Fix for rounding complex numbers with numpy 2.5.  |
 |         |            | - Tested on Python 3.8 to 3.15.                     |
 | v1.1.1  | 2025-04-10 | - Updates for numpy and pydot dependencies.         |

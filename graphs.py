@@ -317,13 +317,14 @@ In general there will be zero or more candidate reductions returned.
 """
 
 import doctest
+import gzip
 import os
 import sys
 import time
 from itertools import product
 
 if "-v" in sys.argv or "--version" in sys.argv:
-    print("Coupled Cell Network graphs.py v1.1.2")
+    print("Coupled Cell Network graphs.py v1.1.3")
     sys.exit(0)
 
 try:
@@ -346,6 +347,13 @@ except ImportError:
 
 
 MAXLAT = 42294  # Increase this if you have a big powerful computer and are patient ;)
+
+
+def open_file(filename, mode):
+    """Open a possibly GZIPPED file."""
+    return (
+        gzip.open(filename, mode) if filename.endswith(".gz") else open(filename, mode)
+    )
 
 
 class NotBalancedError(ValueError):
@@ -945,7 +953,7 @@ def make_partition(classifiers):
     return partition
 
 
-def go(a, name="", format="png", top_only=False, reduce=False):
+def go(a, name="", format="png", top_only=False, reduce=False, resume_file=None):
     """Take a graph, draw it, then print and draw the lattice.
 
     Given a CoupledCellNetwork object (and an optional name for it), it shows
@@ -999,7 +1007,7 @@ def go(a, name="", format="png", top_only=False, reduce=False):
         # the a.quotients_with_partitions() method or similar if you didn't
         # want the lattice).
         start = time.time()
-        lattice = a.lattice()
+        lattice = a.lattice(resume_file=resume_file)
         taken = time.time() - start
         for p in lattice.partitions:
             print("")
@@ -1701,12 +1709,7 @@ class CoupledCellNetwork(object):
             last_good_partition = None
             if os.path.isfile(resume_file):
                 # print("Resuming from %s" % resume_file)
-                if resume_file.endswith(".gz"):
-                    import gzip
-
-                    h = gzip.open(resume_file)
-                else:
-                    h = open(resume_file, "rU")
+                h = open_file(resume_file, "rt")
                 a = h.readline()
                 assert a.strip() == repr(self)
                 for line in h:
@@ -1726,10 +1729,10 @@ class CoupledCellNetwork(object):
                         break
                 h.close()
                 if not done:
-                    h = open(resume_file, "a")
+                    h = open_file(resume_file, "at")
             else:
                 # print("Checkpointing in %s" % resume_file)
-                h = open(resume_file, "w")
+                h = open_file(resume_file, "wt")
                 h.write("%r\n" % self)
             if not done:
                 # TODO - Jump the known partitions from the file?
@@ -1800,14 +1803,9 @@ class CoupledCellNetwork(object):
             last_good_partition = None
             if os.path.isfile(resume_file):
                 # print("Resuming from %s" % resume_file)
-                if resume_file.endswith(".gz"):
-                    import gzip
-
-                    h = gzip.open(resume_file)
-                else:
-                    h = open(resume_file, "rU")
+                h = open_file(resume_file, "rt")
                 a = h.readline()
-                assert a.strip() == repr(self)
+                assert a.strip() == repr(self), f"{a.strip()} vs {repr(self)}"
                 for line in h:
                     if line[0] == "[" and line[-2:] == "]\n":
                         last_good_partition = [
@@ -1825,10 +1823,10 @@ class CoupledCellNetwork(object):
                         break
                 h.close()
                 if not done:
-                    h = open(resume_file, "a")
+                    h = open_file(resume_file, "at")
             else:
                 # print("Checkpointing in %s" % resume_file)
-                h = open(resume_file, "w")
+                h = open_file(resume_file, "wt")
                 h.write("%r\n" % self)
             if not done:
                 # TODO - Jump the known partitions from the file?
