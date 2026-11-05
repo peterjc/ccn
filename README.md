@@ -3,24 +3,26 @@ Algorithm to find lattices of synchrony subspaces, and their reduced lattices
 
 Copyright 2010-2014 by Hiroko Kamei & Peter J. A. Cock.
 Revisions copyright 2014-2022 by Hiroko Kamei, Haibo Ruan, and Peter Cock.
+Revisions copyright 2023-2026 by Peter Cock.
 
 The initial version (v1.0.0) was originally published as a supplementary file
 for the manuscript:
 
-> Hiroko Kamei and Peter Cock (2013) "Computation of Balanced Equivalence
-> Relations and their Lattice for a Coupled Cell Network", SIAM Journal
-> on Applied Dynamical Systems (SIADS) 12(1), pp. 352-382.
-> http://dx.doi.org/10.1137/100819795 http://arxiv.org/abs/1211.6334
+  Hiroko Kamei and Peter Cock (2013) "Computation of Balanced Equivalence
+  Relations and their Lattice for a Coupled Cell Network", SIAM Journal
+  on Applied Dynamical Systems (SIADS) 12(1), pp. 352-382.
+  http://dx.doi.org/10.1137/100819795 http://arxiv.org/abs/1211.6334
 
-The minor version (v1.1.0) was extended to construct a reduced lattice, and
-the modified script provided as a supplementary file for the manuscript:
+This and subsequent revisions are available at https://github.com/peterjc/ccn
+(GitHub repository).
 
-> Hiroko Kamei and Haibo Ruan (2021) "Reduced Lattices of Synchrony Subspaces
-> and their Indices", SIAM Journal on Applied Dynamical Systems (SIADS) 20(2),
-> pp. 636-670. https://doi.org/10.1137/20M1348832
-> https://arxiv.org/abs/2007.07414v1
+For v1.1.0, this was extended to construct a reduced lattice, and the
+modified script provided as a supplementary file for the manuscript:
 
-Public releases are available on GitHub, at https://github.com/peterjc/ccn
+  Hiroko Kamei and Haibo Ruan (2021) "Reduced Lattices of Synchrony Subspaces
+  and their Indices", SIAM Journal on Applied Dynamical Systems (SIADS) 20(2),
+  pp. 636-670. https://doi.org/10.1137/20M1348832
+  https://arxiv.org/abs/2007.07414v1
 
 You are welcome to use and modify this code provided this copyright notice
 retained, however we request you cite the manuscripts in any scientific
@@ -32,6 +34,7 @@ History
 
 | Version | Released   | Description                                         |
 |---------|------------|-----------------------------------------------------|
+| *TBC*   | *Pending*  | - Tested on Python 3.10 to 3.15.                    |
 | v1.1.2  | 2026-09-27 | - Fix for rounding complex numbers with numpy 2.5.  |
 |         |            | - Tested on Python 3.8 to 3.15.                     |
 | v1.1.1  | 2025-04-10 | - Updates for numpy and pydot dependencies.         |
